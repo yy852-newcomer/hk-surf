@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="??????????????5????????????????????">
+  <title>??????? & ????? (HK Surf)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&family=JetBrains+Mono:wght@700;900&display=swap');
+    
+    * { 
+      box-sizing: border-box; 
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    html, body {
+      margin: 0; padding: 0;
+      width: 100vw; height: 100vh;
+      overflow: hidden; /* ??????? */
+      background-color: #ffffff; color: #000000;
+      font-family: 'Noto Sans TC', sans-serif;
+      user-select: none;
+      touch-action: pan-y pinch-zoom;
+    }
+
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* ?? 6 ????????????????? */
+    .screen-container {
+      width: 100vw; 
+      height: 100vh;
+      max-width: 520px; 
+      margin: 0 auto;
+      padding: 6px 8px 4px 8px;
+      display: flex; 
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 3px;
+      position: relative;
+    }
+
+    /* ???????????? */
+    .ink-b { border: 2px solid #000000; }
+    .ink-b-b { border-bottom: 2px solid #000000; }
+    .ink-b-r { border-right: 2px solid #000000; }
+    .ink-b-t { border-top: 2px solid #000000; }
+
+    /* ?????? (Night / Inverted E-Ink) */
+    .inverted { background-color: #000000 !important; color: #ffffff !important; }
+    .inverted .ink-b, .inverted .ink-b-b, .inverted .ink-b-r, .inverted .ink-b-t { border-color: #ffffff !important; }
+    .inverted .bg-white { background-color: #000000 !important; color: #ffffff !important; }
+    .inverted .bg-black { background-color: #ffffff !important; color: #000000 !important; }
+    .inverted .text-black { color: #ffffff !important; }
+    .inverted .text-white { color: #000000 !important; }
+    .inverted .border-black { border-color: #ffffff !important; }
+    .inverted .border-white { border-color: #000000 !important; }
+    .inverted .stats-cell { background-color: #000000 !important; border-color: #ffffff !important; color: #ffffff !important; }
+    .inverted .stats-cell.active-day { background-color: #ffffff !important; color: #000000 !important; }
+    .inverted .f-mini-cell { border-color: #ffffff !important; color: #ffffff !important; }
+    .inverted .f-mini-cell.active-f { background-color: #ffffff !important; color: #000000 !important; }
+    .inverted .spot-dot.active { background-color: #ffffff !important; }
+    .inverted .spot-dot { border-color: #ffffff !important; }
+
+    /* 5 ????????????? */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 2px;
+      width: 100%;
+      height: 100%;
+    }
+
+    .stats-cell {
+      border: 1px solid #000000;
+      background-color: #ffffff;
+      padding: 1px 1px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      min-height: 0;
+    }
+
+    .stats-cell.active-day {
+      background-color: #000000;
+      color: #ffffff;
+    }
+
+    /* 5 ????????? (5 ???) */
+    .f-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 2px;
+      width: 100%;
+    }
+    .f-mini-cell {
+      border: 1px solid #000000;
+      padding: 2px 1px;
+      text-align: center;
+      font-size: 8px;
+      line-height: 1.15;
+    }
+    .f-mini-cell.active-f {
+      background-color: #000000;
+      color: #ffffff;
+      font-weight: 900;
+    }
+
+    /* ??????? */
+    .spot-dot {
+      width: 5px;
+      height: 5px;
+      border: 1px solid #000000;
+      border-radius: 9999px;
+      display: inline-block;
+      transition: background-color 0.15s ease;
+    }
+    .spot-dot.active {
+      background-color: #000000;
+    }
+  </style>
+</head>
+<body>
+
+<div class="screen-container" id="mainContainer">
+
+  <!-- 1. ??????????????????????????? 12 ?? AM/PM ?? (?????????) -->
+  <header class="flex justify-between items-center shrink-0 pt-0.5">
+    <div class="flex flex-col gap-1">
+      <div class="flex items-center gap-1.5">
+        <!-- ???????????? (?? HK SURF ????) -->
+        <div class="inline-flex items-center bg-black text-white px-1.5 py-0.5 text-xs font-black tracking-wider select-none">
+          <button onclick="prevSpot()" class="px-0.5 text-[9px] hover:opacity-75 cursor-pointer" title="?????" aria-label="?????">?</button>
+          <span class="mx-1 cursor-pointer" onclick="nextSpot()">HK SURF</span>
+          <button onclick="nextSpot()" class="px-0.5 text-[9px] hover:opacity-75 cursor-pointer" title="?????" aria-label="?????">?</button>
+        </div>
+        
+        <!-- 3 ??????????? -->
+        <div class="flex items-center gap-1 px-0.5" id="spotDots">
+          <span class="spot-dot active" onclick="switchSpot(0)" title="???"></span>
+          <span class="spot-dot" onclick="switchSpot(1)" title="?????"></span>
+          <span class="spot-dot" onclick="switchSpot(2)" title="?????"></span>
+        </div>
+
+        <button onclick="toggleTheme()" title="??????" aria-label="????" class="ink-b px-1.5 py-0.5 text-[11px] font-bold active:bg-black active:text-white cursor-pointer"><i class="fa-solid fa-circle-half-stroke"></i></button>
+        <button onclick="fetchAllData()" title="??????" aria-label="????" class="ink-b px-1.5 py-0.5 text-[11px] font-bold active:bg-black active:text-white cursor-pointer"><i id="syncIcon" class="fa-solid fa-rotate"></i></button>
+      </div>
+      <!-- HKO ???????? (??????????????) -->
+      <div id="warnBadge" class="bg-black text-white text-[9px] px-1.5 py-0.5 font-bold inline-flex items-center gap-1 max-w-[210px] truncate">
+        <i class="fa-solid fa-shield-halved text-[8px]"></i>
+        <span id="warnText" class="truncate">??????? (??)</span>
+      </div>
+    </div>
+    
+    <!-- ????? 12 ??? AM/PM ??? (??? ?:?) -->
+    <div class="text-right leading-none flex flex-col justify-center items-end shrink-0 pl-1.5">
+      <div class="flex items-baseline justify-end gap-1.5">
+        <span id="ampm" class="font-mono text-xs sm:text-sm font-black tracking-tight">AM</span>
+        <span id="clock" class="font-mono text-4xl sm:text-5xl font-black tracking-tighter leading-none">--:--</span>
+      </div>
+      <div class="text-[11px] font-bold mt-1 tracking-tight">
+        <span id="date">----/--/--</span>
+        <span id="wkday" class="ml-1.5 border-b-2 border-black font-black">??-</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. ??????????? (?? 5 ???????????????????) -->
+  <section class="ink-b grid grid-cols-5 text-center items-center py-1 bg-white shrink-0">
+    <div class="ink-b-r"><p class="text-[8px] font-bold uppercase opacity-80">??</p><p class="font-mono text-base font-black leading-none mt-0.5"><span id="temp">28</span>°</p></div>
+    <div class="ink-b-r"><p class="text-[8px] font-bold uppercase opacity-80">??</p><p id="cond" class="text-[10px] font-black leading-tight mt-0.5 truncate px-0.5">????</p></div>
+    <div class="ink-b-r"><p class="text-[8px] font-bold uppercase opacity-80">??</p><p id="humi" class="font-mono text-xs font-bold mt-0.5">78%</p></div>
+    <div class="ink-b-r"><p class="text-[8px] font-bold uppercase opacity-80">UV</p><p id="uv" class="font-mono text-xs font-bold mt-0.5">6</p></div>
+    <div>
+      <p class="text-[8px] font-bold uppercase opacity-80">??</p>
+      <p id="tideTimes" class="font-mono text-[7px] sm:text-[8px] font-black leading-tight mt-0.5 tracking-tighter">
+        <span class="block whitespace-nowrap">?--:--</span>
+        <span class="block whitespace-nowrap">?--:--</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- 3. ?????????? (?????????????? / ????? / ?????) -->
+  <section class="p-2 bg-white shrink-0">
+    <div class="grid grid-cols-12 items-center gap-2">
+      <!-- ???????? (?????? 2mm???????) -->
+      <div class="col-span-7 pl-1 flex flex-col justify-between h-full">
+        <div>
+          <div id="spotTitle" class="text-[9px] font-black uppercase tracking-wider border-b border-black inline-block -mt-1 mb-1 -translate-y-[2mm]">
+            ?????????
+          </div>
+        </div>
+        <div class="flex items-baseline gap-1 my-auto -translate-y-1">
+          <span id="cs_now" class="font-mono text-5xl sm:text-6xl font-black leading-none tracking-tighter">0.8</span>
+          <span class="text-base font-black">m</span>
+          <span id="cs_now_ft" class="text-[10px] font-mono font-bold opacity-75 ml-1">(2.6?)</span>
+        </div>
+      </div>
+      
+      <!-- ??????? (??????????????) -->
+      <div class="col-span-5 pl-2 border-l-2 border-black grid grid-rows-3 gap-y-1 h-full py-0.5">
+        <div class="grid grid-cols-[36px_1fr] items-center gap-x-2">
+          <span class="text-[8px] font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight">??</span>
+          <span id="cs_pd" class="font-mono text-base font-black text-right leading-none">7s</span>
+        </div>
+        <div class="grid grid-cols-[36px_1fr] items-center gap-x-2">
+          <span class="text-[8px] font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight">??</span>
+          <span id="cs_dr" class="font-bold text-xs text-right leading-none whitespace-nowrap">? (S)</span>
+        </div>
+        <div class="grid grid-cols-[36px_1fr] items-center gap-x-2">
+          <span class="text-[8px] font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight">??</span>
+          <span id="cs_total" class="font-mono text-xs font-bold text-right leading-none">1.0m</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. ??????? 5 ??????????? (??????????) -->
+  <section class="flex flex-col justify-center min-h-0 py-0.5 max-h-[125px] shrink-0">
+    <div class="flex justify-between items-center border-b-2 border-black pb-0.5 mb-0.5 shrink-0">
+      <span class="text-[9px] font-black tracking-wider flex items-center gap-1">
+        <i class="fa-solid fa-chart-simple text-[8px]"></i> <span id="statsTitle">?? 5 ???????????</span>
+      </span>
+      <span class="text-[7px] font-bold opacity-75 inline-flex items-center gap-0.5">
+        ?? 1.5 ?????? <i class="fa-solid fa-water text-[7.5px]"></i>
+      </span>
+    </div>
+    
+    <!-- 5 ????????? -->
+    <div class="stats-grid flex-1 items-stretch" id="cs_stats">
+      <div class="col-span-5 text-center text-[10px] py-1 font-mono font-bold">?? 5 ????????...</div>
+    </div>
+  </section>
+
+  <!-- 5. ??????? 5 ???????? (????????????) -->
+  <section class="shrink-0">
+    <div class="flex justify-between items-center mb-0.5">
+      <span class="text-[8px] font-black opacity-80 tracking-wider">HKO 5-DAY FORECAST (???????)</span>
+    </div>
+    <div class="f-mini-grid" id="f_mini">
+      <!-- ? JavaScript ???? 5 ??????? -->
+    </div>
+  </section>
+
+  <!-- 6. ??????????????? -->
+  <footer class="flex justify-between items-center text-[6.5px] sm:text-[7.5px] font-mono px-0.5 shrink-0 opacity-80 border-t border-black pt-0.5">
+    <span class="truncate" id="footerSpotDesc">??: ??? (22.2312°N, 113.9472°E)</span>
+    <span id="lastUpdated" class="shrink-0 ml-1">UPDATED: --:--:--</span>
+  </footer>
+
+</div>
+
+<script>
+  // 0. ??????????????
+  const SURF_SPOTS = [
+    {
+      id: 'cheung_sha',
+      name: '???',
+      badge: '??? SURF',
+      lat: 22.2312,
+      lon: 113.9472,
+      windyZoom: 12,
+      tideStation: '?? / ???',
+      tideOffsetHours: 0 // ???????
+    },
+    {
+      id: 'hk_big_wave_bay',
+      name: '?????',
+      badge: '????? SURF',
+      lat: 22.2472,
+      lon: 114.2492,
+      windyZoom: 13,
+      tideStation: '??? / ???',
+      tideOffsetHours: -0.5 // ?????????? 30 ??
+    },
+    {
+      id: 'sk_tai_long_wan',
+      name: '?????',
+      badge: '????? SURF',
+      lat: 22.4005,
+      lon: 114.3752,
+      windyZoom: 13,
+      tideStation: '?? / ???',
+      tideOffsetHours: -0.8 // ????????
+    }
+  ];
+
+  let currentSpotIdx = 0;
+
+  // ??????
+  function switchSpot(index) {
+    if (index < 0) index = SURF_SPOTS.length - 1;
+    if (index >= SURF_SPOTS.length) index = 0;
+    currentSpotIdx = index;
+    updateSpotUI();
+    loadSwellStats();
+    loadTideTimes();
+  }
+
+  // ????????????
+  function nextSpot() {
+    switchSpot(currentSpotIdx + 1);
+  }
+
+  // ????????????
+  function prevSpot() {
+    switchSpot(currentSpotIdx - 1);
+  }
+
+  // ????????
+  function updateSpotUI() {
+    const spot = SURF_SPOTS[currentSpotIdx];
+    document.getElementById('spotTitle').innerText = `${spot.name}??????`;
+    document.getElementById('footerSpotDesc').innerText = `??: ${spot.name} (${spot.lat}°N, ${spot.lon}°E)`;
+
+    // ???????
+    const dots = document.querySelectorAll('.spot-dot');
+    dots.forEach((dot, idx) => {
+      if (idx === currentSpotIdx) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+  }
+
+  // ???????????? (Swipe Gestures)
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  const mainContainer = document.getElementById('mainContainer');
+
+  mainContainer.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+    touchStartTime = Date.now();
+  }, { passive: true });
+
+  mainContainer.addEventListener('touchend', (e) => {
+    const endX = e.changedTouches[0].screenX;
+    const endY = e.changedTouches[0].screenY;
+    const diffX = endX - touchStartX;
+    const diffY = endY - touchStartY;
+    const duration = Date.now() - touchStartTime;
+
+    // ??????? (?? 45px ????????????????????)
+    if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.3 && duration < 600) {
+      if (diffX > 0) {
+        nextSpot();
+      } else {
+        prevSpot();
+      }
+    }
+  }, { passive: true });
+
+  // ??????? (?????????)
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') nextSpot();
+    if (e.key === 'ArrowLeft') prevSpot();
+  });
+
+  // 1. ???? (12 ?? AM/PM ??????????????)
+  function runClock() {
+    const now = new Date();
+    const pad = (n) => n.toString().padStart(2, '0');
+    let hours = now.getHours();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    document.getElementById('ampm').innerText = ampm;
+    document.getElementById('clock').innerText = `${pad(hours)}:${pad(now.getMinutes())}`;
+    document.getElementById('date').innerText = `${now.getFullYear()}/${pad(now.getMonth() + 1)}/${pad(now.getDate())}`;
+    document.getElementById('wkday').innerText = ['???', '???', '???', '???', '???', '???', '???'][now.getDay()];
+  }
+  setInterval(runClock, 1000);
+  runClock();
+
+  // ?????? (??????????)
+  function toggleTheme() {
+    document.body.classList.toggle('inverted');
+  }
+
+  // 2. ???????????????? (??/??/??????)
+  async function loadHKO() {
+    try {
+      const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
+      if (res.ok) {
+        const data = await res.json();
+        const hko = data.temperature?.data?.find(t => t.place === '?????') || data.temperature?.data?.[0];
+        if (hko) document.getElementById('temp').innerText = hko.value;
+        if (data.humidity?.data?.[0]) document.getElementById('humi').innerText = data.humidity.data[0].value + '%';
+        if (data.uvindex?.data?.[0]) {
+          document.getElementById('uv').innerText = data.uvindex.data[0].value;
+        } else {
+          document.getElementById('uv').innerText = '0';
+        }
+        const isRain = data.rainfall?.data?.some(r => r.max > 0);
+        document.getElementById('cond').innerText = isRain ? '???' : '????';
+      }
+    } catch (e) {
+      console.warn('HKO weather API fallback:', e);
+    }
+
+    try {
+      const wRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=tc');
+      if (wRes.ok) {
+        const wData = await wRes.json();
+        const keys = Object.keys(wData);
+        if (keys.length > 0) {
+          const WARN_NAMES = {
+            'TC1': '??????',
+            'TC3': '??????',
+            'TC8NE': '??????',
+            'TC8SE': '??????',
+            'TC8NW': '??????',
+            'TC8SW': '??????',
+            'TC8': '??????',
+            'TC9': '??????',
+            'TC10': '??????',
+            'WRAINA': '??????',
+            'WRAINR': '??????',
+            'WRAINB': '??????',
+            'WTS': '????',
+            'WMS': '???????',
+            'WFIREY': '??????',
+            'WFIRER': '??????',
+            'WHOT': '??????',
+            'WCOLD': '??????',
+            'WL': '??????',
+            'WFNL': '??????',
+            'WFROST': '????',
+            'WTMW': '????'
+          };
+
+          const priority = ['WTCSGNL', 'WRAIN', 'WTS', 'WTMW', 'WL', 'WMS', 'WHOT', 'WCOLD', 'WFIRE', 'WFROST'];
+          keys.sort((a, b) => {
+            const idxA = priority.indexOf(a) === -1 ? 99 : priority.indexOf(a);
+            const idxB = priority.indexOf(b) === -1 ? 99 : priority.indexOf(b);
+            return idxA - idxB;
+          });
+
+          const hasThunderstorm = keys.some(k => k === 'WTS' || wData[k]?.code === 'WTS');
+
+          const otherWarnings = keys
+            .filter(k => k !== 'WTS' && wData[k]?.code !== 'WTS')
+            .map(k => {
+              const item = wData[k];
+              const code = item.code || '';
+              return WARN_NAMES[code] || item.type || item.name || '??????';
+            });
+
+          const warnEl = document.getElementById('warnText');
+          const boltIcon = '<i class="fa-solid fa-bolt text-[9px] text-white"></i>';
+
+          if (otherWarnings.length > 0) {
+            const textPart = otherWarnings.slice(0, 2).join(' · ');
+            warnEl.innerHTML = hasThunderstorm ? `${textPart} ${boltIcon}` : textPart;
+          } else if (hasThunderstorm) {
+            warnEl.innerHTML = `${boltIcon} ????`;
+          } else {
+            warnEl.innerText = '??????? (??)';
+          }
+        } else {
+          document.getElementById('warnText').innerText = '??????? (??)';
+        }
+      }
+    } catch (e) {
+      document.getElementById('warnText').innerText = '??????? (??)';
+    }
+  }
+
+  // 3. ????? 5 ?????
+  async function loadForecast() {
+    const container = document.getElementById('f_mini');
+    try {
+      const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.weatherForecast && data.weatherForecast.length > 0) {
+          container.innerHTML = '';
+          data.weatherForecast.slice(0, 5).forEach((f, i) => {
+            const isToday = i === 0;
+            const wk = isToday ? '?' : f.week.replace('??', '');
+            const wDesc = f.forecastWeather || '';
+            let weather = '?';
+            if (wDesc.includes('?')) weather = '?';
+            else if (wDesc.includes('?')) weather = '?';
+            else if (wDesc.includes('?') || wDesc.includes('?')) weather = '?';
+
+            container.innerHTML += `
+              <div class="f-mini-cell ${isToday ? 'active-f' : 'bg-white'}">
+                <div class="font-bold">${wk}</div>
+                <div class="font-black my-0.5 text-[9px]">${weather}</div>
+                <div class="font-mono text-[7px] tracking-tighter">${f.forecastMintemp.value}-${f.forecastMaxtemp.value}°</div>
+              </div>`;
+          });
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Forecast fallback:', e);
+    }
+    renderFallbackForecast();
+  }
+
+  function renderFallbackForecast() {
+    const container = document.getElementById('f_mini');
+    container.innerHTML = '';
+    const days = ['?', '?', 'D3', 'D4', 'D5'];
+    days.forEach((d, i) => {
+      container.innerHTML += `
+        <div class="f-mini-cell ${i === 0 ? 'active-f' : 'bg-white'}">
+          <div class="font-bold">${d}</div>
+          <div class="font-black my-0.5 text-[9px]">?</div>
+          <div class="font-mono text-[7px] tracking-tighter">26-31°</div>
+        </div>`;
+    });
+  }
+
+  // 3.5 ?????????????? (?????? ? ??? ? ??????)
+  function loadTideTimes() {
+    const now = new Date();
+    const pad = (n) => n.toString().padStart(2, '0');
+    const spot = SURF_SPOTS[currentSpotIdx];
+    
+    // ????????????????? (???????? 12.4206 ??)
+    const refNewMoon = new Date('2024-01-11T11:57:00Z');
+    const diffDays = (now - refNewMoon) / (1000 * 60 * 60 * 24);
+    const moonAge = (diffDays % 29.53058867 + 29.53058867) % 29.53058867;
+    
+    // ??????????? vs ???? vs ????????????
+    const period = 12.4206;
+    const baseHigh = ((moonAge * 0.84 + 8.6 + spot.tideOffsetHours) % period + period) % period;
+    
+    // ???? 00:00 ? 24:00 ????????? (High Tides)
+    const highCandidates = [baseHigh - period, baseHigh, baseHigh + period, baseHigh + period * 2];
+    const highTides = highCandidates.filter(t => t >= 0 && t < 24).sort((a, b) => a - b);
+    
+    // ??????? 6.21 ?? (Low Tides)
+    const baseLow = baseHigh + (period / 2);
+    const lowCandidates = [baseLow - period * 2, baseLow - period, baseLow, baseLow + period, baseLow + period * 2];
+    const lowTides = lowCandidates.filter(t => t >= 0 && t < 24).sort((a, b) => a - b);
+    
+    const formatTime = (hFloat) => {
+      const h = Math.floor(hFloat);
+      const m = Math.floor((hFloat % 1) * 60);
+      return `${pad(h % 24)}:${pad(m % 60)}`;
+    };
+    
+    // ???????????????????
+    const highStr = highTides.map(formatTime).join(' ');
+    const lowStr = lowTides.map(formatTime).join(' ');
+    
+    const tideEl = document.getElementById('tideTimes');
+    if (tideEl) {
+      tideEl.innerHTML = `<span class="block whitespace-nowrap">?${highStr}</span><span class="block whitespace-nowrap">?${lowStr}</span>`;
+      tideEl.title = `??????????? ${highTides.map(formatTime).join(', ')} | ?? ${lowTides.map(formatTime).join(', ')}`;
+    }
+  }
+
+  // 4. ??????????? 5 ??????????????
+  async function loadSwellStats() {
+    const spot = SURF_SPOTS[currentSpotIdx];
+    const statsGrid = document.getElementById('cs_stats');
+    
+    try {
+      const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${spot.lat}&longitude=${spot.lon}&current=wave_height,swell_wave_height,swell_wave_direction,swell_wave_period&hourly=wave_height,swell_wave_height,swell_wave_period&forecast_days=5&timezone=Asia%2FHong_Kong`;
+      const res = await fetch(url);
+      
+      if (res.ok) {
+        const data = await res.json();
+        
+        // ????????
+        const curSwell = data.current?.swell_wave_height ?? 0.8;
+        const curPeriod = Math.round(data.current?.swell_wave_period ?? 7);
+        const curDir = data.current?.swell_wave_direction ?? 180;
+        const curTotal = data.current?.wave_height ?? 1.0;
+
+        document.getElementById('cs_now').innerText = curSwell.toFixed(1);
+        document.getElementById('cs_now_ft').innerText = `(${(curSwell * 3.28).toFixed(1)}?)`;
+        document.getElementById('cs_pd').innerText = curPeriod + 's';
+        document.getElementById('cs_total').innerText = curTotal.toFixed(1) + 'm';
+        
+        const dirs = ['? (N)', '?? (NE)', '? (E)', '?? (SE)', '? (S)', '?? (SW)', '? (W)', '?? (NW)'];
+        document.getElementById('cs_dr').innerText = dirs[Math.round(curDir / 45) % 8];
+
+        // ?? 5 ?????
+        statsGrid.innerHTML = '';
+        const hourlySwell = data.hourly?.swell_wave_height || [];
+        const hourlyPd = data.hourly?.swell_wave_period || [];
+        const weekDays = ['?', '?', '?', '?', '?', '?', '?'];
+        const baseDate = new Date();
+
+        for (let day = 0; day < 5; day++) {
+          const targetDate = new Date(baseDate);
+          targetDate.setDate(baseDate.getDate() + day);
+          const m = targetDate.getMonth() + 1;
+          const d = targetDate.getDate();
+          const wk = weekDays[targetDate.getDay()];
+          const dayPrefix = day === 0 ? '?' : (day === 1 ? '?' : `D${day + 1}`);
+
+          const startIdx = day * 24;
+          const endIdx = (day + 1) * 24;
+          const dayHeights = hourlySwell.slice(startIdx, endIdx);
+          const dayPds = hourlyPd.slice(startIdx, endIdx);
+
+          let avg = '0.8', min = '0.6', max = '1.0', avgPd = 7;
+          if (dayHeights.length > 0) {
+            avg = (dayHeights.reduce((a, b) => a + b, 0) / dayHeights.length).toFixed(1);
+            min = Math.min(...dayHeights).toFixed(1);
+            max = Math.max(...dayHeights).toFixed(1);
+          }
+          if (dayPds.length > 0) {
+            avgPd = Math.round(dayPds.reduce((a, b) => a + b, 0) / dayPds.length);
+          }
+
+          const isToday = (day === 0);
+          /* ????? 1.5 ???????????????????????????? */
+          const isFullSwell = parseFloat(avg) >= 1.5;
+          const waveVisual = isFullSwell
+            ? `<i class="fa-solid fa-water text-xs sm:text-sm leading-none" title="???? (?1.5m)"></i>`
+            : '';
+
+          statsGrid.innerHTML += `
+            <div class="stats-cell ${isToday ? 'active-day' : ''}">
+              <div class="text-[7.5px] font-black tracking-tight leading-none pt-0.5">
+                <div>${dayPrefix} ${m}/${d}</div>
+                <div class="text-[6.5px] font-bold opacity-85 mt-0.5">??${wk}</div>
+              </div>
+              <div class="w-full flex items-center justify-center h-2.5 my-0 px-0.5">
+                ${waveVisual}
+              </div>
+              <div class="font-mono text-[11px] font-black leading-none">
+                ${avg}<span class="text-[6.5px] font-normal">m</span>
+              </div>
+              <div class="text-[6.5px] font-mono opacity-80 leading-none mt-0.5">
+                ${min}-${max}
+              </div>
+              <div class="text-[6.5px] font-bold border-t ${isToday ? 'border-white' : 'border-black'} border-dotted w-full pt-0.5 mt-0.5 leading-none">
+                ${avgPd}s
+              </div>
+            </div>`;
+        }
+        return;
+      }
+    } catch (e) {
+      console.warn('Swell stats fallback for spot:', spot.name, e);
+    }
+    
+    renderFallbackSwellStats();
+  }
+
+  function renderFallbackSwellStats() {
+    const statsGrid = document.getElementById('cs_stats');
+    statsGrid.innerHTML = '';
+    
+    const spot = SURF_SPOTS[currentSpotIdx];
+    const isEastCoast = currentSpotIdx > 0;
+    const baseAvg = isEastCoast ? '1.1' : '0.8';
+    const weekDays = ['?', '?', '?', '?', '?', '?', '?'];
+    const baseDate = new Date();
+
+    const fallbackData = [
+      { avg: baseAvg, min: '0.6', max: '1.2', pd: 7, active: true },
+      { avg: isEastCoast ? '1.5' : '1.0', min: '0.8', max: '1.6', pd: 8, active: false },
+      { avg: isEastCoast ? '1.6' : '1.2', min: '1.0', max: '1.8', pd: 9, active: false },
+      { avg: '0.7', min: '0.5', max: '0.9', pd: 6, active: false },
+      { avg: '0.6', min: '0.4', max: '0.8', pd: 6, active: false }
+    ];
+
+    fallbackData.forEach((item, day) => {
+      const targetDate = new Date(baseDate);
+      targetDate.setDate(baseDate.getDate() + day);
+      const m = targetDate.getMonth() + 1;
+      const d = targetDate.getDate();
+      const wk = weekDays[targetDate.getDay()];
+      const dayPrefix = day === 0 ? '?' : (day === 1 ? '?' : `D${day + 1}`);
+
+      const isFullSwell = parseFloat(item.avg) >= 1.5;
+      const waveVisual = isFullSwell
+        ? `<i class="fa-solid fa-water text-xs sm:text-sm leading-none" title="???? (?1.5m)"></i>`
+        : '';
+
+      statsGrid.innerHTML += `
+        <div class="stats-cell ${item.active ? 'active-day' : ''}">
+          <div class="text-[7.5px] font-black tracking-tight leading-none pt-0.5">
+            <div>${dayPrefix} ${m}/${d}</div>
+            <div class="text-[6.5px] font-bold opacity-85 mt-0.5">??${wk}</div>
+          </div>
+          <div class="w-full flex items-center justify-center h-2.5 my-0 px-0.5">
+            ${waveVisual}
+          </div>
+          <div class="font-mono text-[11px] font-black leading-none">${item.avg}<span class="text-[6.5px] font-normal">m</span></div>
+          <div class="text-[6.5px] font-mono opacity-80 leading-none mt-0.5">${item.min}-${item.max}</div>
+          <div class="text-[6.5px] font-bold border-t ${item.active ? 'border-white' : 'border-black'} border-dotted w-full pt-0.5 mt-0.5 leading-none">${item.pd}s</div>
+        </div>`;
+    });
+  }
+
+  // 5. ????????
+  async function fetchAllData() {
+    const icon = document.getElementById('syncIcon');
+    icon.classList.add('fa-spin');
+    
+    await Promise.allSettled([
+      loadHKO(),
+      loadForecast(),
+      loadSwellStats(),
+      Promise.resolve(loadTideTimes())
+    ]);
+    
+    const now = new Date();
+    const pad = (n) => n.toString().padStart(2, '0');
+    document.getElementById('lastUpdated').innerText = `UPDATED: ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    
+    setTimeout(() => icon.classList.remove('fa-spin'), 500);
+  }
+
+  // 6. ?????????? 30 ?????????????????
+  function triggerAutoInversion() {
+    const wasInverted = document.body.classList.contains('inverted');
+    
+    if (!wasInverted) {
+      document.body.classList.add('inverted');
+    } else {
+      document.body.classList.remove('inverted');
+    }
+
+    setTimeout(() => {
+      if (!wasInverted) {
+        document.body.classList.remove('inverted');
+      } else {
+        document.body.classList.add('inverted');
+      }
+    }, 1200);
+  }
+
+  // ???????????????????? 15 ??????
+  window.addEventListener('DOMContentLoaded', () => {
+    updateSpotUI();
+    fetchAllData();
+    setInterval(fetchAllData, 15 * 60 * 1000);
+    
+    // ? 30 ????????????????????
+    setInterval(triggerAutoInversion, 30 * 60 * 1000);
+  });
+</script>
+
+</body>
+</html>
