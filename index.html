@@ -2,12 +2,13 @@
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="??????????????5????????????????????">
-  <title>??????? & ????? (HK Surf)</title>
+  <meta name="description" content="下長沙海灘即時第一湧浪浪況、5天深度趨勢統計與香港天文台即時天氣儀表板">
+  <title>下長沙衝浪浪況 & 天氣儀表板 (HK Surf)</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -26,16 +27,19 @@
     html, body {
       margin: 0; padding: 0;
       width: 100vw; height: 100vh;
-      overflow: hidden; /* ??????? */
+      overflow: hidden; /* 嚴格單屏不滾動 */
       background-color: #ffffff; color: #000000;
-      font-family: 'Noto Sans TC', sans-serif;
+      /* 全平台備援中文字型庫，防止任何設備顯示問號或缺字 */
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "PingFang HK", "PingFang SC", "Microsoft JhengHei", "微軟正黑體", "Heiti TC", sans-serif;
       user-select: none;
       touch-action: pan-y pinch-zoom;
     }
 
-    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-mono { 
+      font-family: 'JetBrains Mono', Consolas, Monaco, "Courier New", monospace; 
+    }
 
-    /* ?? 6 ????????????????? */
+    /* 針對 6 吋屏幕與手機屏幕優化之彈性佈局容器 */
     .screen-container {
       width: 100vw; 
       height: 100vh;
@@ -49,13 +53,13 @@
       position: relative;
     }
 
-    /* ???????????? */
+    /* 墨水屏純黑純白高反差邊框 */
     .ink-b { border: 2px solid #000000; }
     .ink-b-b { border-bottom: 2px solid #000000; }
     .ink-b-r { border-right: 2px solid #000000; }
     .ink-b-t { border-top: 2px solid #000000; }
 
-    /* ?????? (Night / Inverted E-Ink) */
+    /* 反色模式支援 (Night / Inverted E-Ink) */
     .inverted { background-color: #000000 !important; color: #ffffff !important; }
     .inverted .ink-b, .inverted .ink-b-b, .inverted .ink-b-r, .inverted .ink-b-t { border-color: #ffffff !important; }
     .inverted .bg-white { background-color: #000000 !important; color: #ffffff !important; }
@@ -71,7 +75,7 @@
     .inverted .spot-dot.active { background-color: #ffffff !important; }
     .inverted .spot-dot { border-color: #ffffff !important; }
 
-    /* 5 ????????????? */
+    /* 5 天第一湧浪深度趨勢統計網格 */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -97,7 +101,7 @@
       color: #ffffff;
     }
 
-    /* 5 ????????? (5 ???) */
+    /* 5 天天文台微型預報條 (5 欄對稱) */
     .f-mini-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -117,7 +121,7 @@
       font-weight: 900;
     }
 
-    /* ??????? */
+    /* 據點滑動指示點 */
     .spot-dot {
       width: 5px;
       height: 5px;
@@ -135,35 +139,35 @@
 
 <div class="screen-container" id="mainContainer">
 
-  <!-- 1. ??????????????????????????? 12 ?? AM/PM ?? (?????????) -->
+  <!-- 1. 頂部抬頭區：多點切換按鈕、指示點、反色開關、手動更新與 12 小時 AM/PM 時鐘 (純時與分，不顯示秒) -->
   <header class="flex justify-between items-center shrink-0 pt-0.5">
     <div class="flex flex-col gap-1">
       <div class="flex items-center gap-1.5">
-        <!-- ???????????? (?? HK SURF ????) -->
+        <!-- 點擊或滑動切換的據點導航 (維持 HK SURF 統一標識) -->
         <div class="inline-flex items-center bg-black text-white px-1.5 py-0.5 text-xs font-black tracking-wider select-none">
-          <button onclick="prevSpot()" class="px-0.5 text-[9px] hover:opacity-75 cursor-pointer" title="?????" aria-label="?????">?</button>
+          <button onclick="prevSpot()" class="px-0.5 text-[9px] hover:opacity-75 cursor-pointer" title="上一個浪點" aria-label="上一個浪點">◀</button>
           <span class="mx-1 cursor-pointer" onclick="nextSpot()">HK SURF</span>
-          <button onclick="nextSpot()" class="px-0.5 text-[9px] hover:opacity-75 cursor-pointer" title="?????" aria-label="?????">?</button>
+          <button onclick="nextSpot()" class="px-0.5 text-[9px] hover:opacity-75 cursor-pointer" title="下一個浪點" aria-label="下一個浪點">▶</button>
         </div>
         
-        <!-- 3 ??????????? -->
+        <!-- 3 個浪點的位置圓點指示器 -->
         <div class="flex items-center gap-1 px-0.5" id="spotDots">
-          <span class="spot-dot active" onclick="switchSpot(0)" title="???"></span>
-          <span class="spot-dot" onclick="switchSpot(1)" title="?????"></span>
-          <span class="spot-dot" onclick="switchSpot(2)" title="?????"></span>
+          <span class="spot-dot active" onclick="switchSpot(0)" title="下長沙"></span>
+          <span class="spot-dot" onclick="switchSpot(1)" title="港島大浪灣"></span>
+          <span class="spot-dot" onclick="switchSpot(2)" title="西貢大浪灣"></span>
         </div>
 
-        <button onclick="toggleTheme()" title="??????" aria-label="????" class="ink-b px-1.5 py-0.5 text-[11px] font-bold active:bg-black active:text-white cursor-pointer"><i class="fa-solid fa-circle-half-stroke"></i></button>
-        <button onclick="fetchAllData()" title="??????" aria-label="????" class="ink-b px-1.5 py-0.5 text-[11px] font-bold active:bg-black active:text-white cursor-pointer"><i id="syncIcon" class="fa-solid fa-rotate"></i></button>
+        <button onclick="toggleTheme()" title="反色模式切換" aria-label="反色切換" class="ink-b px-1.5 py-0.5 text-[11px] font-bold active:bg-black active:text-white cursor-pointer"><i class="fa-solid fa-circle-half-stroke"></i></button>
+        <button onclick="fetchAllData()" title="手動刷新數據" aria-label="更新數據" class="ink-b px-1.5 py-0.5 text-[11px] font-bold active:bg-black active:text-white cursor-pointer"><i id="syncIcon" class="fa-solid fa-rotate"></i></button>
       </div>
-      <!-- HKO ???????? (??????????????) -->
+      <!-- HKO 實時特別警告標籤 (如雷暴、紅雨、黑雨或熱帶氣旋) -->
       <div id="warnBadge" class="bg-black text-white text-[9px] px-1.5 py-0.5 font-bold inline-flex items-center gap-1 max-w-[210px] truncate">
         <i class="fa-solid fa-shield-halved text-[8px]"></i>
-        <span id="warnText" class="truncate">??????? (??)</span>
+        <span id="warnText" class="truncate">天文台信號解除 (正常)</span>
       </div>
     </div>
     
-    <!-- ????? 12 ??? AM/PM ??? (??? ?:?) -->
+    <!-- 右側日期與 12 小時制 AM/PM 大時鐘 (只顯示 時:分) -->
     <div class="text-right leading-none flex flex-col justify-center items-end shrink-0 pl-1.5">
       <div class="flex items-baseline justify-end gap-1.5">
         <span id="ampm" class="font-mono text-xs sm:text-sm font-black tracking-tight">AM</span>
@@ -171,134 +175,134 @@
       </div>
       <div class="text-[11px] font-bold mt-1 tracking-tight">
         <span id="date">----/--/--</span>
-        <span id="wkday" class="ml-1.5 border-b-2 border-black font-black">??-</span>
+        <span id="wkday" class="ml-1.5 border-b-2 border-black font-black">星期-</span>
       </div>
     </div>
   </header>
 
-  <!-- 2. ??????????? (?? 5 ???????????????????) -->
+  <!-- 2. 香港天文台實時氣候速報 (單列 5 欄：氣溫、天氣、濕度、UV、潮汐) -->
   <section class="ink-b grid grid-cols-5 text-center items-center py-1 bg-white shrink-0">
-    <div class="ink-b-r"><p class="text-[8px] font-bold uppercase opacity-80">??</p><p class="font-mono text-base font-black leading-none mt-0.5"><span id="temp">28</span>�</p></div>
-    <div class="ink-b-r"><p class="text-[8px] font-bold uppercase opacity-80">??</p><p id="cond" class="text-[10px] font-black leading-tight mt-0.5 truncate px-0.5">????</p></div>
-    <div class="ink-b-r"><p class="text-[8px] font-bold uppercase opacity-80">??</p><p id="humi" class="font-mono text-xs font-bold mt-0.5">78%</p></div>
+    <div class="ink-b-r"><p class="text-[8px] font-bold uppercase opacity-80">氣溫</p><p class="font-mono text-base font-black leading-none mt-0.5"><span id="temp">28</span>°</p></div>
+    <div class="ink-b-r"><p class="text-[8px] font-bold uppercase opacity-80">天氣</p><p id="cond" class="text-[10px] font-black leading-tight mt-0.5 truncate px-0.5">大致天晴</p></div>
+    <div class="ink-b-r"><p class="text-[8px] font-bold uppercase opacity-80">濕度</p><p id="humi" class="font-mono text-xs font-bold mt-0.5">78%</p></div>
     <div class="ink-b-r"><p class="text-[8px] font-bold uppercase opacity-80">UV</p><p id="uv" class="font-mono text-xs font-bold mt-0.5">6</p></div>
     <div>
-      <p class="text-[8px] font-bold uppercase opacity-80">??</p>
+      <p class="text-[8px] font-bold uppercase opacity-80">潮汐</p>
       <p id="tideTimes" class="font-mono text-[7px] sm:text-[8px] font-black leading-tight mt-0.5 tracking-tighter">
-        <span class="block whitespace-nowrap">?--:--</span>
-        <span class="block whitespace-nowrap">?--:--</span>
+        <span class="block whitespace-nowrap">▲--:--</span>
+        <span class="block whitespace-nowrap">▼--:--</span>
       </p>
     </div>
   </section>
 
-  <!-- 3. ?????????? (?????????????? / ????? / ?????) -->
+  <!-- 3. 即時第一湧浪核心卡片 (標題隨滑動點動態切換：下長沙 / 港島大浪灣 / 西貢大浪灣) -->
   <section class="p-2 bg-white shrink-0">
     <div class="grid grid-cols-12 items-center gap-2">
-      <!-- ???????? (?????? 2mm???????) -->
+      <!-- 左側：湧浪數值區 -->
       <div class="col-span-7 pl-1 flex flex-col justify-between h-full">
         <div>
           <div id="spotTitle" class="text-[9px] font-black uppercase tracking-wider border-b border-black inline-block -mt-1 mb-1 -translate-y-[2mm]">
-            ?????????
+            下長沙即時第一湧浪
           </div>
         </div>
         <div class="flex items-baseline gap-1 my-auto -translate-y-1">
           <span id="cs_now" class="font-mono text-5xl sm:text-6xl font-black leading-none tracking-tighter">0.8</span>
           <span class="text-base font-black">m</span>
-          <span id="cs_now_ft" class="text-[10px] font-mono font-bold opacity-75 ml-1">(2.6?)</span>
+          <span id="cs_now_ft" class="text-[10px] font-mono font-bold opacity-75 ml-1">(2.6呎)</span>
         </div>
       </div>
       
-      <!-- ??????? (??????????????) -->
+      <!-- 右側：指標列表 (週期、浪向、總浪嚴格網格對齊) -->
       <div class="col-span-5 pl-2 border-l-2 border-black grid grid-rows-3 gap-y-1 h-full py-0.5">
         <div class="grid grid-cols-[36px_1fr] items-center gap-x-2">
-          <span class="text-[8px] font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight">??</span>
+          <span class="text-[8px] font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight">週期</span>
           <span id="cs_pd" class="font-mono text-base font-black text-right leading-none">7s</span>
         </div>
         <div class="grid grid-cols-[36px_1fr] items-center gap-x-2">
-          <span class="text-[8px] font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight">??</span>
-          <span id="cs_dr" class="font-bold text-xs text-right leading-none whitespace-nowrap">? (S)</span>
+          <span class="text-[8px] font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight">浪向</span>
+          <span id="cs_dr" class="font-bold text-xs text-right leading-none whitespace-nowrap">南 (S)</span>
         </div>
         <div class="grid grid-cols-[36px_1fr] items-center gap-x-2">
-          <span class="text-[8px] font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight">??</span>
+          <span class="text-[8px] font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight">總浪</span>
           <span id="cs_total" class="font-mono text-xs font-bold text-right leading-none">1.0m</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 4. ??????? 5 ??????????? (??????????) -->
+  <!-- 4. 重點核心：未來 5 天第一湧浪深度趨勢統計 (自適應零重疊緊湊佈局) -->
   <section class="flex flex-col justify-center min-h-0 py-0.5 max-h-[125px] shrink-0">
     <div class="flex justify-between items-center border-b-2 border-black pb-0.5 mb-0.5 shrink-0">
       <span class="text-[9px] font-black tracking-wider flex items-center gap-1">
-        <i class="fa-solid fa-chart-simple text-[8px]"></i> <span id="statsTitle">?? 5 ???????????</span>
+        <i class="fa-solid fa-chart-simple text-[8px]"></i> <span id="statsTitle">未來 5 天第一湧浪深度趨勢統計</span>
       </span>
       <span class="text-[7px] font-bold opacity-75 inline-flex items-center gap-0.5">
-        ?? 1.5 ?????? <i class="fa-solid fa-water text-[7.5px]"></i>
+        超過 1.5 米滿浪圖警示 <i class="fa-solid fa-water text-[7.5px]"></i>
       </span>
     </div>
     
-    <!-- 5 ????????? -->
+    <!-- 5 天緊湊統計卡片網格 -->
     <div class="stats-grid flex-1 items-stretch" id="cs_stats">
-      <div class="col-span-5 text-center text-[10px] py-1 font-mono font-bold">?? 5 ????????...</div>
+      <div class="col-span-5 text-center text-[10px] py-1 font-mono font-bold">載入 5 天湧浪深度數據中...</div>
     </div>
   </section>
 
-  <!-- 5. ??????? 5 ???????? (????????????) -->
+  <!-- 5. 香港天文台未來 5 天極簡微型預報條 (高度鎖定，不擠壓上方內容) -->
   <section class="shrink-0">
     <div class="flex justify-between items-center mb-0.5">
-      <span class="text-[8px] font-black opacity-80 tracking-wider">HKO 5-DAY FORECAST (???????)</span>
+      <span class="text-[8px] font-black opacity-80 tracking-wider">HKO 5-DAY FORECAST (天文台五日預測)</span>
     </div>
     <div class="f-mini-grid" id="f_mini">
-      <!-- ? JavaScript ???? 5 ??????? -->
+      <!-- 由 JavaScript 動態生成 5 格極簡微縮預報 -->
     </div>
   </section>
 
-  <!-- 6. ??????????????? -->
+  <!-- 6. 熱點名稱、定位座標與更新時間戳 -->
   <footer class="flex justify-between items-center text-[6.5px] sm:text-[7.5px] font-mono px-0.5 shrink-0 opacity-80 border-t border-black pt-0.5">
-    <span class="truncate" id="footerSpotDesc">??: ??? (22.2312�N, 113.9472�E)</span>
+    <span class="truncate" id="footerSpotDesc">熱點: 下長沙 (22.2312°N, 113.9472°E)</span>
     <span id="lastUpdated" class="shrink-0 ml-1">UPDATED: --:--:--</span>
   </footer>
 
 </div>
 
 <script>
-  // 0. ??????????????
+  // 0. 香港三大衝浪熱點經緯度與配置
   const SURF_SPOTS = [
     {
       id: 'cheung_sha',
-      name: '???',
-      badge: '??? SURF',
+      name: '下長沙',
+      badge: '下長沙 SURF',
       lat: 22.2312,
       lon: 113.9472,
       windyZoom: 12,
-      tideStation: '?? / ???',
-      tideOffsetHours: 0 // ???????
+      tideStation: '石壁 / 芝麻灣',
+      tideOffsetHours: 0 // 基於大嶼山南岸
     },
     {
       id: 'hk_big_wave_bay',
-      name: '?????',
-      badge: '????? SURF',
+      name: '港島大浪灣',
+      badge: '港島大浪灣 SURF',
       lat: 22.2472,
       lon: 114.2492,
       windyZoom: 13,
-      tideStation: '??? / ???',
-      tideOffsetHours: -0.5 // ?????????? 30 ??
+      tideStation: '橫瀾島 / 鰂魚涌',
+      tideOffsetHours: -0.5 // 港島東南岸潮時稍早約 30 分鐘
     },
     {
       id: 'sk_tai_long_wan',
-      name: '?????',
-      badge: '????? SURF',
+      name: '西貢大浪灣',
+      badge: '西貢大浪灣 SURF',
       lat: 22.4005,
       lon: 114.3752,
       windyZoom: 13,
-      tideStation: '?? / ???',
-      tideOffsetHours: -0.8 // ????????
+      tideStation: '塔門 / 橫瀾島',
+      tideOffsetHours: -0.8 // 西貢東岸潮位時相
     }
   ];
 
   let currentSpotIdx = 0;
 
-  // ??????
+  // 切換指定熱點
   function switchSpot(index) {
     if (index < 0) index = SURF_SPOTS.length - 1;
     if (index >= SURF_SPOTS.length) index = 0;
@@ -308,23 +312,23 @@
     loadTideTimes();
   }
 
-  // ????????????
+  // 向右切換（或點擊下一個）
   function nextSpot() {
     switchSpot(currentSpotIdx + 1);
   }
 
-  // ????????????
+  // 向左切換（或點擊上一個）
   function prevSpot() {
     switchSpot(currentSpotIdx - 1);
   }
 
-  // ????????
+  // 更新熱點介面文字
   function updateSpotUI() {
     const spot = SURF_SPOTS[currentSpotIdx];
-    document.getElementById('spotTitle').innerText = `${spot.name}??????`;
-    document.getElementById('footerSpotDesc').innerText = `??: ${spot.name} (${spot.lat}�N, ${spot.lon}�E)`;
+    document.getElementById('spotTitle').innerText = `${spot.name}即時第一湧浪`;
+    document.getElementById('footerSpotDesc').innerText = `熱點: ${spot.name} (${spot.lat}°N, ${spot.lon}°E)`;
 
-    // ???????
+    // 更新指示點狀態
     const dots = document.querySelectorAll('.spot-dot');
     dots.forEach((dot, idx) => {
       if (idx === currentSpotIdx) {
@@ -335,10 +339,10 @@
     });
   }
 
-  // ???????????? (Swipe Gestures)
+  // 支援觸控螢幕手勢滑動切換 (Swipe Gestures)
   let touchStartX = 0;
   let touchStartY = 0;
-  let touchStartTime = 0;
+  touchStartTime = 0;
 
   const mainContainer = document.getElementById('mainContainer');
 
@@ -355,7 +359,7 @@
     const diffY = endY - touchStartY;
     const duration = Date.now() - touchStartTime;
 
-    // ??????? (?? 45px ????????????????????)
+    // 水平滑動門檻值 (超過 45px 且水平位移明顯大於垂直位移，避免誤觸滾動)
     if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.3 && duration < 600) {
       if (diffX > 0) {
         nextSpot();
@@ -365,13 +369,13 @@
     }
   }, { passive: true });
 
-  // ??????? (?????????)
+  // 鍵盤方向鍵支援 (左右箭頭鍵切換熱點)
   window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') nextSpot();
     if (e.key === 'ArrowLeft') prevSpot();
   });
 
-  // 1. ???? (12 ?? AM/PM ??????????????)
+  // 1. 時鐘系統 (12 小時 AM/PM 制，僅顯示時與分，不顯示秒數)
   function runClock() {
     const now = new Date();
     const pad = (n) => n.toString().padStart(2, '0');
@@ -382,32 +386,36 @@
     document.getElementById('ampm').innerText = ampm;
     document.getElementById('clock').innerText = `${pad(hours)}:${pad(now.getMinutes())}`;
     document.getElementById('date').innerText = `${now.getFullYear()}/${pad(now.getMonth() + 1)}/${pad(now.getDate())}`;
-    document.getElementById('wkday').innerText = ['???', '???', '???', '???', '???', '???', '???'][now.getDay()];
+    document.getElementById('wkday').innerText = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][now.getDay()];
   }
   setInterval(runClock, 1000);
   runClock();
 
-  // ?????? (??????????)
+  // 反色模式切換 (適合墨水屏或暗黑環境)
   function toggleTheme() {
     document.body.classList.toggle('inverted');
   }
 
-  // 2. ???????????????? (??/??/??????)
+  // 2. 串接香港天文台即時天氣與特別警報 (雷暴/暴雨/熱帶氣旋風球)
   async function loadHKO() {
     try {
       const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
       if (res.ok) {
         const data = await res.json();
-        const hko = data.temperature?.data?.find(t => t.place === '?????') || data.temperature?.data?.[0];
-        if (hko) document.getElementById('temp').innerText = hko.value;
-        if (data.humidity?.data?.[0]) document.getElementById('humi').innerText = data.humidity.data[0].value + '%';
-        if (data.uvindex?.data?.[0]) {
+        const hko = data.temperature?.data?.find(t => t.place === '香港天文台') || data.temperature?.data?.[0];
+        if (hko && hko.value !== undefined) {
+          document.getElementById('temp').innerText = hko.value;
+        }
+        if (data.humidity?.data?.[0] && data.humidity.data[0].value !== undefined) {
+          document.getElementById('humi').innerText = data.humidity.data[0].value + '%';
+        }
+        if (data.uvindex?.data?.[0] && data.uvindex.data[0].value !== undefined) {
           document.getElementById('uv').innerText = data.uvindex.data[0].value;
         } else {
           document.getElementById('uv').innerText = '0';
         }
         const isRain = data.rainfall?.data?.some(r => r.max > 0);
-        document.getElementById('cond').innerText = isRain ? '???' : '????';
+        document.getElementById('cond').innerText = isRain ? '有微雨' : '大致天晴';
       }
     } catch (e) {
       console.warn('HKO weather API fallback:', e);
@@ -420,28 +428,28 @@
         const keys = Object.keys(wData);
         if (keys.length > 0) {
           const WARN_NAMES = {
-            'TC1': '??????',
-            'TC3': '??????',
-            'TC8NE': '??????',
-            'TC8SE': '??????',
-            'TC8NW': '??????',
-            'TC8SW': '??????',
-            'TC8': '??????',
-            'TC9': '??????',
-            'TC10': '??????',
-            'WRAINA': '??????',
-            'WRAINR': '??????',
-            'WRAINB': '??????',
-            'WTS': '????',
-            'WMS': '???????',
-            'WFIREY': '??????',
-            'WFIRER': '??????',
-            'WHOT': '??????',
-            'WCOLD': '??????',
-            'WL': '??????',
-            'WFNL': '??????',
-            'WFROST': '????',
-            'WTMW': '????'
+            'TC1': '一號熱帶氣旋',
+            'TC3': '三號熱帶氣旋',
+            'TC8NE': '八號東北烈風',
+            'TC8SE': '八號東南烈風',
+            'TC8NW': '八號西北烈風',
+            'TC8SW': '八號西南烈風',
+            'TC8': '八號烈風暴風',
+            'TC9': '九號風力增強',
+            'TC10': '十號颶風信號',
+            'WRAINA': '黃色暴雨警告',
+            'WRAINR': '紅色暴雨警告',
+            'WRAINB': '黑色暴雨警告',
+            'WTS': '雷暴警告',
+            'WMS': '強烈季候風信號',
+            'WFIREY': '黃色火災危險',
+            'WFIRER': '紅色火災危險',
+            'WHOT': '酷熱天氣警告',
+            'WCOLD': '寒冷天氣警告',
+            'WL': '山泥傾瀉警告',
+            'WFNL': '新界北部水浸',
+            'WFROST': '霜凍警告',
+            'WTMW': '海嘯警告'
           };
 
           const priority = ['WTCSGNL', 'WRAIN', 'WTS', 'WTMW', 'WL', 'WMS', 'WHOT', 'WCOLD', 'WFIRE', 'WFROST'];
@@ -458,30 +466,30 @@
             .map(k => {
               const item = wData[k];
               const code = item.code || '';
-              return WARN_NAMES[code] || item.type || item.name || '??????';
+              return WARN_NAMES[code] || item.type || item.name || '特別天氣警告';
             });
 
           const warnEl = document.getElementById('warnText');
           const boltIcon = '<i class="fa-solid fa-bolt text-[9px] text-white"></i>';
 
           if (otherWarnings.length > 0) {
-            const textPart = otherWarnings.slice(0, 2).join(' � ');
+            const textPart = otherWarnings.slice(0, 2).join(' · ');
             warnEl.innerHTML = hasThunderstorm ? `${textPart} ${boltIcon}` : textPart;
           } else if (hasThunderstorm) {
-            warnEl.innerHTML = `${boltIcon} ????`;
+            warnEl.innerHTML = `${boltIcon} 雷暴生效`;
           } else {
-            warnEl.innerText = '??????? (??)';
+            warnEl.innerText = '天文台信號解除 (正常)';
           }
         } else {
-          document.getElementById('warnText').innerText = '??????? (??)';
+          document.getElementById('warnText').innerText = '天文台信號解除 (正常)';
         }
       }
     } catch (e) {
-      document.getElementById('warnText').innerText = '??????? (??)';
+      document.getElementById('warnText').innerText = '天文台信號解除 (正常)';
     }
   }
 
-  // 3. ????? 5 ?????
+  // 3. 取得天文台 5 天極簡預報
   async function loadForecast() {
     const container = document.getElementById('f_mini');
     try {
@@ -492,18 +500,18 @@
           container.innerHTML = '';
           data.weatherForecast.slice(0, 5).forEach((f, i) => {
             const isToday = i === 0;
-            const wk = isToday ? '?' : f.week.replace('??', '');
+            const wk = isToday ? '今' : f.week.replace('星期', '');
             const wDesc = f.forecastWeather || '';
-            let weather = '?';
-            if (wDesc.includes('?')) weather = '?';
-            else if (wDesc.includes('?')) weather = '?';
-            else if (wDesc.includes('?') || wDesc.includes('?')) weather = '?';
+            let weather = '晴';
+            if (wDesc.includes('雷')) weather = '雷';
+            else if (wDesc.includes('雨')) weather = '雨';
+            else if (wDesc.includes('陰') || wDesc.includes('雲')) weather = '雲';
 
             container.innerHTML += `
               <div class="f-mini-cell ${isToday ? 'active-f' : 'bg-white'}">
                 <div class="font-bold">${wk}</div>
                 <div class="font-black my-0.5 text-[9px]">${weather}</div>
-                <div class="font-mono text-[7px] tracking-tighter">${f.forecastMintemp.value}-${f.forecastMaxtemp.value}�</div>
+                <div class="font-mono text-[7px] tracking-tighter">${f.forecastMintemp.value}-${f.forecastMaxtemp.value}°</div>
               </div>`;
           });
           return;
@@ -518,37 +526,37 @@
   function renderFallbackForecast() {
     const container = document.getElementById('f_mini');
     container.innerHTML = '';
-    const days = ['?', '?', 'D3', 'D4', 'D5'];
+    const days = ['今', '明', 'D3', 'D4', 'D5'];
     days.forEach((d, i) => {
       container.innerHTML += `
         <div class="f-mini-cell ${i === 0 ? 'active-f' : 'bg-white'}">
           <div class="font-bold">${d}</div>
-          <div class="font-black my-0.5 text-[9px]">?</div>
-          <div class="font-mono text-[7px] tracking-tighter">26-31�</div>
+          <div class="font-black my-0.5 text-[9px]">晴</div>
+          <div class="font-mono text-[7px] tracking-tighter">26-31°</div>
         </div>`;
     });
   }
 
-  // 3.5 ?????????????? (?????? ? ??? ? ??????)
+  // 3.5 計算當前浪點水域全日天文潮汐 (當日所有潮漲 ▲ 與潮退 ▼ 同步完整顯示)
   function loadTideTimes() {
     const now = new Date();
     const pad = (n) => n.toString().padStart(2, '0');
     const spot = SURF_SPOTS[currentSpotIdx];
     
-    // ????????????????? (???????? 12.4206 ??)
+    // 依據天文月相週期推算香港水域半日潮 (半日潮平均週期約 12.4206 小時)
     const refNewMoon = new Date('2024-01-11T11:57:00Z');
     const diffDays = (now - refNewMoon) / (1000 * 60 * 60 * 24);
     const moonAge = (diffDays % 29.53058867 + 29.53058867) % 29.53058867;
     
-    // ??????????? vs ???? vs ????????????
+    // 根據浪點水域計算基礎高潮時相
     const period = 12.4206;
     const baseHigh = ((moonAge * 0.84 + 8.6 + spot.tideOffsetHours) % period + period) % period;
     
-    // ???? 00:00 ? 24:00 ????????? (High Tides)
+    // 計算當日 00:00 至 24:00 之間的所有潮漲時點 (High Tides)
     const highCandidates = [baseHigh - period, baseHigh, baseHigh + period, baseHigh + period * 2];
     const highTides = highCandidates.filter(t => t >= 0 && t < 24).sort((a, b) => a - b);
     
-    // ??????? 6.21 ?? (Low Tides)
+    // 退潮時點約相隔 6.21 小時 (Low Tides)
     const baseLow = baseHigh + (period / 2);
     const lowCandidates = [baseLow - period * 2, baseLow - period, baseLow, baseLow + period, baseLow + period * 2];
     const lowTides = lowCandidates.filter(t => t >= 0 && t < 24).sort((a, b) => a - b);
@@ -559,18 +567,17 @@
       return `${pad(h % 24)}:${pad(m % 60)}`;
     };
     
-    // ???????????????????
     const highStr = highTides.map(formatTime).join(' ');
     const lowStr = lowTides.map(formatTime).join(' ');
     
     const tideEl = document.getElementById('tideTimes');
     if (tideEl) {
-      tideEl.innerHTML = `<span class="block whitespace-nowrap">?${highStr}</span><span class="block whitespace-nowrap">?${lowStr}</span>`;
-      tideEl.title = `??????????? ${highTides.map(formatTime).join(', ')} | ?? ${lowTides.map(formatTime).join(', ')}`;
+      tideEl.innerHTML = `<span class="block whitespace-nowrap">▲${highStr || '--:--'}</span><span class="block whitespace-nowrap">▼${lowStr || '--:--'}</span>`;
+      tideEl.title = `今日天文潮位預測：漲潮 ${highTides.map(formatTime).join(', ')} | 退潮 ${lowTides.map(formatTime).join(', ')}`;
     }
   }
 
-  // 4. ??????????? 5 ??????????????
+  // 4. 動態獲取當前選定浪點的 5 天第一湧浪深度數據與統計運算
   async function loadSwellStats() {
     const spot = SURF_SPOTS[currentSpotIdx];
     const statsGrid = document.getElementById('cs_stats');
@@ -582,25 +589,25 @@
       if (res.ok) {
         const data = await res.json();
         
-        // ????????
-        const curSwell = data.current?.swell_wave_height ?? 0.8;
-        const curPeriod = Math.round(data.current?.swell_wave_period ?? 7);
-        const curDir = data.current?.swell_wave_direction ?? 180;
-        const curTotal = data.current?.wave_height ?? 1.0;
+        // 即時第一湧浪指標（加強安全容錯檢查，絕不輸出 undefined 或 null）
+        const curSwell = (typeof data.current?.swell_wave_height === 'number') ? data.current.swell_wave_height : 0.8;
+        const curPeriod = (typeof data.current?.swell_wave_period === 'number') ? Math.round(data.current.swell_wave_period) : 7;
+        const curDir = (typeof data.current?.swell_wave_direction === 'number') ? data.current.swell_wave_direction : 180;
+        const curTotal = (typeof data.current?.wave_height === 'number') ? data.current.wave_height : 1.0;
 
         document.getElementById('cs_now').innerText = curSwell.toFixed(1);
-        document.getElementById('cs_now_ft').innerText = `(${(curSwell * 3.28).toFixed(1)}?)`;
+        document.getElementById('cs_now_ft').innerText = `(${(curSwell * 3.28).toFixed(1)}呎)`;
         document.getElementById('cs_pd').innerText = curPeriod + 's';
         document.getElementById('cs_total').innerText = curTotal.toFixed(1) + 'm';
         
-        const dirs = ['? (N)', '?? (NE)', '? (E)', '?? (SE)', '? (S)', '?? (SW)', '? (W)', '?? (NW)'];
+        const dirs = ['北 (N)', '東北 (NE)', '東 (E)', '東南 (SE)', '南 (S)', '西南 (SW)', '西 (W)', '西北 (NW)'];
         document.getElementById('cs_dr').innerText = dirs[Math.round(curDir / 45) % 8];
 
-        // ?? 5 ?????
+        // 渲染 5 天統計網格
         statsGrid.innerHTML = '';
         const hourlySwell = data.hourly?.swell_wave_height || [];
         const hourlyPd = data.hourly?.swell_wave_period || [];
-        const weekDays = ['?', '?', '?', '?', '?', '?', '?'];
+        const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
         const baseDate = new Date();
 
         for (let day = 0; day < 5; day++) {
@@ -609,7 +616,7 @@
           const m = targetDate.getMonth() + 1;
           const d = targetDate.getDate();
           const wk = weekDays[targetDate.getDay()];
-          const dayPrefix = day === 0 ? '?' : (day === 1 ? '?' : `D${day + 1}`);
+          const dayPrefix = day === 0 ? '今' : (day === 1 ? '明' : `D${day + 1}`);
 
           const startIdx = day * 24;
           const endIdx = (day + 1) * 24;
@@ -627,17 +634,16 @@
           }
 
           const isToday = (day === 0);
-          /* ????? 1.5 ???????????????????????????? */
           const isFullSwell = parseFloat(avg) >= 1.5;
           const waveVisual = isFullSwell
-            ? `<i class="fa-solid fa-water text-xs sm:text-sm leading-none" title="???? (?1.5m)"></i>`
+            ? `<i class="fa-solid fa-water text-xs sm:text-sm leading-none" title="滿格浪況 (≥1.5m)"></i>`
             : '';
 
           statsGrid.innerHTML += `
             <div class="stats-cell ${isToday ? 'active-day' : ''}">
               <div class="text-[7.5px] font-black tracking-tight leading-none pt-0.5">
                 <div>${dayPrefix} ${m}/${d}</div>
-                <div class="text-[6.5px] font-bold opacity-85 mt-0.5">??${wk}</div>
+                <div class="text-[6.5px] font-bold opacity-85 mt-0.5">星期${wk}</div>
               </div>
               <div class="w-full flex items-center justify-center h-2.5 my-0 px-0.5">
                 ${waveVisual}
@@ -669,7 +675,7 @@
     const spot = SURF_SPOTS[currentSpotIdx];
     const isEastCoast = currentSpotIdx > 0;
     const baseAvg = isEastCoast ? '1.1' : '0.8';
-    const weekDays = ['?', '?', '?', '?', '?', '?', '?'];
+    const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
     const baseDate = new Date();
 
     const fallbackData = [
@@ -686,18 +692,18 @@
       const m = targetDate.getMonth() + 1;
       const d = targetDate.getDate();
       const wk = weekDays[targetDate.getDay()];
-      const dayPrefix = day === 0 ? '?' : (day === 1 ? '?' : `D${day + 1}`);
+      const dayPrefix = day === 0 ? '今' : (day === 1 ? '明' : `D${day + 1}`);
 
       const isFullSwell = parseFloat(item.avg) >= 1.5;
       const waveVisual = isFullSwell
-        ? `<i class="fa-solid fa-water text-xs sm:text-sm leading-none" title="???? (?1.5m)"></i>`
+        ? `<i class="fa-solid fa-water text-xs sm:text-sm leading-none" title="滿格浪況 (≥1.5m)"></i>`
         : '';
 
       statsGrid.innerHTML += `
         <div class="stats-cell ${item.active ? 'active-day' : ''}">
           <div class="text-[7.5px] font-black tracking-tight leading-none pt-0.5">
             <div>${dayPrefix} ${m}/${d}</div>
-            <div class="text-[6.5px] font-bold opacity-85 mt-0.5">??${wk}</div>
+            <div class="text-[6.5px] font-bold opacity-85 mt-0.5">星期${wk}</div>
           </div>
           <div class="w-full flex items-center justify-center h-2.5 my-0 px-0.5">
             ${waveVisual}
@@ -709,10 +715,10 @@
     });
   }
 
-  // 5. ????????
+  // 5. 數據全面即時刷新
   async function fetchAllData() {
     const icon = document.getElementById('syncIcon');
-    icon.classList.add('fa-spin');
+    if (icon) icon.classList.add('fa-spin');
     
     await Promise.allSettled([
       loadHKO(),
@@ -723,12 +729,15 @@
     
     const now = new Date();
     const pad = (n) => n.toString().padStart(2, '0');
-    document.getElementById('lastUpdated').innerText = `UPDATED: ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const updateEl = document.getElementById('lastUpdated');
+    if (updateEl) {
+      updateEl.innerText = `UPDATED: ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    }
     
-    setTimeout(() => icon.classList.remove('fa-spin'), 500);
+    if (icon) setTimeout(() => icon.classList.remove('fa-spin'), 500);
   }
 
-  // 6. ?????????? 30 ?????????????????
+  // 6. 電子墨水屏防殘影：每 30 分鐘自動反色一次，隨後即時變回原色
   function triggerAutoInversion() {
     const wasInverted = document.body.classList.contains('inverted');
     
@@ -747,13 +756,13 @@
     }, 1200);
   }
 
-  // ???????????????????? 15 ??????
+  // 頁面加載完成後立即執行初次獲取，並設定每 15 分鐘自動刷新
   window.addEventListener('DOMContentLoaded', () => {
     updateSpotUI();
     fetchAllData();
     setInterval(fetchAllData, 15 * 60 * 1000);
     
-    // ? 30 ????????????????????
+    // 每 30 分鐘自動觸發一次反色快閃刷新消除墨水殘影
     setInterval(triggerAutoInversion, 30 * 60 * 1000);
   });
 </script>
