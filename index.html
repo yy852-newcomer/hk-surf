@@ -25,37 +25,33 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* 
-      1. 全域流體排版與間距系統 (Fluid Scaling System with CSS clamp)
-      擺脫傳統固定 px 與失控 %，在任何 DPR/設備尺寸下鎖定最佳視覺曲線
-    */
+    /* 全域流體排版與間距系統 (CSS Clamp) */
     :root {
-      /* 間距流體 Clamp: clamp(最小值, 理想動態值, 最大值) - 適度收緊間距以釋放高度給特大字體 */
       --space-page: clamp(3px, 0.8vh, 10px);
       --gap-main: clamp(2px, 0.5vh, 6px);
-      --gap-grid: clamp(2px, 0.4vw, 5px);
+      --gap-grid: clamp(3px, 0.6vw, 7px);
       --pad-card: clamp(3px, 0.6vh, 8px);
       --border-thick: clamp(1.5px, 0.22vmin, 2.5px);
 
-      /* 字體流體 Clamp (大幅擴大字階，強化遠距離清晰度) */
-      --fs-clock: clamp(2.8rem, 7vmin + 1rem, 5.2rem);
-      --fs-ampm: clamp(0.9rem, 2vmin, 1.4rem);
-      --fs-date: clamp(0.85rem, 1.8vmin, 1.25rem);
-      --fs-swell-main: clamp(3.4rem, 9vmin + 1rem, 6.2rem);
-      --fs-unit: clamp(1.1rem, 2.4vmin, 1.7rem);
-      --fs-subtitle: clamp(0.85rem, 1.8vmin, 1.25rem);
-      --fs-label: clamp(0.78rem, 1.6vmin, 1.12rem);
-      --fs-value: clamp(1rem, 2.2vmin, 1.55rem);
-      --fs-tide: clamp(0.82rem, 1.8vmin, 1.2rem);
-      --fs-forecast-day: clamp(0.82rem, 1.8vmin, 1.2rem);
-      --fs-footer: clamp(0.75rem, 1.6vmin, 1.05rem);
+      /* 字體流體 Clamp 全面增大幅度 (Boosted for Maximum Readability) */
+      --fs-clock: clamp(3.2rem, 8.5vmin + 1.2rem, 5.8rem);
+      --fs-ampm: clamp(1.05rem, 2.3vmin, 1.55rem);
+      --fs-date: clamp(0.95rem, 2.1vmin, 1.4rem);
+      --fs-swell-main: clamp(3.8rem, 10vmin + 1.2rem, 6.8rem);
+      --fs-unit: clamp(1.25rem, 2.6vmin, 1.9rem);
+      --fs-subtitle: clamp(0.95rem, 2.1vmin, 1.4rem);
+      --fs-label: clamp(0.88rem, 1.9vmin, 1.25rem);
+      --fs-value: clamp(1.15rem, 2.5vmin, 1.75rem);
+      --fs-tide: clamp(0.88rem, 1.8vmin, 1.25rem);
+      --fs-forecast-day: clamp(0.92rem, 2vmin, 1.35rem);
+      --fs-footer: clamp(0.82rem, 1.8vmin, 1.15rem);
     }
 
     html, body {
       margin: 0; padding: 0;
       width: 100%;
       height: 100vh;
-      height: 100dvh; /* 適配 iOS Safari / Chrome 動態工具列 */
+      height: 100dvh;
       background-color: #ffffff; 
       color: #000000;
       font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "PingFang HK", "PingFang SC", "Microsoft JhengHei", "微軟正黑體", sans-serif;
@@ -63,31 +59,27 @@
       touch-action: pan-y pinch-zoom;
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
-      overflow: hidden; /* 嚴格單屏不滾動，杜絕排版崩潰破版 */
+      overflow: hidden;
     }
 
     .font-mono { 
       font-family: 'JetBrains Mono', Consolas, Monaco, "Courier New", monospace; 
     }
 
-    /* 
-      自適應外框容器：
-      結合 Clamp 寬度限制，手機滿屏張力飽滿，10 吋 iPad 或大螢幕自動優雅置中舒展
-    */
     .screen-container {
       width: 100%;
-      max-width: clamp(340px, 92vw, 680px);
+      max-width: clamp(360px, 95vw, 760px);
       height: 100vh;
       height: 100dvh;
       margin: 0 auto;
-      padding: clamp(4px, env(safe-area-inset-top, 6px), 14px) 
-               clamp(6px, env(safe-area-inset-right, 8px), 18px) 
-               clamp(4px, env(safe-area-inset-bottom, 6px), 14px) 
-               clamp(6px, env(safe-area-inset-left, 8px), 18px);
+      padding: clamp(4px, env(safe-area-inset-top, 6px), 12px) 
+               clamp(6px, env(safe-area-inset-right, 8px), 16px) 
+               clamp(4px, env(safe-area-inset-bottom, 6px), 12px) 
+               clamp(6px, env(safe-area-inset-left, 8px), 16px);
       display: flex; 
       flex-direction: column;
       justify-content: space-between;
-      gap: var(--gap-main);
+      gap: clamp(1px, 0.4vh, 4px);
       position: relative;
     }
 
@@ -107,14 +99,17 @@
     .inverted .text-white { color: #000000 !important; }
     .inverted .border-black { border-color: #ffffff !important; }
     .inverted .border-white { border-color: #000000 !important; }
-    .inverted .stats-cell { background-color: #000000 !important; border-color: #ffffff !important; color: #ffffff !important; }
+    .inverted .stats-cell { background-color: #111111 !important; color: #ffffff !important; }
     .inverted .stats-cell.active-day { background-color: #ffffff !important; color: #000000 !important; }
-    .inverted .f-mini-cell { border-color: #ffffff !important; color: #ffffff !important; }
+    .inverted .f-mini-cell { background-color: #111111 !important; color: #ffffff !important; }
     .inverted .f-mini-cell.active-f { background-color: #ffffff !important; color: #000000 !important; }
     .inverted .spot-dot.active { background-color: #ffffff !important; }
     .inverted .spot-dot { border-color: #ffffff !important; }
 
-    /* 5 天第一湧浪深度趨勢統計網格 */
+    /* 
+      P5 優化：去雜線/純留白設計 (P5: Clean Whitespace & De-cluttered Grids)
+      取消內部交錯的小實線，改用微小呼吸間隔與深淺色塊對比
+    */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -123,15 +118,15 @@
     }
 
     .stats-cell {
-      border: var(--border-thick) solid #000000;
-      background-color: #ffffff;
-      padding: clamp(2px, 0.4vh, 5px) clamp(1px, 0.3vw, 4px);
+      background-color: #f7f7f7; /* 極淡底色營造自然卡片感，杜絕黑色實線雜訊 */
+      border-radius: 4px;
+      padding: clamp(3px, 0.6vh, 6px) clamp(2px, 0.4vw, 5px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
       text-align: center;
-      min-width: 0; /* 防止單元格被字體撐爆 */
+      min-width: 0;
     }
 
     .stats-cell.active-day {
@@ -139,7 +134,7 @@
       color: #ffffff;
     }
 
-    /* 5 天天文台微型預報條 */
+    /* 5 天天文台微型預報條 (去線留白版) */
     .f-mini-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -148,8 +143,9 @@
     }
 
     .f-mini-cell {
-      border: var(--border-thick) solid #000000;
-      padding: clamp(2px, 0.4vh, 5px) 2px;
+      background-color: #f7f7f7;
+      border-radius: 4px;
+      padding: clamp(3px, 0.5vh, 6px) 2px;
       text-align: center;
       min-width: 0;
       line-height: 1.2;
@@ -174,7 +170,7 @@
       background-color: #000000;
     }
 
-    /* 動態字體綁定 class (由 CSS Clamp 全局接管) */
+    /* 動態字體綁定 class */
     .font-fluid-clock { font-size: var(--fs-clock); line-height: 0.9; }
     .font-fluid-ampm { font-size: var(--fs-ampm); }
     .font-fluid-date { font-size: var(--fs-date); }
@@ -197,7 +193,7 @@
     <div class="flex flex-col gap-1 min-w-0 pr-2">
       <div class="flex items-center gap-1.5 flex-wrap">
         <!-- 點擊或滑動切換的據點導航 -->
-        <div class="inline-flex items-center bg-black text-white px-2 py-0.5 font-black tracking-wider select-none shrink-0 font-fluid-label">
+        <div class="inline-flex items-center bg-black text-white px-2 py-0.5 font-black tracking-wider select-none shrink-0 font-fluid-label rounded-sm">
           <button onclick="prevSpot()" class="px-1 font-black hover:opacity-75 cursor-pointer" title="上一個浪點" aria-label="上一個浪點">◀</button>
           <span class="mx-1 cursor-pointer font-black" onclick="nextSpot()">HK SURF</span>
           <button onclick="nextSpot()" class="px-1 font-black hover:opacity-75 cursor-pointer" title="下一個浪點" aria-label="下一個浪點">▶</button>
@@ -210,18 +206,18 @@
           <span class="spot-dot" onclick="switchSpot(2)" title="西貢大浪灣"></span>
         </div>
 
-        <button onclick="toggleTheme()" title="反色模式切換" aria-label="反色切換" class="ink-b px-1.5 py-0.5 font-black font-fluid-label active:bg-black active:text-white cursor-pointer shrink-0"><i class="fa-solid fa-circle-half-stroke"></i></button>
-        <button onclick="fetchAllData()" title="手動刷新數據" aria-label="更新數據" class="ink-b px-1.5 py-0.5 font-black font-fluid-label active:bg-black active:text-white cursor-pointer shrink-0"><i id="syncIcon" class="fa-solid fa-rotate"></i></button>
+        <button onclick="toggleTheme()" title="反色模式切換" aria-label="反色切換" class="ink-b px-1.5 py-0.5 font-black font-fluid-label active:bg-black active:text-white cursor-pointer shrink-0 rounded-sm"><i class="fa-solid fa-circle-half-stroke"></i></button>
+        <button onclick="fetchAllData()" title="手動刷新數據" aria-label="更新數據" class="ink-b px-1.5 py-0.5 font-black font-fluid-label active:bg-black active:text-white cursor-pointer shrink-0 rounded-sm"><i id="syncIcon" class="fa-solid fa-rotate"></i></button>
       </div>
       
-      <!-- HKO 實時特別警告標籤 (雷暴以雷電圖示呈現) -->
-      <div id="warnBadge" class="bg-black text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 max-w-[280px] truncate">
+      <!-- HKO 實時特別警告標籤 -->
+      <div id="warnBadge" class="bg-black text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 max-w-[280px] truncate rounded-sm">
         <i class="fa-solid fa-shield-halved shrink-0 text-xs"></i>
         <span id="warnText" class="truncate font-black font-fluid-label">天文台信號解除 (正常)</span>
       </div>
     </div>
     
-    <!-- 右側日期與 12 小時制 AM/PM 大時鐘 (時:分，無秒數) -->
+    <!-- 右側日期與 12 小時制 AM/PM 大時鐘 -->
     <div class="text-right leading-none flex flex-col justify-center items-end shrink-0 pl-1">
       <div class="flex items-baseline justify-end gap-1">
         <span id="ampm" class="font-mono font-fluid-ampm font-black tracking-tight">AM</span>
@@ -234,8 +230,8 @@
     </div>
   </header>
 
-  <!-- 2. 香港天文台實時氣候速報 (單列 5 欄，潮汐享有超寬空間) -->
-  <section class="ink-b grid grid-cols-[0.8fr_1fr_0.8fr_0.7fr_2.5fr] text-center items-center py-1 bg-white shrink-0">
+  <!-- 2. 香港天文台實時氣候速報 (整合 P1：動態即時潮位狀態徽章) -->
+  <section class="ink-b grid grid-cols-[0.85fr_1.1fr_0.85fr_0.75fr_2.7fr] text-center items-center py-1 bg-white shrink-0">
     <div class="ink-b-r px-0.5 min-w-0">
       <p class="font-fluid-label font-black uppercase">氣溫</p>
       <p class="font-mono font-fluid-value font-black mt-0.5 leading-none"><span id="temp">28</span>°</p>
@@ -253,7 +249,11 @@
       <p id="uv" class="font-mono font-fluid-value font-black mt-0.5 leading-none">6</p>
     </div>
     <div class="px-1 min-w-0">
-      <p class="font-fluid-label font-black uppercase truncate">今日潮汐</p>
+      <!-- P1: 標題整合當前即時潮況徽章 (例如「潮汐 · 漲潮中 ▲」) -->
+      <div class="flex items-center justify-center gap-1 font-fluid-label font-black">
+        <span class="uppercase">潮汐</span>
+        <span id="tideNowBadge" class="bg-black text-white text-[0.75rem] px-1 py-0.2 font-black rounded-sm leading-none whitespace-nowrap">計算中</span>
+      </div>
       <p id="tideTimes" class="font-mono font-fluid-tide font-black leading-tight mt-0.5 tracking-tight">
         <span class="block truncate">▲ --:--</span>
         <span class="block truncate">▼ --:--</span>
@@ -261,42 +261,46 @@
     </div>
   </section>
 
-  <!-- 3. 即時第一湧浪核心卡片 (無邊框簡約開闊設計) -->
-  <section class="p-0.5 sm:p-1 bg-white shrink-0 flex flex-col justify-center min-h-0">
-    <div class="grid grid-cols-12 items-center gap-2">
+  <!-- 3. 即時第一湧浪核心卡片 (整合 P2：浪向動態方位箭頭) -->
+  <section class="py-1 px-2 bg-white shrink-0 flex flex-col justify-center items-center min-h-0">
+    <div class="w-full max-w-[92%] sm:max-w-[82%] mx-auto grid grid-cols-12 items-center gap-3 sm:gap-6">
       <!-- 左側：湧浪數值主區 -->
-      <div class="col-span-7 pl-0.5 flex flex-col justify-between h-full min-w-0">
+      <div class="col-span-7 flex flex-col items-center justify-center text-center h-full min-w-0 py-0.5">
         <div>
-          <div id="spotTitle" class="font-fluid-subtitle font-black uppercase tracking-wider border-b-2 border-black inline-block mb-0.5 truncate max-w-full">
+          <div id="spotTitle" class="font-fluid-subtitle font-black uppercase tracking-wider border-b-2 border-black inline-block mb-1 truncate max-w-full">
             下長沙即時第一湧浪
           </div>
         </div>
-        <div class="flex items-baseline gap-1.5 my-auto flex-nowrap overflow-hidden">
+        <div class="flex items-baseline justify-center gap-1.5 my-auto flex-nowrap overflow-hidden">
           <span id="cs_now" class="font-mono font-fluid-swell font-black tracking-tighter">0.8</span>
           <span class="font-fluid-unit font-black">m</span>
           <span id="cs_now_ft" class="font-fluid-label font-mono font-black whitespace-nowrap ml-0.5 opacity-90">(2.6呎)</span>
         </div>
       </div>
       
-      <!-- 右側：指標列表 (週期、浪向、總浪) -->
-      <div class="col-span-5 pl-2 ink-b-l grid grid-rows-3 gap-y-1 h-full py-0.5 min-w-0">
-        <div class="grid grid-cols-[clamp(34px,5cqi,52px)_1fr] items-center gap-x-1 min-w-0">
-          <span class="font-fluid-label font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight">週期</span>
-          <span id="cs_pd" class="font-mono font-fluid-value font-black text-right leading-none truncate">7s</span>
+      <!-- 右側：指標列表 (整合 P2 箭頭旋轉展示) -->
+      <div class="col-span-5 pl-3 sm:pl-4 ink-b-l grid grid-rows-3 gap-y-1.5 h-full py-1 min-w-0 justify-center">
+        <div class="grid grid-cols-[clamp(40px,6cqi,58px)_1fr] items-center gap-x-2 min-w-0">
+          <span class="font-fluid-label font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight rounded-sm">週期</span>
+          <span id="cs_pd" class="font-mono font-fluid-value font-black text-right leading-none truncate pr-1">7s</span>
         </div>
-        <div class="grid grid-cols-[clamp(34px,5cqi,52px)_1fr] items-center gap-x-1 min-w-0">
-          <span class="font-fluid-label font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight">浪向</span>
-          <span id="cs_dr" class="font-fluid-value font-black text-right leading-none truncate">南 (S)</span>
+        <div class="grid grid-cols-[clamp(40px,6cqi,58px)_1fr] items-center gap-x-2 min-w-0">
+          <span class="font-fluid-label font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight rounded-sm">浪向</span>
+          <!-- P2: 動態浪向箭頭 + 文字 -->
+          <div class="flex items-center justify-end gap-1.5 min-w-0 pr-1">
+            <i id="cs_dr_arrow" class="fa-solid fa-arrow-up font-black text-sm transition-transform duration-500" title="浪推進方向"></i>
+            <span id="cs_dr" class="font-fluid-value font-black leading-none truncate">南 (S)</span>
+          </div>
         </div>
-        <div class="grid grid-cols-[clamp(34px,5cqi,52px)_1fr] items-center gap-x-1 min-w-0">
-          <span class="font-fluid-label font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight">總浪</span>
-          <span id="cs_total" class="font-mono font-fluid-value font-black text-right leading-none truncate">1.0m</span>
+        <div class="grid grid-cols-[clamp(40px,6cqi,58px)_1fr] items-center gap-x-2 min-w-0">
+          <span class="font-fluid-label font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight rounded-sm">總浪</span>
+          <span id="cs_total" class="font-mono font-fluid-value font-black text-right leading-none truncate pr-1">1.0m</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 4. 重點核心：未來 5 天第一湧浪深度趨勢統計 -->
+  <!-- 4. 重點核心：未來 5 天第一湧浪深度趨勢統計 (P5 去雜線純留白卡片) -->
   <section class="flex flex-col justify-between shrink-0">
     <div class="flex justify-between items-center border-b-2 border-black pb-0.5 mb-1 shrink-0">
       <span class="font-fluid-subtitle font-black tracking-wider flex items-center gap-1">
@@ -307,15 +311,15 @@
       </span>
     </div>
     
-    <!-- 5 天統計卡片網格 -->
+    <!-- 5 天統計卡片網格 (P5: 移除了內部網格線，改為乾淨留白卡片) -->
     <div class="stats-grid" id="cs_stats">
       <div class="col-span-5 text-center py-2 font-mono font-black font-fluid-label">載入 5 天湧浪深度數據中...</div>
     </div>
   </section>
 
-  <!-- 5. 香港天文台未來 5 天極簡微型預報條 -->
+  <!-- 5. 香港天文台未來 5 天極簡微型預報條 (P5 留白卡片) -->
   <section class="shrink-0">
-    <div class="flex justify-between items-center mb-1">
+    <div class="flex justify-between items-center mb-0.5">
       <span class="font-fluid-label font-black tracking-wider">HKO 5-DAY FORECAST (天文台五日預測)</span>
     </div>
     <div class="f-mini-grid" id="f_mini">
@@ -538,6 +542,23 @@
     }
   }
 
+  function getWeatherIcon(desc, iconCode) {
+    const text = desc || '';
+    if (text.includes('雷')) return '<i class="fa-solid fa-cloud-bolt" title="雷暴"></i>';
+    if (text.includes('雨') || text.includes('驟雨')) return '<i class="fa-solid fa-cloud-showers-heavy" title="驟雨/有雨"></i>';
+    if (text.includes('晴') && (text.includes('雲') || text.includes('短暫') || text.includes('大致'))) return '<i class="fa-solid fa-cloud-sun" title="短暫陽光/大致天晴"></i>';
+    if (text.includes('晴') || text.includes('天晴')) return '<i class="fa-solid fa-sun" title="天晴"></i>';
+    if (text.includes('陰') || text.includes('多雲') || text.includes('雲')) return '<i class="fa-solid fa-cloud" title="多雲/陰天"></i>';
+    if (text.includes('霧') || text.includes('薄霧')) return '<i class="fa-solid fa-smog" title="有霧"></i>';
+    if (text.includes('風')) return '<i class="fa-solid fa-wind" title="風勢較大"></i>';
+
+    if (iconCode >= 50 && iconCode <= 52) return '<i class="fa-solid fa-sun" title="天晴"></i>';
+    if (iconCode >= 53 && iconCode <= 54) return '<i class="fa-solid fa-cloud-sun" title="大致天晴"></i>';
+    if (iconCode >= 60 && iconCode <= 61) return '<i class="fa-solid fa-cloud" title="多雲"></i>';
+    if (iconCode >= 62 && iconCode <= 65) return '<i class="fa-solid fa-cloud-showers-heavy" title="有雨"></i>';
+    return '<i class="fa-solid fa-sun" title="晴"></i>';
+  }
+
   async function loadForecast() {
     const container = document.getElementById('f_mini');
     try {
@@ -550,15 +571,13 @@
             const isToday = i === 0;
             const wk = isToday ? '今' : f.week.replace('星期', '');
             const wDesc = f.forecastWeather || '';
-            let weather = '晴';
-            if (wDesc.includes('雷')) weather = '雷';
-            else if (wDesc.includes('雨')) weather = '雨';
-            else if (wDesc.includes('陰') || wDesc.includes('雲')) weather = '雲';
+            const iconCode = f.ForecastIcon;
+            const weatherIcon = getWeatherIcon(wDesc, iconCode);
 
             container.innerHTML += `
-              <div class="f-mini-cell ${isToday ? 'active-f' : 'bg-white'}">
+              <div class="f-mini-cell ${isToday ? 'active-f' : ''}">
                 <div class="font-fluid-forecast font-black">${wk}</div>
-                <div class="font-black my-0.5 font-fluid-forecast">${weather}</div>
+                <div class="my-0.5 font-fluid-forecast flex items-center justify-center h-[1.3em]">${weatherIcon}</div>
                 <div class="font-mono font-fluid-footer font-black tracking-tighter truncate">${f.forecastMintemp.value}-${f.forecastMaxtemp.value}°</div>
               </div>`;
           });
@@ -575,17 +594,24 @@
     const container = document.getElementById('f_mini');
     if (!container) return;
     container.innerHTML = '';
-    const days = ['今', '明', 'D3', 'D4', 'D5'];
-    days.forEach((d, i) => {
+    const fallbackList = [
+      { d: '今', icon: '<i class="fa-solid fa-sun"></i>', temp: '26-31°' },
+      { d: '明', icon: '<i class="fa-solid fa-cloud-sun"></i>', temp: '26-31°' },
+      { d: 'D3', icon: '<i class="fa-solid fa-cloud-showers-heavy"></i>', temp: '25-29°' },
+      { d: 'D4', icon: '<i class="fa-solid fa-cloud"></i>', temp: '25-30°' },
+      { d: 'D5', icon: '<i class="fa-solid fa-sun"></i>', temp: '26-31°' }
+    ];
+    fallbackList.forEach((item, i) => {
       container.innerHTML += `
-        <div class="f-mini-cell ${i === 0 ? 'active-f' : 'bg-white'}">
-          <div class="font-fluid-forecast font-black">${d}</div>
-          <div class="font-black my-0.5 font-fluid-forecast">晴</div>
-          <div class="font-mono font-fluid-footer font-black tracking-tighter truncate">26-31°</div>
+        <div class="f-mini-cell ${i === 0 ? 'active-f' : ''}">
+          <div class="font-fluid-forecast font-black">${item.d}</div>
+          <div class="my-0.5 font-fluid-forecast flex items-center justify-center h-[1.3em]">${item.icon}</div>
+          <div class="font-mono font-fluid-footer font-black tracking-tighter truncate">${item.temp}</div>
         </div>`;
     });
   }
 
+  // P1 實裝：計算全日潮時與即時潮況趨勢（現正漲潮中 / 退潮中）
   function loadTideTimes() {
     const now = new Date();
     const pad = (n) => n.toString().padStart(2, '0');
@@ -598,13 +624,38 @@
     const period = 12.4206;
     const baseHigh = ((moonAge * 0.84 + 8.6 + spot.tideOffsetHours) % period + period) % period;
     
-    const highCandidates = [baseHigh - period, baseHigh, baseHigh + period, baseHigh + period * 2];
-    const highTides = highCandidates.filter(t => t >= 0 && t < 24).sort((a, b) => a - b);
-    
-    const baseLow = baseHigh + (period / 2);
-    const lowCandidates = [baseLow - period * 2, baseLow - period, baseLow, baseLow + period, baseLow + period * 2];
-    const lowTides = lowCandidates.filter(t => t >= 0 && t < 24).sort((a, b) => a - b);
-    
+    // 生成當日及相鄰高低潮事件列表
+    const events = [];
+    for (let k = -2; k <= 3; k++) {
+      const hTime = baseHigh + k * period;
+      events.push({ type: 'HIGH', time: hTime });
+      const lTime = hTime + (period / 2);
+      events.push({ type: 'LOW', time: lTime });
+    }
+    events.sort((a, b) => a.time - b.time);
+
+    const nowFloat = now.getHours() + (now.getMinutes() / 60) + (now.getSeconds() / 3600);
+
+    // 找出下一個極值潮時
+    const nextEvent = events.find(ev => ev.time > nowFloat);
+    const prevEvent = [...events].reverse().find(ev => ev.time <= nowFloat);
+
+    const badgeEl = document.getElementById('tideNowBadge');
+    if (badgeEl && nextEvent) {
+      const isRising = (nextEvent.type === 'HIGH');
+      const diffHours = (nextEvent.time - nowFloat).toFixed(1);
+      if (isRising) {
+        badgeEl.innerHTML = `▲ 漲潮中 (${diffHours}h滿)`;
+        badgeEl.className = "bg-black text-white text-[0.74rem] px-1.5 py-0.5 font-black rounded-sm leading-none whitespace-nowrap";
+      } else {
+        badgeEl.innerHTML = `▼ 退潮中 (${diffHours}h乾)`;
+        badgeEl.className = "bg-black text-white text-[0.74rem] px-1.5 py-0.5 font-black rounded-sm leading-none whitespace-nowrap";
+      }
+    }
+
+    const highTides = events.filter(e => e.type === 'HIGH' && e.time >= 0 && e.time < 24).map(e => e.time);
+    const lowTides = events.filter(e => e.type === 'LOW' && e.time >= 0 && e.time < 24).map(e => e.time);
+
     const formatTime = (hFloat) => {
       const h = Math.floor(hFloat);
       const m = Math.floor((hFloat % 1) * 60);
@@ -619,6 +670,22 @@
       tideEl.innerHTML = `<span class="block truncate">▲ ${highStr || '--:--'}</span><span class="block truncate">▼ ${lowStr || '--:--'}</span>`;
       tideEl.title = `今日天文潮位預測：漲潮 ${highTides.map(formatTime).join(', ')} | 退潮 ${lowTides.map(formatTime).join(', ')}`;
     }
+  }
+
+  // P2 實裝：浪向動態箭頭更新
+  function updateWaveDirectionUI(dirDegrees) {
+    const arrowEl = document.getElementById('cs_dr_arrow');
+    const dirEl = document.getElementById('cs_dr');
+    if (!dirEl || !arrowEl) return;
+
+    // 海洋浪向為波浪推進來向（例如 180° 表示波浪由南向北湧來，波浪推進朝向 0° 北方）
+    // 讓箭頭指向海浪推進衝擊岸邊的方向
+    const propagationAngle = (dirDegrees + 180) % 360;
+    arrowEl.style.transform = `rotate(${propagationAngle}deg)`;
+
+    const dirs = ['北 (N)', '東北 (NE)', '東 (E)', '東南 (SE)', '南 (S)', '西南 (SW)', '西 (W)', '西北 (NW)'];
+    const idx = Math.round(dirDegrees / 45) % 8;
+    dirEl.innerText = dirs[idx];
   }
 
   async function loadSwellStats() {
@@ -642,8 +709,8 @@
         document.getElementById('cs_pd').innerText = curPeriod + 's';
         document.getElementById('cs_total').innerText = curTotal.toFixed(1) + 'm';
         
-        const dirs = ['北 (N)', '東北 (NE)', '東 (E)', '東南 (SE)', '南 (S)', '西南 (SW)', '西 (W)', '西北 (NW)'];
-        document.getElementById('cs_dr').innerText = dirs[Math.round(curDir / 45) % 8];
+        // P2: 更新浪向動態箭頭與文字
+        updateWaveDirectionUI(curDir);
 
         statsGrid.innerHTML = '';
         const hourlySwell = data.hourly?.swell_wave_height || [];
@@ -679,6 +746,7 @@
             ? `<i class="fa-solid fa-water text-xs leading-none" title="滿格浪況 (≥1.5m)"></i>`
             : '';
 
+          // P5: 純粹留白卡片排版
           statsGrid.innerHTML += `
             <div class="stats-cell ${isToday ? 'active-day' : ''}">
               <div class="font-fluid-label font-black leading-tight pt-0.5 truncate w-full text-center">
@@ -687,13 +755,13 @@
               <div class="w-full flex items-center justify-center h-3 my-0.5">
                 ${waveVisual}
               </div>
-              <div class="font-mono font-fluid-value font-black leading-none my-0.5">
+              <div class="font-mono font-fluid-value font-black leading-none my-0.5 text-base sm:text-xl">
                 ${avg}<span class="font-fluid-footer font-black ml-0.5">m</span>
               </div>
               <div class="font-fluid-footer font-mono font-black leading-tight truncate">
                 ${min}-${max}m
               </div>
-              <div class="font-fluid-footer font-mono font-black border-t-2 ${isToday ? 'border-white' : 'border-black'} border-solid w-full pt-1 mt-0.5 leading-none truncate">
+              <div class="font-fluid-footer font-mono font-black border-t-2 ${isToday ? 'border-white' : 'border-black'} border-solid w-full pt-1 mt-0.5 leading-none truncate text-[0.8rem] sm:text-[0.95rem]">
                 ${avgPd}s
               </div>
             </div>`;
@@ -726,6 +794,8 @@
       { avg: '0.6', min: '0.4', max: '0.8', pd: 6, active: false }
     ];
 
+    updateWaveDirectionUI(180);
+
     fallbackData.forEach((item, day) => {
       const targetDate = new Date(baseDate);
       targetDate.setDate(baseDate.getDate() + day);
@@ -746,11 +816,11 @@
           <div class="w-full flex items-center justify-center h-3 my-0.5">
             ${waveVisual}
           </div>
-          <div class="font-mono font-fluid-value font-black leading-none my-0.5">
+          <div class="font-mono font-fluid-value font-black leading-none my-0.5 text-base sm:text-xl">
             ${item.avg}<span class="font-fluid-footer font-black ml-0.5">m</span>
           </div>
           <div class="font-fluid-footer font-mono font-black leading-tight truncate">${item.min}-${item.max}m</div>
-          <div class="font-fluid-footer font-mono font-black border-t-2 ${item.active ? 'border-white' : 'border-black'} border-solid w-full pt-1 mt-0.5 leading-none truncate">${item.pd}s</div>
+          <div class="font-fluid-footer font-mono font-black border-t-2 ${item.active ? 'border-white' : 'border-black'} border-solid w-full pt-1 mt-0.5 leading-none truncate text-[0.8rem] sm:text-[0.95rem]">${item.pd}s</div>
         </div>`;
     });
   }
