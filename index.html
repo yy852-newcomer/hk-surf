@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <!-- 1. 加入 viewport-fit=cover，適配 iPhone 瀏海屏與各類全螢幕設備 -->
+  <!-- 跨設備適配：支援全螢幕瀏海屏與防止雙擊縮放造成版面破裂 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -25,12 +25,12 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* 關鍵修復：防止不同作業系統與手機瀏覽器自動把字體暴力放大而導致破版 */
+    /* 核心抗變形設定：鎖定系統字體縮放，防範各類設備強制拉伸文字 */
     html, body {
       margin: 0; padding: 0;
       width: 100%;
       min-height: 100vh;
-      min-height: 100dvh; /* 適配 iOS Safari / Chrome 動態工具列，避免底部被吃掉 */
+      min-height: 100dvh; /* 適配 iOS Safari / Chrome 動態網址列收合 */
       background-color: #ffffff; 
       color: #000000;
       font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "PingFang HK", "PingFang SC", "Microsoft JhengHei", "微軟正黑體", sans-serif;
@@ -39,17 +39,17 @@
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
       overflow-x: hidden;
-      overflow-y: auto; /* 螢幕極端過矮時允許平滑滾動，常規螢幕嚴格單屏 */
+      overflow-y: auto; /* 保障極矮螢幕可微滾動，常規平板與手機單屏鎖定 */
     }
 
     .font-mono { 
       font-family: 'JetBrains Mono', Consolas, Monaco, "Courier New", monospace; 
     }
 
-    /* 自適應全設備外框容器：手機滿屏、iPad/平板/電腦居中自適應比例 */
+    /* 自適應全設備外框容器：手機 100% 滿屏、iPad/平板/電腦優雅居中維持黃金比例 */
     .screen-container {
       width: 100%;
-      max-width: 480px; /* 黃金比例，防止平板與電腦上字體過度拉伸變形 */
+      max-width: 480px; /* 防止在寬螢幕平板或電腦上被過度拉伸為奇怪的扁平長方形 */
       min-height: 100vh;
       min-height: 100dvh;
       margin: 0 auto;
@@ -57,11 +57,11 @@
       display: flex; 
       flex-direction: column;
       justify-content: space-between;
-      gap: clamp(2px, 0.8vh, 6px); /* 彈性間距：根據設備高度自動微調 */
+      gap: clamp(2px, 0.8vh, 6px);
       position: relative;
     }
 
-    /* 墨水屏純黑高反差邊框 (使用 1.5px/2px 確保跨設備不產生模糊像素) */
+    /* 墨水屏純黑高反差邊框 */
     .ink-b { border: 1.5px solid #000000; }
     .ink-b-b { border-bottom: 1.5px solid #000000; }
     .ink-b-r { border-right: 1.5px solid #000000; }
@@ -83,7 +83,7 @@
     .inverted .spot-dot.active { background-color: #ffffff !important; }
     .inverted .spot-dot { border-color: #ffffff !important; }
 
-    /* 5 天第一湧浪深度趨勢統計網格 (強制等寬且內容不擠壓) */
+    /* 5 天第一湧浪深度趨勢統計網格 (強制等寬且防被字體撐開變形) */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -100,7 +100,7 @@
       justify-content: space-between;
       align-items: center;
       text-align: center;
-      min-width: 0; /* 關鍵：防止單元格被內容撐開變形 */
+      min-width: 0; /* 關鍵：防單元格撐破 */
     }
 
     .stats-cell.active-day {
@@ -167,14 +167,14 @@
         <button onclick="toggleTheme()" title="反色模式切換" aria-label="反色切換" class="ink-b px-1.5 py-0.5 text-[11px] font-bold active:bg-black active:text-white cursor-pointer shrink-0"><i class="fa-solid fa-circle-half-stroke"></i></button>
         <button onclick="fetchAllData()" title="手動刷新數據" aria-label="更新數據" class="ink-b px-1.5 py-0.5 text-[11px] font-bold active:bg-black active:text-white cursor-pointer shrink-0"><i id="syncIcon" class="fa-solid fa-rotate"></i></button>
       </div>
-      <!-- HKO 實時特別警告標籤 -->
+      <!-- HKO 實時特別警告標籤 (直接顯示等級與名稱，雷暴以雷電圖案顯示) -->
       <div id="warnBadge" class="bg-black text-white text-[10px] px-2 py-0.5 font-bold inline-flex items-center gap-1.5 max-w-[230px] truncate">
         <i class="fa-solid fa-shield-halved text-[9px] shrink-0"></i>
         <span id="warnText" class="truncate">天文台信號解除 (正常)</span>
       </div>
     </div>
     
-    <!-- 右側日期與 12 小時制 AM/PM 大時鐘 (純時與分) -->
+    <!-- 右側日期與 12 小時制 AM/PM 大時鐘 (只顯示 時:分，不帶秒數) -->
     <div class="text-right leading-none flex flex-col justify-center items-end shrink-0 pl-1">
       <div class="flex items-baseline justify-end gap-1">
         <span id="ampm" class="font-mono text-xs sm:text-sm font-black tracking-tight">AM</span>
@@ -187,7 +187,7 @@
     </div>
   </header>
 
-  <!-- 2. 香港天文台實時氣候速報 (單列 5 欄：氣溫、天氣、濕度、UV、潮汐) -->
+  <!-- 2. 香港天文台實時氣候速報 (單列 5 欄：移除水溫以騰出充裕空間給潮汐顯示) -->
   <section class="ink-b grid grid-cols-5 text-center items-center py-1.5 bg-white shrink-0">
     <div class="ink-b-r px-0.5 min-w-0"><p class="text-[9px] font-bold uppercase opacity-80">氣溫</p><p class="font-mono text-base font-black leading-none mt-1"><span id="temp">28</span>°</p></div>
     <div class="ink-b-r px-0.5 min-w-0"><p class="text-[9px] font-bold uppercase opacity-80">天氣</p><p id="cond" class="text-[10px] font-black leading-tight mt-1 truncate">大致天晴</p></div>
@@ -237,7 +237,7 @@
     </div>
   </section>
 
-  <!-- 4. 重點核心：未來 5 天第一湧浪深度趨勢統計 (抗變形彈性網格) -->
+  <!-- 4. 重點核心：未來 5 天第一湧浪深度趨勢統計 (抗擠壓與抗變形彈性網格) -->
   <section class="flex flex-col justify-center min-h-0 py-0.5 shrink-0">
     <div class="flex justify-between items-center border-b-2 border-black pb-0.5 mb-1 shrink-0">
       <span class="text-[10px] font-black tracking-wider flex items-center gap-1">
@@ -319,7 +319,7 @@
   function nextSpot() { switchSpot(currentSpotIdx + 1); }
   function prevSpot() { switchSpot(currentSpotIdx - 1); }
 
-  // 更新熱點介面文字
+  // 更新熱點介面文字與座標
   function updateSpotUI() {
     const spot = SURF_SPOTS[currentSpotIdx];
     document.getElementById('spotTitle').innerText = `${spot.name}即時第一湧浪`;
@@ -356,7 +356,7 @@
     const diffY = endY - touchStartY;
     const duration = Date.now() - touchStartTime;
 
-    // 水平滑動門檻值 (防止垂直輕微抖動誤觸)
+    // 水平滑動門檻值 (防止垂直滾動微抖動誤觸)
     if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY) * 1.3 && duration < 600) {
       if (diffX > 0) {
         nextSpot();
@@ -534,7 +534,7 @@
     });
   }
 
-  // 3.5 計算當前浪點水域全日天文潮汐
+  // 3.5 計算當前浪點水域全日天文潮汐 (所有高低潮全部顯示)
   function loadTideTimes() {
     const now = new Date();
     const pad = (n) => n.toString().padStart(2, '0');
