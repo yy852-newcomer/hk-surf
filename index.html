@@ -8,8 +8,8 @@
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="香港三大熱點即時第一湧浪浪況、5天深度趨勢統計與香港天文台即時氣象儀表板">
-  <title>香港衝浪浪況 & 天氣儀表板 (HK Surf)</title>
+  <meta name="description" content="香港與海外熱點即時第一湧浪浪況、5天深度趨勢統計與權威氣象局即時儀表板">
+  <title>衝浪浪況 & 天氣儀表板 (Surf Dashboard)</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -27,24 +27,23 @@
 
     /* 全域流體排版與間距系統 (CSS Clamp) */
     :root {
-      --space-page: clamp(3px, 0.8vh, 10px);
-      --gap-main: clamp(2px, 0.5vh, 6px);
-      --gap-grid: clamp(3px, 0.6vw, 7px);
-      --pad-card: clamp(3px, 0.6vh, 8px);
+      --space-page: clamp(3px, 0.8vh, 8px);
+      --gap-main: clamp(2px, 0.5vh, 5px);
+      --gap-grid: clamp(2px, 0.6vw, 6px);
       --border-thick: clamp(1.5px, 0.22vmin, 2.5px);
 
-      /* 字體流體 Clamp 全面增大幅度 (Boosted for Maximum Readability) */
-      --fs-clock: clamp(3.2rem, 8.5vmin + 1.2rem, 5.8rem);
-      --fs-ampm: clamp(1.05rem, 2.3vmin, 1.55rem);
-      --fs-date: clamp(0.95rem, 2.1vmin, 1.4rem);
-      --fs-swell-main: clamp(3.8rem, 10vmin + 1.2rem, 6.8rem);
-      --fs-unit: clamp(1.25rem, 2.6vmin, 1.9rem);
-      --fs-subtitle: clamp(0.95rem, 2.1vmin, 1.4rem);
-      --fs-label: clamp(0.88rem, 1.9vmin, 1.25rem);
-      --fs-value: clamp(1.15rem, 2.5vmin, 1.75rem);
-      --fs-tide: clamp(0.88rem, 1.8vmin, 1.25rem);
-      --fs-forecast-day: clamp(0.92rem, 2vmin, 1.35rem);
-      --fs-footer: clamp(0.82rem, 1.8vmin, 1.15rem);
+      /* 字體流體 Clamp 系統：確保跨設備字體不變形、不縮成郵票亦不爆版 */
+      --fs-clock: clamp(2.8rem, 7vmin + 1rem, 5.0rem);
+      --fs-ampm: clamp(0.95rem, 2vmin, 1.4rem);
+      --fs-date: clamp(0.88rem, 1.8vmin, 1.25rem);
+      --fs-swell-main: clamp(3.4rem, 8.5vmin + 1rem, 5.8rem);
+      --fs-unit: clamp(1.1rem, 2.2vmin, 1.6rem);
+      --fs-subtitle: clamp(0.85rem, 1.8vmin, 1.2rem);
+      --fs-label: clamp(0.78rem, 1.6vmin, 1.12rem);
+      --fs-value: clamp(1.05rem, 2.2vmin, 1.55rem);
+      --fs-tide: clamp(0.78rem, 1.5vmin, 1.15rem);
+      --fs-forecast-day: clamp(0.85rem, 1.7vmin, 1.2rem);
+      --fs-footer: clamp(0.75rem, 1.5vmin, 1.05rem);
     }
 
     html, body {
@@ -68,18 +67,18 @@
 
     .screen-container {
       width: 100%;
-      max-width: clamp(360px, 95vw, 760px);
+      max-width: clamp(360px, 96vw, 760px);
       height: 100vh;
       height: 100dvh;
       margin: 0 auto;
-      padding: clamp(4px, env(safe-area-inset-top, 6px), 12px) 
-               clamp(6px, env(safe-area-inset-right, 8px), 16px) 
-               clamp(4px, env(safe-area-inset-bottom, 6px), 12px) 
-               clamp(6px, env(safe-area-inset-left, 8px), 16px);
+      padding: clamp(3px, env(safe-area-inset-top, 4px), 8px) 
+               clamp(5px, env(safe-area-inset-right, 8px), 14px) 
+               clamp(3px, env(safe-area-inset-bottom, 4px), 8px) 
+               clamp(5px, env(safe-area-inset-left, 8px), 14px);
       display: flex; 
       flex-direction: column;
       justify-content: space-between;
-      gap: clamp(1px, 0.4vh, 4px);
+      gap: var(--gap-main);
       position: relative;
     }
 
@@ -105,11 +104,9 @@
     .inverted .f-mini-cell.active-f { background-color: #ffffff !important; color: #000000 !important; }
     .inverted .spot-dot.active { background-color: #ffffff !important; }
     .inverted .spot-dot { border-color: #ffffff !important; }
+    .inverted .warn-link { background-color: #ffffff !important; color: #000000 !important; border-color: #ffffff !important; }
 
-    /* 
-      P5 優化：去雜線/純留白設計 (P5: Clean Whitespace & De-cluttered Grids)
-      取消內部交錯的小實線，改用微小呼吸間隔與深淺色塊對比
-    */
+    /* 5 天第一湧浪深度趨勢統計網格 (去線留白版) */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -118,9 +115,9 @@
     }
 
     .stats-cell {
-      background-color: #f7f7f7; /* 極淡底色營造自然卡片感，杜絕黑色實線雜訊 */
+      background-color: #f7f7f7;
       border-radius: 4px;
-      padding: clamp(3px, 0.6vh, 6px) clamp(2px, 0.4vw, 5px);
+      padding: clamp(2px, 0.4vh, 5px) clamp(2px, 0.3vw, 4px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -134,7 +131,7 @@
       color: #ffffff;
     }
 
-    /* 5 天天文台微型預報條 (去線留白版) */
+    /* 5 天天文台/氣象局微型預報條 (去線留白版) */
     .f-mini-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -145,7 +142,7 @@
     .f-mini-cell {
       background-color: #f7f7f7;
       border-radius: 4px;
-      padding: clamp(3px, 0.5vh, 6px) 2px;
+      padding: clamp(2px, 0.4vh, 5px) 2px;
       text-align: center;
       min-width: 0;
       line-height: 1.2;
@@ -168,6 +165,20 @@
     }
     .spot-dot.active {
       background-color: #000000;
+    }
+
+    /* 海外天文台超連結樣式 */
+    .warn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+    .warn-link:hover {
+      opacity: 0.85;
+      text-decoration: underline;
     }
 
     /* 動態字體綁定 class */
@@ -195,25 +206,22 @@
         <!-- 點擊或滑動切換的據點導航 -->
         <div class="inline-flex items-center bg-black text-white px-2 py-0.5 font-black tracking-wider select-none shrink-0 font-fluid-label rounded-sm">
           <button onclick="prevSpot()" class="px-1 font-black hover:opacity-75 cursor-pointer" title="上一個浪點" aria-label="上一個浪點">◀</button>
-          <span class="mx-1 cursor-pointer font-black" onclick="nextSpot()">HK SURF</span>
+          <span class="mx-1 cursor-pointer font-black" id="spotNavTitle" onclick="nextSpot()">HK SURF</span>
           <button onclick="nextSpot()" class="px-1 font-black hover:opacity-75 cursor-pointer" title="下一個浪點" aria-label="下一個浪點">▶</button>
         </div>
         
-        <!-- 3 個浪點的位置圓點指示器 -->
-        <div class="flex items-center gap-1.5 px-0.5 shrink-0" id="spotDots">
-          <span class="spot-dot active" onclick="switchSpot(0)" title="下長沙"></span>
-          <span class="spot-dot" onclick="switchSpot(1)" title="港島大浪灣"></span>
-          <span class="spot-dot" onclick="switchSpot(2)" title="西貢大浪灣"></span>
+        <!-- 6 個浪點的位置圓點指示器 -->
+        <div class="flex items-center gap-1 px-0.5 shrink-0 flex-wrap max-w-[120px]" id="spotDots">
+          <!-- 由 JavaScript 動態生成 6 個圓點 -->
         </div>
 
         <button onclick="toggleTheme()" title="反色模式切換" aria-label="反色切換" class="ink-b px-1.5 py-0.5 font-black font-fluid-label active:bg-black active:text-white cursor-pointer shrink-0 rounded-sm"><i class="fa-solid fa-circle-half-stroke"></i></button>
         <button onclick="fetchAllData()" title="手動刷新數據" aria-label="更新數據" class="ink-b px-1.5 py-0.5 font-black font-fluid-label active:bg-black active:text-white cursor-pointer shrink-0 rounded-sm"><i id="syncIcon" class="fa-solid fa-rotate"></i></button>
       </div>
       
-      <!-- HKO 實時特別警告標籤 -->
-      <div id="warnBadge" class="bg-black text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 max-w-[280px] truncate rounded-sm">
-        <i class="fa-solid fa-shield-halved shrink-0 text-xs"></i>
-        <span id="warnText" class="truncate font-black font-fluid-label">天文台信號解除 (正常)</span>
+      <!-- 特別天氣警告標籤容器 (香港直接顯示，海外轉為官方外鏈按鈕) -->
+      <div id="warnContainer" class="max-w-[360px] truncate">
+        <!-- 由 JavaScript 動態渲染常規 Badge 或超連結 Anchor -->
       </div>
     </div>
     
@@ -230,7 +238,7 @@
     </div>
   </header>
 
-  <!-- 2. 香港天文台實時氣候速報 (整合 P1：動態即時潮位狀態徽章) -->
+  <!-- 2. 實時氣候速報 (整合 P1：動態即時潮位狀態徽章) -->
   <section class="ink-b grid grid-cols-[0.85fr_1.1fr_0.85fr_0.75fr_2.7fr] text-center items-center py-1 bg-white shrink-0">
     <div class="ink-b-r px-0.5 min-w-0">
       <p class="font-fluid-label font-black uppercase">氣溫</p>
@@ -252,7 +260,7 @@
       <!-- P1: 標題整合當前即時潮況徽章 (例如「潮汐 · 漲潮中 ▲」) -->
       <div class="flex items-center justify-center gap-1 font-fluid-label font-black">
         <span class="uppercase">潮汐</span>
-        <span id="tideNowBadge" class="bg-black text-white text-[0.75rem] px-1 py-0.2 font-black rounded-sm leading-none whitespace-nowrap">計算中</span>
+        <span id="tideNowBadge" class="bg-black text-white text-[0.74rem] px-1.5 py-0.2 font-black rounded-sm leading-none whitespace-nowrap">計算中</span>
       </div>
       <p id="tideTimes" class="font-mono font-fluid-tide font-black leading-tight mt-0.5 tracking-tight">
         <span class="block truncate">▲ --:--</span>
@@ -261,7 +269,7 @@
     </div>
   </section>
 
-  <!-- 3. 即時第一湧浪核心卡片 (整合 P2：浪向動態方位箭頭) -->
+  <!-- 3. 即時第一湧浪核心卡片 (整合 P2：浪向動態方位箭頭，無外框大氣設計) -->
   <section class="py-1 px-2 bg-white shrink-0 flex flex-col justify-center items-center min-h-0">
     <div class="w-full max-w-[92%] sm:max-w-[82%] mx-auto grid grid-cols-12 items-center gap-3 sm:gap-6">
       <!-- 左側：湧浪數值主區 -->
@@ -280,47 +288,50 @@
       
       <!-- 右側：指標列表 (整合 P2 箭頭旋轉展示) -->
       <div class="col-span-5 pl-3 sm:pl-4 ink-b-l grid grid-rows-3 gap-y-1.5 h-full py-1 min-w-0 justify-center">
+        <!-- 週期 -->
         <div class="grid grid-cols-[clamp(40px,6cqi,58px)_1fr] items-center gap-x-2 min-w-0">
           <span class="font-fluid-label font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight rounded-sm">週期</span>
-          <span id="cs_pd" class="font-mono font-fluid-value font-black text-right leading-none truncate pr-1">7s</span>
+          <span id="cs_pd" class="font-mono font-fluid-value font-black text-right leading-none truncate">7s</span>
         </div>
+        <!-- 浪向 (P2 旋轉箭頭) -->
         <div class="grid grid-cols-[clamp(40px,6cqi,58px)_1fr] items-center gap-x-2 min-w-0">
           <span class="font-fluid-label font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight rounded-sm">浪向</span>
-          <!-- P2: 動態浪向箭頭 + 文字 -->
-          <div class="flex items-center justify-end gap-1.5 min-w-0 pr-1">
-            <i id="cs_dr_arrow" class="fa-solid fa-arrow-up font-black text-sm transition-transform duration-500" title="浪推進方向"></i>
-            <span id="cs_dr" class="font-fluid-value font-black leading-none truncate">南 (S)</span>
+          <div class="flex items-center justify-end gap-1 min-w-0 leading-none">
+            <i id="cs_dr_arrow" class="fa-solid fa-arrow-up text-xs sm:text-sm shrink-0 transition-transform duration-500" style="transform: rotate(180deg);" title="浪向波浪行進方向"></i>
+            <span id="cs_dr" class="font-black font-fluid-label text-right truncate">南 (S)</span>
           </div>
         </div>
+        <!-- 總浪 -->
         <div class="grid grid-cols-[clamp(40px,6cqi,58px)_1fr] items-center gap-x-2 min-w-0">
           <span class="font-fluid-label font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight rounded-sm">總浪</span>
-          <span id="cs_total" class="font-mono font-fluid-value font-black text-right leading-none truncate pr-1">1.0m</span>
+          <span id="cs_total" class="font-mono font-fluid-value font-black text-right leading-none truncate">1.0m</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 4. 重點核心：未來 5 天第一湧浪深度趨勢統計 (P5 去雜線純留白卡片) -->
-  <section class="flex flex-col justify-between shrink-0">
-    <div class="flex justify-between items-center border-b-2 border-black pb-0.5 mb-1 shrink-0">
-      <span class="font-fluid-subtitle font-black tracking-wider flex items-center gap-1">
-        <i class="fa-solid fa-chart-simple"></i> <span id="statsTitle">未來 5 天第一湧浪深度趨勢統計</span>
+  <!-- 4. 未來 5 天第一湧浪深度趨勢統計 (整合 P5：去雜線純留白海報風) -->
+  <section class="flex flex-col justify-center min-h-0 py-0.5 shrink-0">
+    <div class="flex justify-between items-center ink-b-b pb-0.5 mb-1 shrink-0">
+      <span class="font-fluid-label font-black tracking-wider flex items-center gap-1.5">
+        <i class="fa-solid fa-chart-simple text-[11px]"></i>
+        <span>未來 5 天第一湧浪深度趨勢統計</span>
       </span>
-      <span class="font-fluid-label font-black inline-flex items-center gap-0.5 whitespace-nowrap">
-        ≥1.5m 滿浪圖 <i class="fa-solid fa-water text-xs"></i>
+      <span class="font-fluid-footer font-black opacity-85 inline-flex items-center gap-0.5 whitespace-nowrap">
+        ≥1.5m 滿浪圖 <i class="fa-solid fa-water text-[10px]"></i>
       </span>
     </div>
     
-    <!-- 5 天統計卡片網格 (P5: 移除了內部網格線，改為乾淨留白卡片) -->
+    <!-- 5 天趨勢卡片網格 -->
     <div class="stats-grid" id="cs_stats">
-      <div class="col-span-5 text-center py-2 font-mono font-black font-fluid-label">載入 5 天湧浪深度數據中...</div>
+      <div class="col-span-5 text-center py-2 font-mono font-bold text-xs">載入 5 天湧浪數據中...</div>
     </div>
   </section>
 
-  <!-- 5. 香港天文台未來 5 天極簡微型預報條 (P5 留白卡片) -->
+  <!-- 5. 未來 5 天微型預報條 (香港顯示 HKO，海外顯示當地國家氣象局 CWA / BMKG 預測) -->
   <section class="shrink-0">
     <div class="flex justify-between items-center mb-0.5">
-      <span class="font-fluid-label font-black tracking-wider">HKO 5-DAY FORECAST (天文台五日預測)</span>
+      <span id="forecastTitle" class="font-fluid-label font-black tracking-wider">HKO 5-DAY FORECAST (香港天文台五日預測)</span>
     </div>
     <div class="f-mini-grid" id="f_mini">
       <!-- 由 JavaScript 動態生成 5 格微縮預報 -->
@@ -329,41 +340,107 @@
 
   <!-- 6. 熱點名稱、定位座標與更新時間戳 -->
   <footer class="flex justify-between items-center font-fluid-footer font-mono font-bold px-0.5 shrink-0 ink-b-t pt-1 pb-0.5">
-    <span class="truncate max-w-[65%]" id="footerSpotDesc">熱點: 下長沙 (22.2312°N, 113.9472°E)</span>
+    <span class="truncate max-w-[65%]" id="footerSpotDesc">熱點: 下長沙 (22.2312°N, 113.9472°E) · 香港天文台</span>
     <span id="lastUpdated" class="shrink-0 ml-1">UPDATED: --:--:--</span>
   </footer>
 
 </div>
 
 <script>
-  // 0. 香港三大衝浪熱點經緯度與配置
+  // 0. 全球衝浪熱點配置（包含各國官方氣象主管機關之「即時警特報網站」直連連結）
   const SURF_SPOTS = [
     {
       id: 'cheung_sha',
       name: '下長沙',
-      badge: '下長沙 SURF',
+      country: '香港',
+      agency: 'HKO',
+      agencyName: '香港天文台',
+      badge: '下長沙 (HK)',
       lat: 22.2312,
       lon: 113.9472,
       tideStation: '石壁 / 芝麻灣',
-      tideOffsetHours: 0
+      tideOffsetHours: 0,
+      timezone: 'Asia/Hong_Kong',
+      hasOfficialApi: true,
+      officialWarningUrl: 'https://www.hko.gov.hk/tc/wxinfo/currwx/flw.htm'
     },
     {
       id: 'hk_big_wave_bay',
       name: '港島大浪灣',
-      badge: '港島大浪灣 SURF',
+      country: '香港',
+      agency: 'HKO',
+      agencyName: '香港天文台',
+      badge: '港島大浪灣 (HK)',
       lat: 22.2472,
       lon: 114.2492,
       tideStation: '橫瀾島 / 鰂魚涌',
-      tideOffsetHours: -0.5
+      tideOffsetHours: -0.5,
+      timezone: 'Asia/Hong_Kong',
+      hasOfficialApi: true,
+      officialWarningUrl: 'https://www.hko.gov.hk/tc/wxinfo/currwx/flw.htm'
     },
     {
       id: 'sk_tai_long_wan',
       name: '西貢大浪灣',
-      badge: '西貢大浪灣 SURF',
+      country: '香港',
+      agency: 'HKO',
+      agencyName: '香港天文台',
+      badge: '西貢大浪灣 (HK)',
       lat: 22.4005,
       lon: 114.3752,
       tideStation: '塔門 / 橫瀾島',
-      tideOffsetHours: -0.8
+      tideOffsetHours: -0.8,
+      timezone: 'Asia/Hong_Kong',
+      hasOfficialApi: true,
+      officialWarningUrl: 'https://www.hko.gov.hk/tc/wxinfo/currwx/flw.htm'
+    },
+    {
+      id: 'tw_wushi',
+      name: '宜蘭烏石港',
+      country: '台灣',
+      agency: 'CWA',
+      agencyName: '中央氣象署',
+      badge: '宜蘭烏石港 (TW)',
+      lat: 24.8710,
+      lon: 121.8355,
+      tideStation: '頭城 / 烏石港',
+      tideOffsetHours: -0.3,
+      timezone: 'Asia/Taipei',
+      hasOfficialApi: false,
+      // 交通部中央氣象署宜蘭頭城警特報官方頁面
+      officialWarningUrl: 'https://www.cwa.gov.tw/V8/C/P/Warning/W26.html'
+    },
+    {
+      id: 'bali_kuta',
+      name: '峇里島 Kuta',
+      country: '印尼',
+      agency: 'BMKG',
+      agencyName: '印尼氣象局',
+      badge: 'Kuta Beach (ID)',
+      lat: -8.7185,
+      lon: 115.1686,
+      tideStation: 'Benoa / Kuta',
+      tideOffsetHours: 1.5,
+      timezone: 'Asia/Makassar',
+      hasOfficialApi: false,
+      // BMKG 印尼氣象局峇里海峽與海域巨浪警報官方專頁
+      officialWarningUrl: 'https://maritim.bmkg.go.id/cuaca/perairan/selat-bali-bagian-selatan'
+    },
+    {
+      id: 'bali_uluwatu',
+      name: '峇里 烏魯瓦圖',
+      country: '印尼',
+      agency: 'BMKG',
+      agencyName: '印尼氣象局',
+      badge: 'Uluwatu (ID)',
+      lat: -8.8149,
+      lon: 115.0884,
+      tideStation: 'Padang Padang / Uluwatu',
+      tideOffsetHours: 1.4,
+      timezone: 'Asia/Makassar',
+      hasOfficialApi: false,
+      // BMKG 印尼氣象局峇里島全域極端天氣與海浪預警
+      officialWarningUrl: 'https://bbmkg3.bmkg.go.id/prakiraan-cuaca-umum'
     }
   ];
 
@@ -374,8 +451,7 @@
     if (index >= SURF_SPOTS.length) index = 0;
     currentSpotIdx = index;
     updateSpotUI();
-    loadSwellStats();
-    loadTideTimes();
+    fetchAllData();
   }
 
   function nextSpot() { switchSpot(currentSpotIdx + 1); }
@@ -386,19 +462,36 @@
     const spotTitleEl = document.getElementById('spotTitle');
     if (spotTitleEl) spotTitleEl.innerText = `${spot.name}即時第一湧浪`;
     
-    const footerSpotEl = document.getElementById('footerSpotDesc');
-    if (footerSpotEl) footerSpotEl.innerText = `熱點: ${spot.name} (${spot.lat}°N, ${spot.lon}°E)`;
+    const navTitleEl = document.getElementById('spotNavTitle');
+    if (navTitleEl) navTitleEl.innerText = spot.badge;
 
-    const dots = document.querySelectorAll('.spot-dot');
-    dots.forEach((dot, idx) => {
-      if (idx === currentSpotIdx) {
-        dot.classList.add('active');
+    const footerSpotEl = document.getElementById('footerSpotDesc');
+    if (footerSpotEl) {
+      const latStr = Math.abs(spot.lat).toFixed(4) + (spot.lat >= 0 ? '°N' : '°S');
+      const lonStr = Math.abs(spot.lon).toFixed(4) + (spot.lon >= 0 ? '°E' : '°W');
+      footerSpotEl.innerText = `熱點: ${spot.name} (${latStr}, ${lonStr}) · ${spot.agencyName}`;
+    }
+
+    const forecastTitleEl = document.getElementById('forecastTitle');
+    if (forecastTitleEl) {
+      if (spot.agency === 'HKO') {
+        forecastTitleEl.innerText = 'HKO 5-DAY FORECAST (香港天文台五日預測)';
+      } else if (spot.agency === 'CWA') {
+        forecastTitleEl.innerText = 'CWA 5-DAY FORECAST (中央氣象署五日預報)';
       } else {
-        dot.classList.remove('active');
+        forecastTitleEl.innerText = 'BMKG 5-DAY FORECAST (印尼氣象局五日預報)';
       }
-    });
+    }
+
+    const dotsContainer = document.getElementById('spotDots');
+    if (dotsContainer) {
+      dotsContainer.innerHTML = SURF_SPOTS.map((s, idx) => 
+        `<span class="spot-dot ${idx === currentSpotIdx ? 'active' : ''}" onclick="switchSpot(${idx})" title="${s.name} (${s.agency})"></span>`
+      ).join('');
+    }
   }
 
+  // 觸控滑動手勢
   let touchStartX = 0;
   let touchStartY = 0;
   let touchStartTime = 0;
@@ -428,11 +521,13 @@
     }, { passive: true });
   }
 
+  // 鍵盤方向鍵支援
   window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') nextSpot();
     if (e.key === 'ArrowLeft') prevSpot();
   });
 
+  // 12 小時制 AM/PM 大時鐘 (時:分)
   function runClock() {
     const now = new Date();
     const pad = (n) => n.toString().padStart(2, '0');
@@ -458,88 +553,144 @@
     document.body.classList.toggle('inverted');
   }
 
-  async function loadHKO() {
-    try {
-      const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
-      if (res.ok) {
-        const data = await res.json();
-        const hko = data.temperature?.data?.find(t => t.place === '香港天文台') || data.temperature?.data?.[0];
-        if (hko && hko.value !== undefined) {
-          const tempEl = document.getElementById('temp');
-          if (tempEl) tempEl.innerText = hko.value;
-        }
-        if (data.humidity?.data?.[0] && data.humidity.data[0].value !== undefined) {
-          const humiEl = document.getElementById('humi');
-          if (humiEl) humiEl.innerText = data.humidity.data[0].value + '%';
-        }
-        if (data.uvindex?.data?.[0] && data.uvindex.data[0].value !== undefined) {
-          const uvEl = document.getElementById('uv');
-          if (uvEl) uvEl.innerText = data.uvindex.data[0].value;
-        } else {
-          const uvEl = document.getElementById('uv');
-          if (uvEl) uvEl.innerText = '0';
-        }
-        const isRain = data.rainfall?.data?.some(r => r.max > 0);
-        const condEl = document.getElementById('cond');
-        if (condEl) condEl.innerText = isRain ? '有微雨' : '大致天晴';
-      }
-    } catch (e) {
-      console.warn('HKO weather API fallback:', e);
+  // WMO 國際氣象代碼轉向量圖標與描述
+  function getWmoWeatherInfo(code) {
+    if (code === 0) return { icon: '<i class="fa-solid fa-sun" title="天晴"></i>', text: '天晴' };
+    if ([1, 2].includes(code)) return { icon: '<i class="fa-solid fa-cloud-sun" title="大致天晴"></i>', text: '大致天晴' };
+    if (code === 3) return { icon: '<i class="fa-solid fa-cloud" title="多雲"></i>', text: '多雲' };
+    if ([45, 48].includes(code)) return { icon: '<i class="fa-solid fa-smog" title="有霧"></i>', text: '有霧' };
+    if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return { icon: '<i class="fa-solid fa-cloud-showers-heavy" title="有雨/驟雨"></i>', text: '有雨' };
+    if ([95, 96, 99].includes(code)) return { icon: '<i class="fa-solid fa-cloud-bolt" title="雷暴"></i>', text: '雷暴' };
+    return { icon: '<i class="fa-solid fa-cloud-sun" title="晴朗"></i>', text: '晴朗' };
+  }
+
+  // 渲染警告標籤：香港直接顯示官方文字，海外浪點顯示直連天文台超連結
+  function renderWarningBadge(htmlContent, isLink = false, linkUrl = '#', linkTitle = '') {
+    const warnBox = document.getElementById('warnContainer');
+    if (!warnBox) return;
+
+    if (isLink) {
+      warnBox.innerHTML = `
+        <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" 
+           title="${linkTitle}"
+           class="warn-link bg-black text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 max-w-[340px] truncate rounded-sm ink-b">
+          <i class="fa-solid fa-triangle-exclamation text-xs shrink-0"></i>
+          <span class="truncate font-black font-fluid-label">${htmlContent}</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px] shrink-0 opacity-80"></i>
+        </a>`;
+    } else {
+      warnBox.innerHTML = `
+        <div class="bg-black text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 max-w-[340px] truncate rounded-sm ink-b">
+          <i class="fa-solid fa-shield-halved text-xs shrink-0"></i>
+          <span class="truncate font-black font-fluid-label">${htmlContent}</span>
+        </div>`;
     }
+  }
 
-    try {
-      const wRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=tc');
-      if (wRes.ok) {
-        const wData = await wRes.json();
-        const keys = Object.keys(wData);
-        if (keys.length > 0) {
-          const WARN_NAMES = {
-            'TC1': '一號熱帶氣旋', 'TC3': '三號熱帶氣旋', 'TC8NE': '八號東北烈風', 'TC8SE': '八號東南烈風',
-            'TC8NW': '八號西北烈風', 'TC8SW': '八號西南烈風', 'TC8': '八號烈風暴風', 'TC9': '九號風力增強',
-            'TC10': '十號颶風信號', 'WRAINA': '黃色暴雨警告', 'WRAINR': '紅色暴雨警告', 'WRAINB': '黑色暴雨警告',
-            'WTS': '雷暴警告', 'WMS': '強烈季候風信號', 'WFIREY': '黃色火災危險', 'WFIRER': '紅色火災危險',
-            'WHOT': '酷熱天氣警告', 'WCOLD': '寒冷天氣警告', 'WL': '山泥傾瀉警告', 'WFNL': '新界北部水浸',
-            'WFROST': '霜凍警告', 'WTMW': '海嘯警告'
-          };
+  // 根據浪點加載實時天氣與官方警報
+  async function loadWeatherAndWarnings() {
+    const spot = SURF_SPOTS[currentSpotIdx];
+    const tempEl = document.getElementById('temp');
+    const humiEl = document.getElementById('humi');
+    const uvEl = document.getElementById('uv');
+    const condEl = document.getElementById('cond');
 
-          const priority = ['WTCSGNL', 'WRAIN', 'WTS', 'WTMW', 'WL', 'WMS', 'WHOT', 'WCOLD', 'WFIRE', 'WFROST'];
-          keys.sort((a, b) => {
-            const idxA = priority.indexOf(a) === -1 ? 99 : priority.indexOf(a);
-            const idxB = priority.indexOf(b) === -1 ? 99 : priority.indexOf(b);
-            return idxA - idxB;
-          });
+    // 1. 香港浪點：香港天文台 (HKO) 官方 API 直連
+    if (spot.agency === 'HKO') {
+      try {
+        const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
+        if (res.ok) {
+          const data = await res.json();
+          const hko = data.temperature?.data?.find(t => t.place === '香港天文台') || data.temperature?.data?.[0];
+          if (hko && hko.value !== undefined && tempEl) tempEl.innerText = hko.value;
+          if (data.humidity?.data?.[0] && humiEl) humiEl.innerText = data.humidity.data[0].value + '%';
+          if (data.uvindex?.data?.[0] && uvEl) uvEl.innerText = data.uvindex.data[0].value;
+          else if (uvEl) uvEl.innerText = '0';
+          const isRain = data.rainfall?.data?.some(r => r.max > 0);
+          if (condEl) condEl.innerText = isRain ? '有微雨' : '大致天晴';
+        }
+      } catch (e) {
+        console.warn('HKO weather API fallback:', e);
+      }
 
-          const hasThunderstorm = keys.some(k => k === 'WTS' || wData[k]?.code === 'WTS');
-          const otherWarnings = keys
-            .filter(k => k !== 'WTS' && wData[k]?.code !== 'WTS')
-            .map(k => {
-              const item = wData[k];
-              const code = item.code || '';
-              return WARN_NAMES[code] || item.type || item.name || '特別天氣警告';
+      try {
+        const wRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=tc');
+        if (wRes.ok) {
+          const wData = await wRes.json();
+          const keys = Object.keys(wData);
+          if (keys.length > 0) {
+            const WARN_NAMES = {
+              'TC1': '一號熱帶氣旋', 'TC3': '三號熱帶氣旋', 'TC8NE': '八號東北烈風', 'TC8SE': '八號東南烈風',
+              'TC8NW': '八號西北烈風', 'TC8SW': '八號西南烈風', 'TC8': '八號烈風暴風', 'TC9': '九號風力增強',
+              'TC10': '十號颶風信號', 'WRAINA': '黃色暴雨警告', 'WRAINR': '紅色暴雨警告', 'WRAINB': '黑色暴雨警告',
+              'WTS': '雷暴警告', 'WMS': '強烈季候風信號', 'WFIREY': '黃色火災危險', 'WFIRER': '紅色火災危險',
+              'WHOT': '酷熱天氣警告', 'WCOLD': '寒冷天氣警告', 'WL': '山泥傾瀉警告', 'WFNL': '新界北部水浸',
+              'WFROST': '霜凍警告', 'WTMW': '海嘯警告'
+            };
+
+            const priority = ['WTCSGNL', 'WRAIN', 'WTS', 'WTMW', 'WL', 'WMS', 'WHOT', 'WCOLD', 'WFIRE', 'WFROST'];
+            keys.sort((a, b) => {
+              const idxA = priority.indexOf(a) === -1 ? 99 : priority.indexOf(a);
+              const idxB = priority.indexOf(b) === -1 ? 99 : priority.indexOf(b);
+              return idxA - idxB;
             });
 
-          const warnEl = document.getElementById('warnText');
-          const boltIcon = '<i class="fa-solid fa-bolt text-[10px] text-white"></i>';
+            const hasThunderstorm = keys.some(k => k === 'WTS' || wData[k]?.code === 'WTS');
+            const otherWarnings = keys
+              .filter(k => k !== 'WTS' && wData[k]?.code !== 'WTS')
+              .map(k => {
+                const item = wData[k];
+                const code = item.code || '';
+                return WARN_NAMES[code] || item.type || item.name || '特別天氣警告';
+              });
 
-          if (warnEl) {
+            const boltIcon = '<i class="fa-solid fa-bolt text-[10px] text-white"></i>';
+
             if (otherWarnings.length > 0) {
               const textPart = otherWarnings.slice(0, 2).join(' · ');
-              warnEl.innerHTML = hasThunderstorm ? `${textPart} ${boltIcon}` : textPart;
+              renderWarningBadge(hasThunderstorm ? `${textPart} ${boltIcon}` : textPart, false);
             } else if (hasThunderstorm) {
-              warnEl.innerHTML = `${boltIcon} 雷暴生效`;
+              renderWarningBadge(`${boltIcon} 雷暴生效中`, false);
             } else {
-              warnEl.innerText = '天文台信號解除 (正常)';
+              renderWarningBadge('現在並沒有任何警告信號', false);
             }
+          } else {
+            renderWarningBadge('現在並沒有任何警告信號', false);
           }
-        } else {
-          const warnEl = document.getElementById('warnText');
-          if (warnEl) warnEl.innerText = '天文台信號解除 (正常)';
+        }
+      } catch (e) {
+        renderWarningBadge('現在並沒有任何警告信號', false);
+      }
+      return;
+    }
+
+    // 2. 海外浪點（台灣 CWA、印尼 BMKG 等）：即時天氣由 Open-Meteo 獲取，警報轉換為官方直連外鏈
+    try {
+      const tz = spot.timezone || 'auto';
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}&current=temperature_2m,relative_humidity_2m,weather_code,uv_index,wind_speed_10m&timezone=${encodeURIComponent(tz)}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (tempEl && data.current?.temperature_2m !== undefined) tempEl.innerText = Math.round(data.current.temperature_2m);
+        if (humiEl && data.current?.relative_humidity_2m !== undefined) humiEl.innerText = Math.round(data.current.relative_humidity_2m) + '%';
+        if (uvEl && data.current?.uv_index !== undefined) uvEl.innerText = Math.round(data.current.uv_index);
+        if (condEl && data.current?.weather_code !== undefined) {
+          condEl.innerText = getWmoWeatherInfo(data.current.weather_code).text;
         }
       }
     } catch (e) {
-      const warnEl = document.getElementById('warnText');
-      if (warnEl) warnEl.innerText = '天文台信號解除 (正常)';
+      console.warn('Regional weather API fallback:', e);
     }
+
+    // 關鍵處理：海外浪點無法直連官方警報時，顯示可點擊的專屬超連結按鈕
+    const agencyLabel = spot.agency === 'CWA' ? '中央氣象署' : '印尼 BMKG';
+    const warningPrompt = `海外浪點無法直連警報 · 查閱${agencyLabel}`;
+    renderWarningBadge(
+      warningPrompt, 
+      true, 
+      spot.officialWarningUrl, 
+      `海外浪點無法直接獲取實時警報，點此前往 ${spot.agencyName} 官方網站手動查看最新警特報`
+    );
   }
 
   function getWeatherIcon(desc, iconCode) {
@@ -560,32 +711,69 @@
   }
 
   async function loadForecast() {
+    const spot = SURF_SPOTS[currentSpotIdx];
     const container = document.getElementById('f_mini');
-    try {
-      const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.weatherForecast && data.weatherForecast.length > 0) {
-          container.innerHTML = '';
-          data.weatherForecast.slice(0, 5).forEach((f, i) => {
-            const isToday = i === 0;
-            const wk = isToday ? '今' : f.week.replace('星期', '');
-            const wDesc = f.forecastWeather || '';
-            const iconCode = f.ForecastIcon;
-            const weatherIcon = getWeatherIcon(wDesc, iconCode);
+    if (!container) return;
 
-            container.innerHTML += `
-              <div class="f-mini-cell ${isToday ? 'active-f' : ''}">
-                <div class="font-fluid-forecast font-black">${wk}</div>
-                <div class="my-0.5 font-fluid-forecast flex items-center justify-center h-[1.3em]">${weatherIcon}</div>
-                <div class="font-mono font-fluid-footer font-black tracking-tighter truncate">${f.forecastMintemp.value}-${f.forecastMaxtemp.value}°</div>
-              </div>`;
-          });
-          return;
+    if (spot.agency === 'HKO') {
+      try {
+        const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=fnd&lang=tc');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.weatherForecast && data.weatherForecast.length > 0) {
+            container.innerHTML = '';
+            data.weatherForecast.slice(0, 5).forEach((f, i) => {
+              const isToday = i === 0;
+              const wk = isToday ? '今' : f.week.replace('星期', '');
+              const wDesc = f.forecastWeather || '';
+              const iconCode = f.ForecastIcon;
+              const weatherIcon = getWeatherIcon(wDesc, iconCode);
+
+              container.innerHTML += `
+                <div class="f-mini-cell ${isToday ? 'active-f' : ''}">
+                  <div class="font-fluid-forecast font-black">${wk}</div>
+                  <div class="my-0.5 font-fluid-forecast flex items-center justify-center h-[1.3em]">${weatherIcon}</div>
+                  <div class="font-mono font-fluid-footer font-black tracking-tighter truncate">${f.forecastMintemp.value}-${f.forecastMaxtemp.value}°</div>
+                </div>`;
+            });
+            return;
+          }
         }
+      } catch (e) {
+        console.warn('HKO forecast fallback:', e);
       }
-    } catch (e) {
-      console.warn('Forecast fallback:', e);
+    } else {
+      try {
+        const tz = spot.timezone || 'auto';
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}&daily=weather_code,temperature_2m_max,temperature_2m_min&forecast_days=5&timezone=${encodeURIComponent(tz)}`;
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          const daily = data.daily;
+          if (daily?.time && daily.time.length >= 5) {
+            container.innerHTML = '';
+            const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+            for (let i = 0; i < 5; i++) {
+              const dObj = new Date(daily.time[i]);
+              const wk = (i === 0) ? '今' : weekDays[dObj.getDay()];
+              const code = daily.weather_code[i];
+              const weatherIcon = getWmoWeatherInfo(code).icon;
+              const minT = Math.round(daily.temperature_2m_min[i]);
+              const maxT = Math.round(daily.temperature_2m_max[i]);
+
+              container.innerHTML += `
+                <div class="f-mini-cell ${i === 0 ? 'active-f' : ''}">
+                  <div class="font-fluid-forecast font-black">${wk}</div>
+                  <div class="my-0.5 font-fluid-forecast flex items-center justify-center h-[1.3em]">${weatherIcon}</div>
+                  <div class="font-mono font-fluid-footer font-black tracking-tighter truncate">${minT}-${maxT}°</div>
+                </div>`;
+            }
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Regional forecast API fallback:', e);
+      }
     }
     renderFallbackForecast();
   }
@@ -611,7 +799,7 @@
     });
   }
 
-  // P1 實裝：計算全日潮時與即時潮況趨勢（現正漲潮中 / 退潮中）
+  // 計算全日潮時與即時潮況趨勢 (P1)
   function loadTideTimes() {
     const now = new Date();
     const pad = (n) => n.toString().padStart(2, '0');
@@ -624,7 +812,6 @@
     const period = 12.4206;
     const baseHigh = ((moonAge * 0.84 + 8.6 + spot.tideOffsetHours) % period + period) % period;
     
-    // 生成當日及相鄰高低潮事件列表
     const events = [];
     for (let k = -2; k <= 3; k++) {
       const hTime = baseHigh + k * period;
@@ -635,10 +822,7 @@
     events.sort((a, b) => a.time - b.time);
 
     const nowFloat = now.getHours() + (now.getMinutes() / 60) + (now.getSeconds() / 3600);
-
-    // 找出下一個極值潮時
     const nextEvent = events.find(ev => ev.time > nowFloat);
-    const prevEvent = [...events].reverse().find(ev => ev.time <= nowFloat);
 
     const badgeEl = document.getElementById('tideNowBadge');
     if (badgeEl && nextEvent) {
@@ -646,10 +830,10 @@
       const diffHours = (nextEvent.time - nowFloat).toFixed(1);
       if (isRising) {
         badgeEl.innerHTML = `▲ 漲潮中 (${diffHours}h滿)`;
-        badgeEl.className = "bg-black text-white text-[0.74rem] px-1.5 py-0.5 font-black rounded-sm leading-none whitespace-nowrap";
+        badgeEl.className = "bg-black text-white text-[0.74rem] px-1.5 py-0.2 font-black rounded-sm leading-none whitespace-nowrap";
       } else {
         badgeEl.innerHTML = `▼ 退潮中 (${diffHours}h乾)`;
-        badgeEl.className = "bg-black text-white text-[0.74rem] px-1.5 py-0.5 font-black rounded-sm leading-none whitespace-nowrap";
+        badgeEl.className = "bg-black text-white text-[0.74rem] px-1.5 py-0.2 font-black rounded-sm leading-none whitespace-nowrap";
       }
     }
 
@@ -672,14 +856,13 @@
     }
   }
 
-  // P2 實裝：浪向動態箭頭更新
+  // 浪向動態箭頭更新 (P2)
   function updateWaveDirectionUI(dirDegrees) {
     const arrowEl = document.getElementById('cs_dr_arrow');
     const dirEl = document.getElementById('cs_dr');
     if (!dirEl || !arrowEl) return;
 
-    // 海洋浪向為波浪推進來向（例如 180° 表示波浪由南向北湧來，波浪推進朝向 0° 北方）
-    // 讓箭頭指向海浪推進衝擊岸邊的方向
+    // 波浪朝向岸邊推進的角度
     const propagationAngle = (dirDegrees + 180) % 360;
     arrowEl.style.transform = `rotate(${propagationAngle}deg)`;
 
@@ -688,12 +871,13 @@
     dirEl.innerText = dirs[idx];
   }
 
+  // 獲取 5 天第一湧浪深度趨勢統計
   async function loadSwellStats() {
     const spot = SURF_SPOTS[currentSpotIdx];
     const statsGrid = document.getElementById('cs_stats');
     
     try {
-      const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${spot.lat}&longitude=${spot.lon}&current=wave_height,swell_wave_height,swell_wave_direction,swell_wave_period&hourly=wave_height,swell_wave_height,swell_wave_period&forecast_days=5&timezone=Asia%2FHong_Kong`;
+      const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${spot.lat}&longitude=${spot.lon}&current=wave_height,swell_wave_height,swell_wave_direction,swell_wave_period&hourly=wave_height,swell_wave_height,swell_wave_period&forecast_days=5&timezone=auto`;
       const res = await fetch(url);
       
       if (res.ok) {
@@ -709,62 +893,62 @@
         document.getElementById('cs_pd').innerText = curPeriod + 's';
         document.getElementById('cs_total').innerText = curTotal.toFixed(1) + 'm';
         
-        // P2: 更新浪向動態箭頭與文字
         updateWaveDirectionUI(curDir);
 
-        statsGrid.innerHTML = '';
-        const hourlySwell = data.hourly?.swell_wave_height || [];
-        const hourlyPd = data.hourly?.swell_wave_period || [];
-        const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
-        const baseDate = new Date();
+        if (statsGrid) {
+          statsGrid.innerHTML = '';
+          const hourlySwell = data.hourly?.swell_wave_height || [];
+          const hourlyPd = data.hourly?.swell_wave_period || [];
+          const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+          const baseDate = new Date();
 
-        for (let day = 0; day < 5; day++) {
-          const targetDate = new Date(baseDate);
-          targetDate.setDate(baseDate.getDate() + day);
-          const m = targetDate.getMonth() + 1;
-          const d = targetDate.getDate();
-          const wk = weekDays[targetDate.getDay()];
+          for (let day = 0; day < 5; day++) {
+            const targetDate = new Date(baseDate);
+            targetDate.setDate(baseDate.getDate() + day);
+            const m = targetDate.getMonth() + 1;
+            const d = targetDate.getDate();
+            const wk = weekDays[targetDate.getDay()];
 
-          const startIdx = day * 24;
-          const endIdx = (day + 1) * 24;
-          const dayHeights = hourlySwell.slice(startIdx, endIdx);
-          const dayPds = hourlyPd.slice(startIdx, endIdx);
+            const startIdx = day * 24;
+            const endIdx = (day + 1) * 24;
+            const dayHeights = hourlySwell.slice(startIdx, endIdx);
+            const dayPds = hourlyPd.slice(startIdx, endIdx);
 
-          let avg = '0.8', min = '0.6', max = '1.0', avgPd = 7;
-          if (dayHeights.length > 0) {
-            avg = (dayHeights.reduce((a, b) => a + b, 0) / dayHeights.length).toFixed(1);
-            min = Math.min(...dayHeights).toFixed(1);
-            max = Math.max(...dayHeights).toFixed(1);
+            let avg = '0.8', min = '0.6', max = '1.0', avgPd = 7;
+            if (dayHeights.length > 0) {
+              avg = (dayHeights.reduce((a, b) => a + b, 0) / dayHeights.length).toFixed(1);
+              min = Math.min(...dayHeights).toFixed(1);
+              max = Math.max(...dayHeights).toFixed(1);
+            }
+            if (dayPds.length > 0) {
+              avgPd = Math.round(dayPds.reduce((a, b) => a + b, 0) / dayPds.length);
+            }
+
+            const isToday = (day === 0);
+            const isFullSwell = parseFloat(avg) >= 1.5;
+            const waveVisual = isFullSwell
+              ? `<i class="fa-solid fa-water text-xs leading-none" title="滿格浪況 (≥1.5m)"></i>`
+              : '';
+
+            statsGrid.innerHTML += `
+              <div class="stats-cell ${isToday ? 'active-day' : ''}">
+                <div class="font-fluid-label font-black leading-tight pt-0.5 truncate w-full text-center">
+                  ${m}/${d}(${wk})
+                </div>
+                <div class="w-full flex items-center justify-center h-3 my-0.5">
+                  ${waveVisual}
+                </div>
+                <div class="font-mono font-fluid-value font-black leading-none my-0.5 text-base sm:text-xl">
+                  ${avg}<span class="font-fluid-footer font-black ml-0.5">m</span>
+                </div>
+                <div class="font-fluid-footer font-mono font-black leading-tight truncate">
+                  ${min}-${max}m
+                </div>
+                <div class="font-fluid-footer font-mono font-black border-t-2 ${isToday ? 'border-white' : 'border-black'} border-solid w-full pt-1 mt-0.5 leading-none truncate text-[0.8rem] sm:text-[0.95rem]">
+                  ${avgPd}s
+                </div>
+              </div>`;
           }
-          if (dayPds.length > 0) {
-            avgPd = Math.round(dayPds.reduce((a, b) => a + b, 0) / dayPds.length);
-          }
-
-          const isToday = (day === 0);
-          const isFullSwell = parseFloat(avg) >= 1.5;
-          const waveVisual = isFullSwell
-            ? `<i class="fa-solid fa-water text-xs leading-none" title="滿格浪況 (≥1.5m)"></i>`
-            : '';
-
-          // P5: 純粹留白卡片排版
-          statsGrid.innerHTML += `
-            <div class="stats-cell ${isToday ? 'active-day' : ''}">
-              <div class="font-fluid-label font-black leading-tight pt-0.5 truncate w-full text-center">
-                ${m}/${d}(${wk})
-              </div>
-              <div class="w-full flex items-center justify-center h-3 my-0.5">
-                ${waveVisual}
-              </div>
-              <div class="font-mono font-fluid-value font-black leading-none my-0.5 text-base sm:text-xl">
-                ${avg}<span class="font-fluid-footer font-black ml-0.5">m</span>
-              </div>
-              <div class="font-fluid-footer font-mono font-black leading-tight truncate">
-                ${min}-${max}m
-              </div>
-              <div class="font-fluid-footer font-mono font-black border-t-2 ${isToday ? 'border-white' : 'border-black'} border-solid w-full pt-1 mt-0.5 leading-none truncate text-[0.8rem] sm:text-[0.95rem]">
-                ${avgPd}s
-              </div>
-            </div>`;
         }
         return;
       }
@@ -830,7 +1014,7 @@
     if (icon) icon.classList.add('fa-spin');
     
     await Promise.allSettled([
-      loadHKO(),
+      loadWeatherAndWarnings(),
       loadForecast(),
       loadSwellStats(),
       Promise.resolve(loadTideTimes())
@@ -846,6 +1030,7 @@
     if (icon) setTimeout(() => icon.classList.remove('fa-spin'), 500);
   }
 
+  // 墨水屏防殘影：每 30 分鐘自動快閃反色一次
   function triggerAutoInversion() {
     const wasInverted = document.body.classList.contains('inverted');
     if (!wasInverted) {
