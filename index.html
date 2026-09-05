@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <!-- 全設備防變形與防雙擊縮放設定 (Web App 1.1 標準) -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#f5f6f8">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="衝浪浪況、大自然時鐘、香港公眾假期日曆與彩蛋衝浪小遊戲 (Web App 1.1 正式版)">
-  <title>衝浪浪況、時鐘與香港公眾假期看板 (Web App 1.1 正式版)</title>
+  <meta name="description" content="衝浪浪況、大自然時鐘與香港公眾假期電子日曆三合一看板 (Web App 1.1 正式版)">
+  <title>衝浪浪況、時鐘與香港公眾假期日曆看板 (v1.1 正式版)</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -16,7 +17,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&family=JetBrains+Mono:wght@700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;900&family=JetBrains+Mono:wght@700;900&family=Press+Start+2P&display=swap');
     
     *, *::before, *::after { 
       box-sizing: border-box; 
@@ -24,33 +25,34 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
+    /* 全域流體排版與柔和低對比灰階配色系統 */
     :root {
       --space-page: clamp(3px, 0.8vh, 8px);
       --gap-main: clamp(2px, 0.45vh, 5px);
       --gap-grid: clamp(2px, 0.6vw, 6px);
-      --border-thick: clamp(1.5px, 0.22vmin, 2.5px);
+      --border-thick: clamp(1.5px, 0.22vmin, 2px);
 
-      /* 柔和灰階配色變數 (消除刺眼死黑純白) */
-      --bg-primary: #f5f6f8;
-      --text-main: #212529;
-      --text-muted: #5a626d;
-      --ink-dark: #2d3238;
+      /* 柔和灰階色票 */
+      --paper-bg: #f5f6f8;
+      --paper-card: #ffffff;
+      --ink-dark: #212529;
+      --ink-tag: #2d3238;
       --ink-border: #495057;
-      --ink-border-light: #d5d9e0;
-      --cell-bg: #ebedf2;
+      --ink-muted: #6c757d;
+      --cell-bg: #eaedf2;
 
       /* 字體流體 Clamp 系統 */
       --fs-clock: clamp(3.2rem, 8vmin + 1rem, 5.8rem);
       --fs-ampm: clamp(0.95rem, 2vmin, 1.4rem);
       --fs-date: clamp(0.88rem, 1.8vmin, 1.25rem);
-      --fs-swell-main: clamp(3.4rem, 8.5vmin + 1rem, 5.8rem);
+      --fs-swell-main: clamp(3.2rem, 8vmin + 0.8rem, 5.5rem);
       --fs-unit: clamp(1.1rem, 2.2vmin, 1.6rem);
-      --fs-subtitle: clamp(0.85rem, 1.8vmin, 1.2rem);
-      --fs-label: clamp(0.78rem, 1.6vmin, 1.12rem);
-      --fs-value: clamp(1.05rem, 2.2vmin, 1.55rem);
-      --fs-tide: clamp(0.78rem, 1.5vmin, 1.15rem);
-      --fs-forecast-day: clamp(0.85rem, 1.7vmin, 1.2rem);
-      --fs-footer: clamp(0.75rem, 1.5vmin, 1.05rem);
+      --fs-subtitle: clamp(0.82rem, 1.7vmin, 1.15rem);
+      --fs-label: clamp(0.75rem, 1.5vmin, 1.05rem);
+      --fs-value: clamp(1.0rem, 2.0vmin, 1.45rem);
+      --fs-tide: clamp(0.75rem, 1.4vmin, 1.08rem);
+      --fs-forecast-day: clamp(0.82rem, 1.6vmin, 1.15rem);
+      --fs-footer: clamp(0.72rem, 1.4vmin, 0.98rem);
     }
 
     html, body {
@@ -58,8 +60,8 @@
       width: 100%;
       height: 100vh;
       height: 100dvh;
-      background-color: var(--bg-primary); 
-      color: var(--text-main);
+      background-color: var(--paper-bg); 
+      color: var(--ink-dark);
       font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "PingFang HK", "PingFang SC", "Microsoft JhengHei", sans-serif;
       user-select: none;
       touch-action: pan-y pinch-zoom;
@@ -71,17 +73,20 @@
     .font-mono { 
       font-family: 'JetBrains Mono', Consolas, Monaco, "Courier New", monospace; 
     }
+    .font-pixel {
+      font-family: 'Press Start 2P', monospace;
+    }
 
     .screen-container {
       width: 100%;
-      max-width: clamp(360px, 96vw, 760px);
+      max-width: clamp(340px, 96vw, 760px);
       height: 100vh;
       height: 100dvh;
       margin: 0 auto;
-      padding: clamp(3px, env(safe-area-inset-top, 4px), 8px) 
-               clamp(5px, env(safe-area-inset-right, 8px), 14px) 
-               clamp(3px, env(safe-area-inset-bottom, 4px), 8px) 
-               clamp(5px, env(safe-area-inset-left, 8px), 14px);
+      padding: clamp(2px, env(safe-area-inset-top, 4px), 6px) 
+               clamp(4px, env(safe-area-inset-right, 8px), 12px) 
+               clamp(2px, env(safe-area-inset-bottom, 4px), 6px) 
+               clamp(4px, env(safe-area-inset-left, 8px), 12px);
       display: flex; 
       flex-direction: column;
       justify-content: space-between;
@@ -89,90 +94,81 @@
       position: relative;
     }
 
+    /* 墨水屏石墨炭灰邊框 */
     .ink-b { border: var(--border-thick) solid var(--ink-border); }
     .ink-b-b { border-bottom: var(--border-thick) solid var(--ink-border); }
     .ink-b-r { border-right: var(--border-thick) solid var(--ink-border); }
     .ink-b-t { border-top: var(--border-thick) solid var(--ink-border); }
     .ink-b-l { border-left: var(--border-thick) solid var(--ink-border); }
 
-    .bg-dark-tag { background-color: var(--ink-dark); }
-    .text-dark-tag { color: var(--ink-dark); }
+    .bg-dark-tag { background-color: var(--ink-tag); color: #ffffff; }
 
-    /* 反色模式支援 (Night / Inverted E-Ink) - 柔和深岩石灰調 */
+    /* 反色模式支援 (Inverted E-Ink) */
     .inverted { 
       background-color: #17191d !important; 
       color: #e5e8ed !important; 
     }
     .inverted .ink-b, .inverted .ink-b-b, .inverted .ink-b-r, .inverted .ink-b-t, .inverted .ink-b-l { 
-      border-color: #444c56 !important; 
+      border-color: #555e69 !important; 
     }
     .inverted .bg-white { 
-      background-color: #1e2227 !important; 
+      background-color: #1f2329 !important; 
       color: #e5e8ed !important; 
     }
     .inverted .bg-dark-tag { 
       background-color: #e5e8ed !important; 
       color: #17191d !important; 
     }
-    .inverted .text-dark-tag { 
-      color: #e5e8ed !important; 
-    }
-    .inverted .border-black { border-color: #444c56 !important; }
-    .inverted svg { stroke: #e5e8ed; }
-
     .inverted .bg-neutral-50,
     .inverted .bg-neutral-100,
-    .inverted .bg-neutral-200 {
-      background-color: #24292f !important;
+    .inverted .bg-neutral-200,
+    .inverted .stats-cell,
+    .inverted .f-mini-cell {
+      background-color: #262b32 !important;
       color: #e5e8ed !important;
-      border-color: #444c56 !important;
+      border-color: #555e69 !important;
     }
-    .inverted .text-neutral-400,
-    .inverted .text-neutral-500,
-    .inverted .text-neutral-600 {
-      color: #8b949e !important;
-    }
-
-    .inverted .cal-cell { 
-      background-color: #1e2227 !important; 
-      color: #e5e8ed !important; 
-      border-color: #383f47 !important; 
-    }
-    .inverted .cal-cell.cal-today { 
-      background-color: #e5e8ed !important; 
-      color: #17191d !important; 
-    }
-    .inverted .cal-cell.cal-holiday { 
-      border-color: #8b949e !important; 
-    }
-    .inverted .cal-holiday-tag { 
-      background-color: #e5e8ed !important; 
-      color: #17191d !important; 
-    }
-    .inverted .cal-cell.other-month { 
-      opacity: 0.28 !important; 
-    }
-
-    .inverted .stats-cell { 
-      background-color: #21262d !important; 
-      color: #e5e8ed !important; 
-    }
-    .inverted .stats-cell.active-day { 
-      background-color: #e5e8ed !important; 
-      color: #17191d !important; 
-    }
-    .inverted .f-mini-cell { 
-      background-color: #21262d !important; 
-      color: #e5e8ed !important; 
-    }
-    .inverted .f-mini-cell.active-f { 
-      background-color: #e5e8ed !important; 
-      color: #17191d !important; 
+    .inverted .stats-cell.active-day,
+    .inverted .f-mini-cell.active-f {
+      background-color: #e5e8ed !important;
+      color: #17191d !important;
     }
     .inverted .spot-dot.active { background-color: #e5e8ed !important; }
     .inverted .spot-dot { border-color: #e5e8ed !important; }
 
-    /* 電子墨水屏翻頁微動效 */
+    /* 統一頂部導航列規範 (手機端防重疊自適應) */
+    .unified-top-header {
+      height: clamp(32px, 4.2vh, 40px);
+      min-height: clamp(32px, 4.2vh, 40px);
+      max-height: clamp(32px, 4.2vh, 40px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 0 1px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      gap: 3px;
+    }
+
+    .unified-tab-btn {
+      height: clamp(25px, 3.3vh, 30px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 0 clamp(4px, 1vw, 8px);
+      font-weight: 900;
+      border-radius: 2px;
+      user-select: none;
+      cursor: pointer;
+      box-sizing: border-box;
+      line-height: 1;
+      white-space: nowrap;
+      font-size: clamp(10px, 1.3vmin, 12px);
+    }
+
+    /* 電子墨水屏翻頁微動效 (E-Ink Flash) */
     @keyframes einkPageFlash {
       0% { opacity: 1; filter: invert(0); }
       35% { opacity: 0.15; filter: invert(1); }
@@ -183,108 +179,70 @@
       animation: einkPageFlash 0.18s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
     }
 
-    /* 日曆網格佈局 (42 格等高，保證翻頁零彈跳) */
-    .cal-grid-header {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: clamp(1.5px, 0.3vw, 4px);
-      width: 100%;
+    /* 衝浪顛簸微動態 */
+    @keyframes surferBobbing {
+      0%, 100% { transform: translate(-50%, 0) rotate(0deg); }
+      50% { transform: translate(-50%, -3px) rotate(3deg); }
     }
-    .cal-grid {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      grid-template-rows: repeat(6, minmax(0, 1fr));
-      gap: clamp(1.5px, 0.3vw, 4px);
-      width: 100%;
-      height: 100%;
-      min-height: 0;
-      min-width: 0;
-    }
-    .cal-cell {
-      background-color: #ffffff;
-      border: var(--border-thick) solid var(--ink-border-light);
-      border-radius: 2px;
-      padding: clamp(1px, 0.25vh, 2px) clamp(1px, 0.25vw, 2.5px);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      width: 100%;
-      height: 100%;
-      min-width: 0 !important;
-      min-height: 0 !important;
-      position: relative;
-      box-sizing: border-box !important;
-      overflow: hidden !important;
-    }
-    .cal-cell.other-month {
-      opacity: 0.35;
-      background-color: #f7f8fa;
-    }
-    .cal-cell.cal-today {
-      background-color: var(--ink-dark);
-      color: #ffffff;
-      border-color: var(--ink-dark);
-    }
-    .cal-cell.cal-holiday {
-      border-color: var(--ink-border);
-      border-width: calc(var(--border-thick) * 1.3);
-    }
-    .cal-holiday-slot {
-      height: clamp(13px, 1.8vh, 17px);
-      max-height: clamp(13px, 1.8vh, 17px);
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      box-sizing: border-box;
-      flex-shrink: 0;
-      margin-top: auto;
-    }
-    .cal-holiday-tag {
-      background-color: var(--ink-dark);
-      color: #ffffff;
-      font-size: clamp(8px, 1.1vmin, 10px);
-      font-weight: 700;
-      line-height: 1;
-      padding: 1px 2.5px;
-      border-radius: 2px;
-      text-align: center;
-      max-width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      box-sizing: border-box;
-      display: inline-block;
-    }
-    .cal-cell.cal-today .cal-holiday-tag {
-      background-color: #ffffff;
-      color: var(--ink-dark);
+    .surfer-riding {
+      animation: surferBobbing 1.6s ease-in-out infinite;
     }
 
-    /* 5 天湧浪統計與微型預報 */
-    .stats-grid, .f-mini-grid {
+    /* 長按脈動充電動態 */
+    @keyframes chargingPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+    }
+    .charging-active {
+      animation: chargingPulse 0.5s infinite ease-in-out !important;
+    }
+
+    /* 5 天深度趨勢網格 */
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: var(--gap-grid);
       width: 100%;
     }
-    .stats-cell, .f-mini-cell {
+    .stats-cell {
       background-color: var(--cell-bg);
-      border-radius: 4px;
-      padding: clamp(2px, 0.4vh, 5px) clamp(2px, 0.3vw, 4px);
+      border-radius: 3px;
+      padding: 2px 1px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
       text-align: center;
       min-width: 0;
+      overflow: hidden;
     }
-    .stats-cell.active-day, .f-mini-cell.active-f {
-      background-color: var(--ink-dark);
+    .stats-cell.active-day {
+      background-color: var(--ink-tag);
       color: #ffffff;
     }
 
+    /* 5 天微型預報網格 */
+    .f-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: var(--gap-grid);
+      width: 100%;
+    }
+    .f-mini-cell {
+      background-color: var(--cell-bg);
+      border-radius: 3px;
+      padding: 2px 1px;
+      text-align: center;
+      min-width: 0;
+      line-height: 1.2;
+    }
+    .f-mini-cell.active-f {
+      background-color: var(--ink-tag);
+      color: #ffffff;
+      font-weight: 900;
+    }
+
+    /* 據點指示圓點 */
     .spot-dot {
       width: clamp(5px, 0.8vmin, 8px);
       height: clamp(5px, 0.8vmin, 8px);
@@ -297,70 +255,97 @@
       background-color: var(--ink-dark);
     }
 
-    /* 統一導航列規格 */
-    .unified-top-header {
-      height: clamp(34px, 4.5vh, 42px);
-      min-height: clamp(34px, 4.5vh, 42px);
-      max-height: clamp(34px, 4.5vh, 42px);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    /* 日曆核心網格 (嚴格 7 列 × 6 行等高排列) */
+    .cal-grid-header {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: clamp(1.5px, 0.3vw, 3px);
       width: 100%;
-      padding: 0 2px;
-      flex-shrink: 0;
     }
-    .unified-tab-btn {
-      height: clamp(26px, 3.4vh, 32px);
-      display: inline-flex;
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      grid-template-rows: repeat(6, minmax(0, 1fr));
+      gap: clamp(1.5px, 0.3vw, 3px);
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
+    .cal-cell {
+      background-color: var(--paper-card);
+      border: var(--border-thick) solid var(--ink-border);
+      border-radius: 2px;
+      padding: 1px 2px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .cal-cell.other-month {
+      opacity: 0.35;
+      background-color: #f1f3f6;
+    }
+    .cal-cell.cal-today {
+      background-color: var(--ink-tag);
+      color: #ffffff;
+    }
+    .cal-cell.cal-holiday {
+      border-width: calc(var(--border-thick) * 1.3);
+    }
+    .cal-holiday-slot {
+      height: clamp(12px, 1.6vh, 15px);
+      max-height: clamp(12px, 1.6vh, 15px);
+      width: 100%;
+      display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      padding: 0 clamp(6px, 1.2vw, 10px);
-      font-weight: 900;
-      border-radius: 2px;
-      user-select: none;
-      cursor: pointer;
+      overflow: hidden;
+      flex-shrink: 0;
+      margin-top: auto;
+    }
+    .cal-holiday-tag {
+      background-color: var(--ink-tag);
+      color: #ffffff;
+      font-size: clamp(7.5px, 1vmin, 9.5px);
+      font-weight: 700;
       line-height: 1;
+      padding: 1px 2px;
+      border-radius: 2px;
+      text-align: center;
+      max-width: 100%;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: inline-block;
+    }
+    .cal-cell.cal-today .cal-holiday-tag {
+      background-color: #ffffff;
+      color: var(--ink-tag);
     }
 
-    /* 衝浪顛簸微動態 */
-    @keyframes surferBobbing {
-      0%, 100% { transform: translate(-50%, 0) rotate(0deg); }
-      50% { transform: translate(-50%, -3px) rotate(3deg); }
-    }
-    .surfer-riding {
-      animation: surferBobbing 1.6s ease-in-out infinite;
-    }
+    /* 動態字體綁定 class */
+    .font-fluid-clock { font-size: var(--fs-clock); line-height: 0.9; }
+    .font-fluid-ampm { font-size: var(--fs-ampm); }
+    .font-fluid-date { font-size: var(--fs-date); }
+    .font-fluid-swell { font-size: var(--fs-swell-main); line-height: 0.9; }
+    .font-fluid-unit { font-size: var(--fs-unit); }
+    .font-fluid-subtitle { font-size: var(--fs-subtitle); }
+    .font-fluid-label { font-size: var(--fs-label); }
+    .font-fluid-value { font-size: var(--fs-value); }
+    .font-fluid-tide { font-size: var(--fs-tide); }
+    .font-fluid-forecast { font-size: var(--fs-forecast-day); }
+    .font-fluid-footer { font-size: var(--fs-footer); }
 
-    /* 彩蛋長按提示動效 */
-    @keyframes surferLongPressPulse {
-      0% { transform: translate(-50%, 0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
-      50% { transform: translate(-50%, -4px) scale(1.18); filter: drop-shadow(0 0 5px rgba(0,0,0,0.3)); }
-      100% { transform: translate(-50%, 0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
-    }
-    .surfer-charging {
-      animation: surferLongPressPulse 0.5s infinite ease-in-out !important;
-      cursor: pointer;
-    }
-
-    /* 鬧鐘微閃 */
-    @keyframes alarmPulse {
+    @keyframes pulseWarning {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.02); }
+      50% { transform: scale(1.08); color: #dc2626; }
     }
-    .alarm-ringing-card {
-      animation: alarmPulse 1.2s infinite ease-in-out;
-    }
-
-    .game-viewport {
-      touch-action: none;
-      user-select: none;
-      position: relative;
-      background: linear-gradient(180deg, #f0f3f6 0%, #e5eaf0 100%);
-    }
-    .inverted .game-viewport {
-      background: linear-gradient(180deg, #1c2026 0%, #15181d 100%) !important;
+    .timer-warning {
+      animation: pulseWarning 0.6s infinite ease-in-out;
     }
   </style>
 </head>
@@ -371,42 +356,45 @@
   <!-- ========================================================= -->
   <!-- 檢視畫面 A：衝浪浪況主儀表板 (SURF DASHBOARD VIEW)          -->
   <!-- ========================================================= -->
-  <main id="surfView" class="flex flex-col justify-between h-full w-full gap-[var(--gap-main)] pt-1">
+  <main id="surfView" class="flex flex-col justify-between h-full w-full gap-[var(--gap-main)] pt-0.5">
 
-    <!-- 1. 頂部抬頭區：標準固定高度 header -->
+    <!-- 1. 頂部抬頭區：標準固定高度 header (手機端防重疊自適應) -->
     <header class="unified-top-header">
-      <div class="flex items-center gap-1.5 min-w-0 pr-1 overflow-hidden">
-        <!-- 據點導航 -->
-        <div class="inline-flex items-center bg-dark-tag text-white px-2 py-0.5 font-black tracking-wider select-none shrink-0 font-fluid-label rounded-sm">
-          <button onclick="prevSpot()" class="px-1 font-black hover:opacity-75 cursor-pointer" title="上一個浪點" aria-label="上一個浪點">◀</button>
-          <span class="mx-1 cursor-pointer font-black" id="spotNavTitle" onclick="nextSpot()">HK SURF</span>
-          <button onclick="nextSpot()" class="px-1 font-black hover:opacity-75 cursor-pointer" title="下一個浪點" aria-label="下一個浪點">▶</button>
+      <div class="flex items-center gap-1 min-w-0 overflow-hidden shrink">
+        <!-- 據點導航 (手機緊湊版) -->
+        <div class="inline-flex items-center bg-dark-tag text-white px-1.5 py-0.5 font-black tracking-wider select-none shrink-0 font-fluid-label rounded-sm text-[11px] sm:text-xs">
+          <button onclick="prevSpot()" class="px-0.5 font-black hover:opacity-75 cursor-pointer" title="上一個浪點" aria-label="上一個浪點">◀</button>
+          <span class="mx-0.5 cursor-pointer font-black truncate max-w-[85px] sm:max-w-[120px]" id="spotNavTitle" onclick="nextSpot()">HK SURF</span>
+          <button onclick="nextSpot()" class="px-0.5 font-black hover:opacity-75 cursor-pointer" title="下一個浪點" aria-label="下一個浪點">▶</button>
         </div>
         
-        <!-- 6 個浪點指示圓點 -->
-        <div class="flex items-center gap-1 px-0.5 shrink-0 flex-wrap max-w-[100px]" id="spotDots"></div>
+        <!-- 6 個浪點指示圓點 (窄屏手機自動隱藏以節省空間) -->
+        <div class="hidden sm:flex items-center gap-1 px-0.5 shrink-0 flex-wrap max-w-[80px]" id="spotDots"></div>
 
         <button onclick="toggleTheme()" title="反色模式切換" aria-label="反色切換" class="ink-b px-1.5 py-0.5 font-black font-fluid-label active:bg-dark-tag active:text-white cursor-pointer shrink-0 rounded-sm">
-          <i class="fa-solid fa-circle-half-stroke"></i>
+          <i class="fa-solid fa-circle-half-stroke text-[10px] sm:text-xs"></i>
         </button>
         <button onclick="fetchAllData()" title="手動刷新數據" aria-label="更新數據" class="ink-b px-1.5 py-0.5 font-black font-fluid-label active:bg-dark-tag active:text-white cursor-pointer shrink-0 rounded-sm">
-          <i id="syncIcon" class="fa-solid fa-rotate"></i>
+          <i id="syncIcon" class="fa-solid fa-rotate text-[10px] sm:text-xs"></i>
         </button>
       </div>
       
-      <!-- 右側統一模式切換標籤組 (浪況 / 時鐘 / 日曆) -->
-      <div class="shrink-0 flex items-center gap-1">
-        <button onclick="switchToSurfView()" id="tabBtnSurf" class="unified-tab-btn ink-b bg-dark-tag text-white font-fluid-label active:scale-95 transition-transform" title="衝浪浪況主版">
-          <i class="fa-solid fa-water text-xs"></i>
-          <span>浪況</span>
+      <!-- 右側統一模式切換標籤組 (手機端緊湊膠囊) -->
+      <div class="shrink-0 flex items-center gap-0.5 sm:gap-1">
+        <button onclick="switchToSurfView()" id="tabBtnSurf" class="unified-tab-btn ink-b bg-dark-tag text-white active:scale-95 transition-transform" title="衝浪浪況主版">
+          <i class="fa-solid fa-water text-[10px] sm:text-xs"></i>
+          <span class="inline sm:hidden">浪</span>
+          <span class="hidden sm:inline">浪況</span>
         </button>
-        <button onclick="switchToClockView()" id="tabBtnClock" class="unified-tab-btn ink-b bg-white text-dark-tag font-fluid-label hover:bg-neutral-100 active:scale-95 transition-transform" title="切換至時鐘模式">
-          <i class="fa-regular fa-clock text-xs"></i>
-          <span>時鐘</span>
+        <button onclick="switchToClockView()" id="tabBtnClock" class="unified-tab-btn ink-b bg-white text-dark-tag hover:bg-neutral-100 active:scale-95 transition-transform" title="切換至時鐘模式">
+          <i class="fa-regular fa-clock text-[10px] sm:text-xs"></i>
+          <span class="inline sm:hidden">鐘</span>
+          <span class="hidden sm:inline">時鐘</span>
         </button>
-        <button onclick="switchToCalendarView()" id="tabBtnCal" class="unified-tab-btn ink-b bg-white text-dark-tag font-fluid-label hover:bg-neutral-100 active:scale-95 transition-transform" title="切換至日曆模式">
-          <i class="fa-regular fa-calendar text-xs"></i>
-          <span>日曆</span>
+        <button onclick="switchToCalendarView()" id="tabBtnCal" class="unified-tab-btn ink-b bg-white text-dark-tag hover:bg-neutral-100 active:scale-95 transition-transform" title="切換至日曆模式">
+          <i class="fa-regular fa-calendar text-[10px] sm:text-xs"></i>
+          <span class="inline sm:hidden">曆</span>
+          <span class="hidden sm:inline">日曆</span>
         </button>
       </div>
     </header>
@@ -419,28 +407,28 @@
       </div>
     </div>
 
-    <!-- 2. 實時氣候速報 (P1 即時潮位狀態) -->
-    <section class="ink-b grid grid-cols-[0.85fr_1.1fr_0.85fr_0.75fr_2.7fr] text-center items-center py-1 bg-white shrink-0">
+    <!-- 2. 實時氣候速報 (整合 P1 即時潮位狀態徽章) -->
+    <section class="ink-b grid grid-cols-[0.85fr_1.1fr_0.85fr_0.75fr_2.7fr] text-center items-center py-1 bg-white shrink-0 rounded-sm">
       <div class="ink-b-r px-0.5 min-w-0">
-        <p class="font-fluid-label font-black uppercase text-neutral-600">氣溫</p>
+        <p class="font-fluid-label font-black uppercase">氣溫</p>
         <p class="font-mono font-fluid-value font-black mt-0.5 leading-none"><span id="temp">28</span>°</p>
       </div>
       <div class="ink-b-r px-0.5 min-w-0">
-        <p class="font-fluid-label font-black uppercase text-neutral-600">天氣</p>
+        <p class="font-fluid-label font-black uppercase">天氣</p>
         <p id="cond" class="font-fluid-value font-black leading-tight mt-0.5 truncate px-0.5">大致天晴</p>
       </div>
       <div class="ink-b-r px-0.5 min-w-0">
-        <p class="font-fluid-label font-black uppercase text-neutral-600">濕度</p>
+        <p class="font-fluid-label font-black uppercase">濕度</p>
         <p id="humi" class="font-mono font-fluid-value font-black mt-0.5 leading-none">78%</p>
       </div>
       <div class="ink-b-r px-0.5 min-w-0">
-        <p class="font-fluid-label font-black uppercase text-neutral-600">UV</p>
+        <p class="font-fluid-label font-black uppercase">UV</p>
         <p id="uv" class="font-mono font-fluid-value font-black mt-0.5 leading-none">6</p>
       </div>
       <div class="px-1 min-w-0">
         <div class="flex items-center justify-center gap-1 font-fluid-label font-black">
-          <span class="uppercase text-neutral-600">潮汐</span>
-          <span id="tideNowBadge" class="bg-dark-tag text-white text-[0.74rem] px-1.5 py-0.2 font-black rounded-sm leading-none whitespace-nowrap">計算中</span>
+          <span class="uppercase">潮汐</span>
+          <span id="tideNowBadge" class="bg-dark-tag text-white text-[0.72rem] px-1 py-0.2 font-black rounded-sm leading-none whitespace-nowrap">計算中</span>
         </div>
         <p id="tideTimes" class="font-mono font-fluid-tide font-black leading-tight mt-0.5 tracking-tight">
           <span class="block truncate">▲ --:--</span>
@@ -449,9 +437,9 @@
       </div>
     </section>
 
-    <!-- 3. 即時第一湧浪核心卡片 (已加入翻頁微動效綁定區) -->
-    <section id="heroSwellCard" class="py-1 px-2 bg-white shrink-0 flex flex-col justify-center items-center min-h-0 transition-opacity">
-      <div class="w-full max-w-[92%] sm:max-w-[82%] mx-auto grid grid-cols-12 items-center gap-3 sm:gap-6">
+    <!-- 3. 即時第一湧浪核心卡片 (帶有墨水屏翻頁微動效綁定區) -->
+    <section id="heroSwellCard" class="py-1 px-2 bg-white shrink-0 flex flex-col justify-center items-center min-h-0 transition-opacity ink-b rounded-sm">
+      <div class="w-full max-w-[92%] sm:max-w-[82%] mx-auto grid grid-cols-12 items-center gap-2 sm:gap-6">
         <!-- 左側：湧浪數值主區 -->
         <div class="col-span-7 flex flex-col items-center justify-center text-center h-full min-w-0 py-0.5">
           <div>
@@ -462,24 +450,24 @@
           <div class="flex items-baseline justify-center gap-1.5 my-auto flex-nowrap overflow-hidden">
             <span id="cs_now" class="font-mono font-fluid-swell font-black tracking-tighter">0.8</span>
             <span class="font-fluid-unit font-black">m</span>
-            <span id="cs_now_ft" class="font-fluid-label font-mono font-black whitespace-nowrap ml-0.5 opacity-80">(2.6呎)</span>
+            <span id="cs_now_ft" class="font-fluid-label font-mono font-black whitespace-nowrap ml-0.5 opacity-90">(2.6呎)</span>
           </div>
         </div>
         
         <!-- 右側：指標列表 (週期 / 浪向 / 總浪) -->
-        <div class="col-span-5 pl-3 sm:pl-4 ink-b-l grid grid-rows-3 gap-y-1.5 h-full py-1 min-w-0 justify-center">
-          <div class="grid grid-cols-[clamp(40px,6cqi,58px)_1fr] items-center gap-x-2 min-w-0">
+        <div class="col-span-5 pl-2 sm:pl-4 ink-b-l grid grid-rows-3 gap-y-1.5 h-full py-0.5 min-w-0 justify-center">
+          <div class="grid grid-cols-[clamp(36px,5cqi,52px)_1fr] items-center gap-x-1 sm:gap-x-2 min-w-0">
             <span class="font-fluid-label font-black bg-dark-tag text-white py-0.5 text-center shrink-0 leading-tight rounded-sm">週期</span>
             <span id="cs_pd" class="font-mono font-fluid-value font-black text-right leading-none truncate">7s</span>
           </div>
-          <div class="grid grid-cols-[clamp(40px,6cqi,58px)_1fr] items-center gap-x-2 min-w-0">
+          <div class="grid grid-cols-[clamp(36px,5cqi,52px)_1fr] items-center gap-x-1 sm:gap-x-2 min-w-0">
             <span class="font-fluid-label font-black bg-dark-tag text-white py-0.5 text-center shrink-0 leading-tight rounded-sm">浪向</span>
             <div class="flex items-center justify-end gap-1 min-w-0 leading-none">
-              <i id="cs_dr_arrow" class="fa-solid fa-arrow-up text-xs sm:text-sm shrink-0 transition-transform duration-500" style="transform: rotate(180deg);" title="浪向波浪行進方向"></i>
+              <i id="cs_dr_arrow" class="fa-solid fa-arrow-up text-xs shrink-0 transition-transform duration-500" style="transform: rotate(180deg);" title="浪向波浪行進方向"></i>
               <span id="cs_dr" class="font-black font-fluid-label text-right truncate">南 (S)</span>
             </div>
           </div>
-          <div class="grid grid-cols-[clamp(40px,6cqi,58px)_1fr] items-center gap-x-2 min-w-0">
+          <div class="grid grid-cols-[clamp(36px,5cqi,52px)_1fr] items-center gap-x-1 sm:gap-x-2 min-w-0">
             <span class="font-fluid-label font-black bg-dark-tag text-white py-0.5 text-center shrink-0 leading-tight rounded-sm">總浪</span>
             <span id="cs_total" class="font-mono font-fluid-value font-black text-right leading-none truncate">1.0m</span>
           </div>
@@ -487,15 +475,15 @@
       </div>
     </section>
 
-    <!-- 4. 未來 5 天第一湧浪深度趨勢統計 -->
+    <!-- 4. 未來 5 天第一湧浪深度趨勢統計 (手機窄屏緊湊防重疊排版) -->
     <section class="flex flex-col justify-center min-h-0 py-0.5 shrink-0">
       <div class="flex justify-between items-center ink-b-b pb-0.5 mb-1 shrink-0">
-        <span class="font-fluid-label font-black tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-chart-simple text-[11px]"></i>
-          <span>未來 5 天第一湧浪深度趨勢統計</span>
+        <span class="font-fluid-label font-black tracking-wider flex items-center gap-1">
+          <i class="fa-solid fa-chart-simple text-[10px]"></i>
+          <span>未來 5 天第一湧浪深度趨勢</span>
         </span>
-        <span class="font-fluid-footer font-black opacity-80 inline-flex items-center gap-0.5 whitespace-nowrap">
-          ≥1.5m 滿浪圖 <i class="fa-solid fa-water text-[10px]"></i>
+        <span class="font-fluid-footer font-black opacity-85 inline-flex items-center gap-0.5 whitespace-nowrap">
+          ≥1.5m 滿浪圖 <i class="fa-solid fa-water text-[9px]"></i>
         </span>
       </div>
       <div class="stats-grid" id="cs_stats">
@@ -506,12 +494,12 @@
     <!-- 5. 未來 5 天微型預報條 -->
     <section class="shrink-0">
       <div class="flex justify-between items-center mb-0.5">
-        <span id="forecastTitle" class="font-fluid-label font-black tracking-wider">HKO 5-DAY FORECAST (香港天文台五日預測)</span>
+        <span id="forecastTitle" class="font-fluid-label font-black tracking-wider truncate">HKO 5-DAY FORECAST (香港天文台五日預測)</span>
       </div>
       <div class="f-mini-grid" id="f_mini"></div>
     </section>
 
-    <!-- 6. 頁尾 -->
+    <!-- 6. 頁尾：浪點資訊與更新時間 -->
     <footer class="flex justify-between items-center font-fluid-footer font-mono font-bold px-0.5 shrink-0 ink-b-t pt-1 pb-0.5">
       <span class="truncate max-w-[65%]" id="footerSpotDesc">熱點: 下長沙 (22.2312°N, 113.9472°E) · 香港天文台</span>
       <span id="lastUpdated" class="shrink-0 ml-1">v1.1 · UPDATED: --:--:--</span>
@@ -521,31 +509,34 @@
   <!-- ========================================================= -->
   <!-- 檢視畫面 B：全螢幕極簡電子時鐘模式 (AMBIENT CLOCK VIEW)      -->
   <!-- ========================================================= -->
-  <main id="clockView" class="hidden flex-col justify-between h-full w-full pt-1 pb-1">
+  <main id="clockView" class="hidden flex-col justify-between h-full w-full pt-0.5 pb-1">
     <!-- 時鐘頂部控制列 -->
     <header class="unified-top-header">
-      <div class="flex items-center gap-1.5">
-        <button id="alarmClockBtn" onclick="openAlarmSettings()" class="unified-tab-btn ink-b bg-white text-dark-tag font-fluid-label hover:opacity-80 transition-all">
-          <i id="alarmBellIcon" class="fa-regular fa-bell text-xs"></i>
-          <span id="alarmStatusText">鬧鐘關閉</span>
+      <div class="flex items-center gap-1 min-w-0 overflow-hidden shrink">
+        <button id="alarmClockBtn" onclick="openAlarmSettings()" class="unified-tab-btn ink-b bg-white text-dark-tag hover:opacity-80 transition-all shrink-0">
+          <i id="alarmBellIcon" class="fa-regular fa-bell text-[10px] sm:text-xs"></i>
+          <span id="alarmStatusText" class="truncate max-w-[75px] sm:max-w-none text-[10px] sm:text-xs">鬧鐘關閉</span>
         </button>
-        <button onclick="toggleTheme()" class="unified-tab-btn ink-b bg-white text-dark-tag font-fluid-label hover:opacity-80 px-2" title="反色切換">
-          <i class="fa-solid fa-circle-half-stroke text-xs"></i>
+        <button onclick="toggleTheme()" class="unified-tab-btn ink-b bg-white text-dark-tag hover:opacity-80 px-1.5 shrink-0" title="反色切換">
+          <i class="fa-solid fa-circle-half-stroke text-[10px] sm:text-xs"></i>
         </button>
       </div>
 
-      <div class="shrink-0 flex items-center gap-1">
-        <button onclick="switchToSurfView()" class="tab-clone-surf unified-tab-btn ink-b bg-white text-dark-tag font-fluid-label hover:bg-neutral-100 active:scale-95 transition-transform" title="返回浪況主版">
-          <i class="fa-solid fa-water text-xs"></i>
-          <span>浪況</span>
+      <div class="shrink-0 flex items-center gap-0.5 sm:gap-1">
+        <button onclick="switchToSurfView()" class="tab-clone-surf unified-tab-btn ink-b bg-white text-dark-tag hover:bg-neutral-100 active:scale-95 transition-transform" title="返回浪況主版">
+          <i class="fa-solid fa-water text-[10px] sm:text-xs"></i>
+          <span class="inline sm:hidden">浪</span>
+          <span class="hidden sm:inline">浪況</span>
         </button>
-        <button onclick="switchToClockView()" class="tab-clone-clock unified-tab-btn ink-b bg-dark-tag text-white font-fluid-label active:scale-95 transition-transform" title="時鐘模式">
-          <i class="fa-regular fa-clock text-xs"></i>
-          <span>時鐘</span>
+        <button onclick="switchToClockView()" class="tab-clone-clock unified-tab-btn ink-b bg-dark-tag text-white active:scale-95 transition-transform" title="時鐘模式">
+          <i class="fa-regular fa-clock text-[10px] sm:text-xs"></i>
+          <span class="inline sm:hidden">鐘</span>
+          <span class="hidden sm:inline">時鐘</span>
         </button>
-        <button onclick="switchToCalendarView()" class="tab-clone-cal unified-tab-btn ink-b bg-white text-dark-tag font-fluid-label hover:bg-neutral-100 active:scale-95 transition-transform" title="切換至日曆模式">
-          <i class="fa-regular fa-calendar text-xs"></i>
-          <span>日曆</span>
+        <button onclick="switchToCalendarView()" class="tab-clone-cal unified-tab-btn ink-b bg-white text-dark-tag hover:bg-neutral-100 active:scale-95 transition-transform" title="切換至日曆模式">
+          <i class="fa-regular fa-calendar text-[10px] sm:text-xs"></i>
+          <span class="inline sm:hidden">曆</span>
+          <span class="hidden sm:inline">日曆</span>
         </button>
       </div>
     </header>
@@ -554,69 +545,67 @@
     <section class="flex flex-col items-center justify-center my-auto w-full text-center py-2">
       <!-- 置中 AM/PM 膠囊 -->
       <div class="mb-2">
-        <span id="ambientAmPm" class="bg-dark-tag text-white px-3.5 py-0.5 font-mono font-black text-sm sm:text-base tracking-widest rounded-sm">
+        <span id="ambientAmPm" class="bg-dark-tag text-white px-3.5 py-0.5 font-mono font-black text-xs sm:text-sm tracking-widest rounded-sm">
           AM
         </span>
       </div>
 
       <!-- 特大置中時間 (時:分) -->
-      <div class="w-full text-center my-1">
-        <span id="ambientClock" class="font-mono font-black tracking-tighter text-center inline-block leading-none" style="font-size: clamp(4.6rem, 18vw, 10rem);">
+      <div class="w-full text-center my-0.5">
+        <span id="ambientClock" class="font-mono font-black tracking-tighter text-center inline-block leading-none" style="font-size: clamp(4.4rem, 16vw, 9.5rem);">
           --:--
         </span>
       </div>
 
-      <!-- 海洋衝浪者秒數動態進度條 (長按衝浪者即可觸發彩蛋衝浪小遊戲) -->
-      <div class="w-64 sm:w-80 mx-auto mt-4 px-1 select-none">
-        <div class="relative w-full pt-6 pb-1">
-          <!-- 款式 D：極速尾流噴泉浪 衝浪者剪影 -->
-          <div id="surferMarker" class="absolute bottom-2 left-0 transition-all duration-300 surfer-riding z-10 cursor-pointer" style="left: 0%; pointer-events: auto;" title="【彩蛋】長按衝浪者進入衝浪小遊戲！">
-            <svg class="w-10 h-8 sm:w-12 sm:h-10 -mb-1 text-neutral-800" viewBox="0 0 86 64" fill="currentColor">
-              <path d="M12 55 C10 44, 11 30, 18 16 C20 12, 23 13, 23 18 C23 23, 19 32, 22 42 C23 46, 25 50, 28 54 Z" opacity="0.85" />
-              <path d="M4 56 C2 48, 5 38, 10 28 C12 24, 14 25, 14 30 C13 36, 11 45, 12 55 Z" opacity="0.7" />
-              <circle cx="21" cy="10" r="1.5" />
-              <circle cx="27" cy="14" r="1.3" />
-              <circle cx="12" cy="22" r="1.2" />
-              <circle cx="6" cy="23" r="1" />
-              <path d="M22 55 C32 52, 56 52, 76 55 C68 58, 33 58, 22 55 Z" />
-              <circle cx="48" cy="17" r="4.2" />
-              <path d="M44 23 L53 25 L61 21 L63 24 L55 29 L54 37 L62 44 L57 47 L50 39 L44 42 L37 49 L33 46 L41 37 L42 29 L35 31 L33 27 Z" />
-            </svg>
-          </div>
-
-          <!-- 底槽與進度填充 -->
-          <div class="w-full h-2 bg-white progress-track rounded-full overflow-hidden ink-b p-[1px] relative">
-            <div id="secondProgressBar" class="h-full bg-dark-tag transition-all duration-300 w-0 rounded-full"></div>
-          </div>
+      <!-- 秒數破浪滑行進度條 (款式 D：極速尾流噴泉浪 Rooster Tail Wake) -->
+      <div class="w-56 sm:w-72 mt-3 mx-auto relative select-none" id="progressArea">
+        <!-- 動態衝浪者標記 (長按進入彩蛋小遊戲) -->
+        <div id="surferMarker" class="absolute -top-7 left-0 transition-all duration-300 pointer-events-auto cursor-pointer surfer-riding z-10" style="left: 0%;" title="長按衝浪者進入彩蛋小遊戲！">
+          <svg class="w-12 h-9 text-neutral-900" viewBox="0 0 86 64" fill="currentColor">
+            <!-- 款式 D：板尾激起的雙重公雞尾噴泉浪花 (Rooster Tail Spray Fan) -->
+            <path d="M12 55 C10 44, 11 30, 18 16 C20 12, 23 13, 23 18 C23 23, 19 32, 22 42 C23 46, 25 50, 28 54 Z" />
+            <path d="M4 56 C2 48, 5 38, 10 28 C12 24, 14 25, 14 30 C13 36, 11 45, 12 55 Z" />
+            <!-- 飛揚水花顆粒 -->
+            <circle cx="21" cy="10" r="1.5" />
+            <circle cx="27" cy="14" r="1.3" />
+            <circle cx="12" cy="22" r="1.2" />
+            <!-- 衝浪板 -->
+            <path d="M22 55 C32 52, 56 52, 76 55 C68 58, 33 58, 22 55 Z" />
+            <!-- 衝浪者身姿 -->
+            <circle cx="48" cy="17" r="4.2" />
+            <path d="M44 23 L53 25 L61 21 L63 24 L55 29 L54 37 L62 44 L57 47 L50 39 L44 42 L37 49 L33 46 L41 37 L42 29 L35 31 L33 27 Z" />
+          </svg>
         </div>
 
-        <div class="flex justify-between items-center text-[10px] font-mono font-bold text-neutral-500 px-0.5 -mt-0.5">
+        <!-- 軌道槽 -->
+        <div class="w-full h-2 bg-white rounded-full overflow-hidden ink-b p-[1px] relative">
+          <div id="secondProgressBar" class="h-full bg-dark-tag transition-all duration-300 w-0 rounded-full"></div>
+        </div>
+        <div class="flex justify-between items-center text-[10px] font-mono font-black opacity-75 mt-0.5">
           <span>00s</span>
-          <span class="inline-flex items-center gap-1">
-            <i class="fa-solid fa-water text-[9px]"></i>
-            <span>60s</span>
-          </span>
+          <span class="flex items-center gap-0.5"><i class="fa-solid fa-water text-[8px]"></i> 60s</span>
         </div>
       </div>
 
       <!-- 置中日期與星期 -->
-      <div class="flex justify-center items-center gap-2.5 mt-4 font-black text-lg sm:text-2xl tracking-tight">
+      <div class="flex justify-center items-center gap-2 mt-3 font-black text-base sm:text-xl tracking-tight">
         <span id="ambientDate">----/--/--</span>
         <span class="opacity-60">·</span>
-        <span id="ambientWkday" class="border-b-2 border-neutral-700 pb-0.5">星期-</span>
+        <span id="ambientWkday" class="border-b-2 border-neutral-800 pb-0.5">星期-</span>
       </div>
 
-      <!-- 當前浪況速報膠囊 -->
-      <div class="mt-4">
-        <div id="ambientSpotSummary" class="ink-b inline-flex items-center gap-1.5 px-3 py-1 font-black text-xs sm:text-sm bg-white text-dark-tag rounded-sm shadow-xs">
+      <!-- 當前浪況速報膠囊摘要 -->
+      <div class="mt-3">
+        <div id="ambientSpotSummary" class="ink-b inline-flex items-center gap-1 px-2.5 py-0.5 font-black text-xs bg-white text-dark-tag rounded-sm shadow-xs">
           <span>下長沙 · 第一湧浪 0.8m · 潮汐計算中</span>
         </div>
       </div>
     </section>
 
-    <footer class="text-center font-mono font-bold text-xs opacity-75 pb-1">
+    <!-- 時鐘底部指引 -->
+    <footer class="text-center font-mono font-bold text-[11px] opacity-75 pb-0.5">
       <span onclick="switchToSurfView()" class="cursor-pointer hover:underline">
-        [ 點擊返回浪況看板 · 長按衝浪者進入小遊戲 ]
+        [ 點擊返回浪況看板 · 滑動屏幕切換視圖 ]
       </span>
     </footer>
   </main>
@@ -624,40 +613,43 @@
   <!-- ========================================================= -->
   <!-- 檢視畫面 C：香港公眾假期電子日曆 (CALENDAR VIEW)            -->
   <!-- ========================================================= -->
-  <main id="calendarView" class="hidden flex-col justify-between h-full w-full pt-1 pb-1 gap-1">
+  <main id="calendarView" class="hidden flex-col justify-between h-full w-full pt-0.5 pb-1 gap-1">
     <header class="unified-top-header">
-      <div class="flex items-center gap-1">
-        <button onclick="prevCalendarMonth()" class="unified-tab-btn ink-b px-2 font-black font-fluid-label hover:bg-neutral-100 cursor-pointer" title="上個月">◀</button>
-        <span id="calendarMonthTitle" class="unified-tab-btn ink-b bg-dark-tag text-white font-mono font-black font-fluid-label tracking-wider select-none px-2">
+      <div class="flex items-center gap-0.5 sm:gap-1 min-w-0 overflow-hidden shrink">
+        <button onclick="prevCalendarMonth()" class="unified-tab-btn ink-b px-1.5 font-black hover:bg-neutral-100 cursor-pointer" title="上個月">◀</button>
+        <span id="calendarMonthTitle" class="unified-tab-btn ink-b bg-dark-tag text-white font-mono font-black tracking-wider select-none px-1.5 sm:px-2 text-[10px] sm:text-xs">
           2026 / 09
         </span>
-        <button onclick="nextCalendarMonth()" class="unified-tab-btn ink-b px-2 font-black font-fluid-label hover:bg-neutral-100 cursor-pointer" title="下個月">▶</button>
-        <button onclick="goCalendarToday()" class="unified-tab-btn ink-b bg-white text-dark-tag font-black text-xs hover:bg-neutral-100 cursor-pointer px-2" title="回到今天">
+        <button onclick="nextCalendarMonth()" class="unified-tab-btn ink-b px-1.5 font-black hover:bg-neutral-100 cursor-pointer" title="下個月">▶</button>
+        <button onclick="goCalendarToday()" class="unified-tab-btn ink-b bg-white text-dark-tag font-black hover:bg-neutral-100 cursor-pointer px-1.5 text-[10px] sm:text-xs" title="回到今天">
           今日
         </button>
-        <button onclick="toggleTheme()" class="unified-tab-btn ink-b bg-white text-dark-tag font-black text-xs cursor-pointer hover:opacity-80 px-2 ml-0.5" title="反色切換">
-          <i class="fa-solid fa-circle-half-stroke"></i>
+        <button onclick="toggleTheme()" class="unified-tab-btn ink-b bg-white text-dark-tag font-black cursor-pointer hover:opacity-80 px-1.5" title="反色切換">
+          <i class="fa-solid fa-circle-half-stroke text-[10px]"></i>
         </button>
       </div>
 
-      <div class="shrink-0 flex items-center gap-1">
-        <button onclick="switchToSurfView()" class="tab-clone-surf unified-tab-btn ink-b bg-white text-dark-tag font-fluid-label hover:bg-neutral-100 active:scale-95 transition-transform" title="返回浪況主版">
-          <i class="fa-solid fa-water text-xs"></i>
-          <span>浪況</span>
+      <div class="shrink-0 flex items-center gap-0.5 sm:gap-1">
+        <button onclick="switchToSurfView()" class="tab-clone-surf unified-tab-btn ink-b bg-white text-dark-tag hover:bg-neutral-100 active:scale-95 transition-transform" title="返回浪況主版">
+          <i class="fa-solid fa-water text-[10px] sm:text-xs"></i>
+          <span class="inline sm:hidden">浪</span>
+          <span class="hidden sm:inline">浪況</span>
         </button>
-        <button onclick="switchToClockView()" class="tab-clone-clock unified-tab-btn ink-b bg-white text-dark-tag font-fluid-label hover:bg-neutral-100 active:scale-95 transition-transform" title="切換至時鐘模式">
-          <i class="fa-regular fa-clock text-xs"></i>
-          <span>時鐘</span>
+        <button onclick="switchToClockView()" class="tab-clone-clock unified-tab-btn ink-b bg-white text-dark-tag hover:bg-neutral-100 active:scale-95 transition-transform" title="切換至時鐘模式">
+          <i class="fa-regular fa-clock text-[10px] sm:text-xs"></i>
+          <span class="inline sm:hidden">鐘</span>
+          <span class="hidden sm:inline">時鐘</span>
         </button>
-        <button onclick="switchToCalendarView()" class="tab-clone-cal unified-tab-btn ink-b bg-dark-tag text-white font-fluid-label active:scale-95 transition-transform" title="日曆模式">
-          <i class="fa-regular fa-calendar text-xs"></i>
-          <span>日曆</span>
+        <button onclick="switchToCalendarView()" class="tab-clone-cal unified-tab-btn ink-b bg-dark-tag text-white active:scale-95 transition-transform" title="日曆模式">
+          <i class="fa-regular fa-calendar text-[10px] sm:text-xs"></i>
+          <span class="inline sm:hidden">曆</span>
+          <span class="hidden sm:inline">日曆</span>
         </button>
       </div>
     </header>
 
     <!-- 星期表頭 -->
-    <section class="cal-grid-header text-center font-black font-fluid-label shrink-0 pb-0.5">
+    <section class="cal-grid-header text-center font-black font-fluid-label shrink-0 pb-0.5 text-xs">
       <div class="bg-dark-tag text-white py-0.5 rounded-xs">日</div>
       <div class="ink-b py-0.5 rounded-xs">一</div>
       <div class="ink-b py-0.5 rounded-xs">二</div>
@@ -667,20 +659,20 @@
       <div class="bg-dark-tag text-white py-0.5 rounded-xs">六</div>
     </section>
 
-    <!-- 日曆核心月視圖網格 (嚴格固定 42 格) -->
+    <!-- 42 格等高月視圖網格 -->
     <section id="calendarGrid" class="cal-grid flex-1 min-h-0"></section>
 
-    <!-- 本月香港公眾假期明細卡片 -->
-    <footer class="ink-b px-2.5 py-1.5 bg-white text-dark-tag rounded-sm shrink-0 flex flex-col justify-between h-[clamp(75px,11.5vh,98px)] min-h-[75px] max-h-[100px] overflow-hidden">
-      <div class="flex justify-between items-center text-[10.5px] sm:text-xs font-black border-b border-neutral-300 pb-1 leading-none shrink-0">
-        <span class="inline-flex items-center gap-1.5">
-          <i class="fa-regular fa-calendar-check text-xs"></i>
-          <span>香港公眾假期詳情 (HK PUBLIC HOLIDAYS)</span>
+    <!-- 底部香港公眾假期卡片 -->
+    <footer class="ink-b px-2 py-1 bg-white text-dark-tag rounded-sm shrink-0 flex flex-col justify-between h-[clamp(72px,11vh,95px)] min-h-[72px] max-h-[96px] overflow-hidden">
+      <div class="flex justify-between items-center text-[10px] sm:text-xs font-black border-b border-neutral-300 pb-0.5 leading-none shrink-0">
+        <span class="inline-flex items-center gap-1">
+          <i class="fa-regular fa-calendar-check text-[10px]"></i>
+          <span>香港公眾假期 (HK HOLIDAYS)</span>
         </span>
-        <span id="calHolidaysCount" class="font-mono text-[10px] sm:text-[11px] bg-dark-tag text-white px-1.5 py-0.5 rounded-xs">本月共 0 天假期</span>
+        <span id="calHolidaysCount" class="font-mono text-[9px] sm:text-[10px] bg-dark-tag text-white px-1.5 py-0.2 rounded-xs">本月共 0 天</span>
       </div>
-      <div id="calendarHolidaysList" class="flex-1 overflow-y-auto min-h-0 pt-1 flex flex-wrap content-start gap-1.5 leading-normal">
-        <span class="text-xs font-bold opacity-75 py-1">無假期</span>
+      <div id="calendarHolidaysList" class="flex-1 overflow-y-auto min-h-0 pt-0.5 flex flex-wrap content-start gap-1 leading-normal">
+        <span class="text-xs font-bold opacity-75 py-0.5">無假期</span>
       </div>
     </footer>
   </main>
@@ -688,39 +680,40 @@
   <!-- ========================================================= -->
   <!-- 鬧鐘設定彈窗 (ALARM SETTINGS MODAL)                        -->
   <!-- ========================================================= -->
-  <div id="alarmModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="alarm-modal-box ink-b bg-white text-dark-tag w-full max-w-sm p-4 rounded-sm shadow-2xl flex flex-col gap-3">
-      <div class="flex justify-between items-center ink-b-b pb-2">
-        <span class="font-black text-sm flex items-center gap-2">
+  <div id="alarmModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3">
+    <div class="ink-b bg-white text-dark-tag w-full max-w-sm p-4 rounded-sm shadow-2xl flex flex-col gap-2.5">
+      <div class="flex justify-between items-center ink-b-b pb-1.5">
+        <span class="font-black text-sm flex items-center gap-1.5">
           <i class="fa-solid fa-bell"></i>
           <span>晨曦醒腦鬧鐘設定</span>
         </span>
         <button onclick="closeAlarmSettings()" class="font-black text-base px-2 hover:opacity-75 cursor-pointer">✕</button>
       </div>
 
-      <div class="flex items-center justify-between py-2.5 ink-b-b">
+      <!-- 實體高反差開關 -->
+      <div class="flex items-center justify-between py-2 ink-b-b">
         <span class="font-black text-sm block">啟用此鬧鐘</span>
-        <div class="flex items-center gap-3">
-          <span id="alarmToggleStateBadge" class="font-mono font-black text-xs sm:text-sm px-2.5 py-1 ink-b bg-white text-dark-tag rounded-sm select-none tracking-wider">OFF 關閉</span>
-          <button type="button" id="alarmToggleBtn" onclick="toggleAlarmEnabledClick()" class="alarm-toggle-box toggle-off ink-b w-16 h-8 rounded-full relative p-[2px] cursor-pointer bg-white transition-all flex items-center select-none" title="點擊切換鬧鐘開關">
-            <span id="alarmToggleKnob" class="alarm-knob w-6 h-6 rounded-full bg-dark-tag block transition-transform duration-200 translate-x-0"></span>
+        <div class="flex items-center gap-2.5">
+          <span id="alarmToggleStateBadge" class="font-mono font-black text-xs px-2 py-0.5 ink-b bg-white text-dark-tag rounded-sm select-none">OFF 關閉</span>
+          <button type="button" id="alarmToggleBtn" onclick="toggleAlarmEnabledClick()" class="ink-b w-14 h-7 rounded-full relative p-[2px] cursor-pointer bg-white transition-all flex items-center select-none" title="點擊切換鬧鐘開關">
+            <span id="alarmToggleKnob" class="w-5 h-5 rounded-full bg-dark-tag block transition-transform duration-200 translate-x-0"></span>
           </button>
         </div>
       </div>
 
       <!-- 時間選擇 -->
-      <div class="grid grid-cols-3 gap-2 text-center py-1">
+      <div class="grid grid-cols-3 gap-1.5 text-center py-1">
         <div>
-          <label class="block text-[10px] font-black uppercase mb-1">小時 (Hour)</label>
-          <select id="alarmHourSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-mono font-black text-center text-sm bg-white text-dark-tag cursor-pointer"></select>
+          <label class="block text-[9px] font-black uppercase mb-0.5">小時 (Hour)</label>
+          <select id="alarmHourSelect" class="w-full ink-b p-1 rounded-sm font-mono font-black text-center text-xs bg-white text-dark-tag cursor-pointer"></select>
         </div>
         <div>
-          <label class="block text-[10px] font-black uppercase mb-1">分鐘 (Min)</label>
-          <select id="alarmMinuteSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-mono font-black text-center text-sm bg-white text-dark-tag cursor-pointer"></select>
+          <label class="block text-[9px] font-black uppercase mb-0.5">分鐘 (Min)</label>
+          <select id="alarmMinuteSelect" class="w-full ink-b p-1 rounded-sm font-mono font-black text-center text-xs bg-white text-dark-tag cursor-pointer"></select>
         </div>
         <div>
-          <label class="block text-[10px] font-black uppercase mb-1">時段 (AM/PM)</label>
-          <select id="alarmAmPmSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-black text-center text-sm bg-white text-dark-tag cursor-pointer">
+          <label class="block text-[9px] font-black uppercase mb-0.5">時段 (AM/PM)</label>
+          <select id="alarmAmPmSelect" class="w-full ink-b p-1 rounded-sm font-black text-center text-xs bg-white text-dark-tag cursor-pointer">
             <option value="AM">AM (上午)</option>
             <option value="PM">PM (下午)</option>
           </select>
@@ -728,18 +721,18 @@
       </div>
 
       <!-- 重複頻率與貪睡 -->
-      <div class="grid grid-cols-2 gap-2 text-xs py-1">
+      <div class="grid grid-cols-2 gap-1.5 text-xs py-0.5">
         <div>
-          <label class="block text-[10px] font-black uppercase mb-1">重複頻率</label>
-          <select id="alarmRepeatSelect" class="alarm-select w-full ink-b p-1 rounded-sm font-bold bg-white text-dark-tag cursor-pointer">
+          <label class="block text-[9px] font-black uppercase mb-0.5">重複頻率</label>
+          <select id="alarmRepeatSelect" class="w-full ink-b p-1 rounded-sm font-bold text-xs bg-white text-dark-tag cursor-pointer">
             <option value="daily">每天重複</option>
             <option value="weekdays">僅工作日 (一至五)</option>
             <option value="once">僅響一次</option>
           </select>
         </div>
         <div>
-          <label class="block text-[10px] font-black uppercase mb-1">貪睡時間 (Snooze)</label>
-          <select id="alarmSnoozeSelect" class="alarm-select w-full ink-b p-1 rounded-sm font-bold bg-white text-dark-tag cursor-pointer">
+          <label class="block text-[9px] font-black uppercase mb-0.5">貪睡時間 (Snooze)</label>
+          <select id="alarmSnoozeSelect" class="w-full ink-b p-1 rounded-sm font-bold text-xs bg-white text-dark-tag cursor-pointer">
             <option value="5">5 分鐘</option>
             <option value="9">9 分鐘</option>
             <option value="15">15 分鐘</option>
@@ -748,9 +741,9 @@
       </div>
 
       <!-- 自然鈴聲 -->
-      <div class="py-1">
-        <label class="block text-[10px] font-black uppercase mb-1">喚醒鈴聲選擇</label>
-        <select id="alarmSoundSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-bold text-xs bg-white text-dark-tag cursor-pointer">
+      <div class="py-0.5">
+        <label class="block text-[9px] font-black uppercase mb-0.5">喚醒鈴聲選擇</label>
+        <select id="alarmSoundSelect" class="w-full ink-b p-1 rounded-sm font-bold text-xs bg-white text-dark-tag cursor-pointer">
           <option value="ocean_birds">🌊 🐦 海浪伴隨晨鳥 (衝浪首選)</option>
           <option value="ocean">🌊 純淨海浪潮水 (大自然白噪音)</option>
           <option value="birds">🐦 清晨雀鳥啼鳴 (林間晨光)</option>
@@ -758,37 +751,37 @@
         </select>
       </div>
 
-      <div class="flex items-center justify-between ink-b-t pt-2 mt-1">
-        <span class="text-[11px] font-bold opacity-80">原生自然合成 (無網絡延遲)</span>
-        <button onclick="testAlarmSound()" id="alarmTestBtn" class="ink-b text-xs px-2.5 py-1 font-black rounded-sm cursor-pointer bg-white text-dark-tag hover:opacity-80 flex items-center gap-1.5">
-          <i class="fa-solid fa-play text-[10px]"></i>
+      <div class="flex items-center justify-between ink-b-t pt-2 mt-0.5">
+        <span class="text-[10px] font-bold opacity-80">原生自然合成 (無網絡延遲)</span>
+        <button onclick="testAlarmSound()" id="alarmTestBtn" class="ink-b text-xs px-2 py-0.5 font-black rounded-sm cursor-pointer bg-white text-dark-tag hover:opacity-80 flex items-center gap-1">
+          <i class="fa-solid fa-play text-[9px]"></i>
           <span>試聽鈴聲</span>
         </button>
       </div>
 
-      <div class="grid grid-cols-2 gap-2 pt-2 ink-b-t mt-1">
-        <button onclick="closeAlarmSettings()" class="ink-b py-1.5 font-black text-xs rounded-sm cursor-pointer bg-white text-dark-tag hover:opacity-80">取消</button>
-        <button onclick="saveAlarmSettings()" class="ink-b bg-dark-tag text-white py-1.5 font-black text-xs rounded-sm cursor-pointer hover:opacity-80">保存設定</button>
+      <div class="grid grid-cols-2 gap-2 pt-2 ink-b-t mt-0.5">
+        <button onclick="closeAlarmSettings()" class="ink-b py-1 font-black text-xs rounded-sm cursor-pointer bg-white text-dark-tag hover:opacity-80">取消</button>
+        <button onclick="saveAlarmSettings()" class="ink-b bg-dark-tag text-white py-1 font-black text-xs rounded-sm cursor-pointer hover:opacity-85">保存設定</button>
       </div>
     </div>
   </div>
 
-  <!-- 鬧鐘響起全螢幕警示彈窗 -->
+  <!-- 鬧鐘響起全螢幕彈窗 -->
   <div id="alarmRingingModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="alarm-ringing-card ink-b bg-white text-dark-tag p-6 rounded-sm max-w-sm w-full text-center shadow-2xl flex flex-col items-center gap-4">
-      <div class="w-16 h-16 bg-dark-tag text-white rounded-full flex items-center justify-center text-2xl animate-bounce ink-b">
+    <div class="ink-b bg-white text-dark-tag p-5 rounded-sm max-w-sm w-full text-center shadow-2xl flex flex-col items-center gap-3">
+      <div class="w-14 h-14 bg-dark-tag text-white rounded-full flex items-center justify-center text-xl animate-bounce ink-b">
         <i class="fa-solid fa-bell"></i>
       </div>
       <div>
-        <h2 class="text-xl font-black">晨曦睇浪時間到了！</h2>
-        <p id="alarmRingingTimeText" class="font-mono text-3xl font-black my-2">06:30 AM</p>
-        <p class="text-xs font-bold opacity-75">已為你自動播放晨間自然鈴聲</p>
+        <h2 class="text-lg font-black">晨曦睇浪時間到了！</h2>
+        <p id="alarmRingingTimeText" class="font-mono text-2xl font-black my-1">06:30 AM</p>
+        <p class="text-xs font-bold opacity-75">已自動播放晨間自然鈴聲</p>
       </div>
-      <div class="grid grid-cols-2 gap-3 w-full mt-2">
-        <button onclick="snoozeAlarm()" class="ink-b bg-white text-dark-tag py-3 font-black text-sm rounded-sm cursor-pointer hover:opacity-80">
+      <div class="grid grid-cols-2 gap-2 w-full mt-1">
+        <button onclick="snoozeAlarm()" class="ink-b bg-white text-dark-tag py-2.5 font-black text-xs rounded-sm cursor-pointer hover:opacity-80">
           貪睡 (Snooze)
         </button>
-        <button onclick="dismissAlarm()" class="ink-b bg-dark-tag text-white py-3 font-black text-sm rounded-sm cursor-pointer hover:opacity-80">
+        <button onclick="dismissAlarm()" class="ink-b bg-dark-tag text-white py-2.5 font-black text-xs rounded-sm cursor-pointer hover:opacity-85">
           關閉鬧鐘
         </button>
       </div>
@@ -796,102 +789,66 @@
   </div>
 
   <!-- ========================================================= -->
-  <!-- 彩蛋衝浪小遊戲 (EASTER EGG SURF MINI-GAME)                -->
+  <!-- 彩蛋衝浪小遊戲 (款式 C: 8-Bit 像素街機風格 + 10 關挑戰)    -->
   <!-- ========================================================= -->
-  <div id="surfGameModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-2 sm:p-4">
-    <div class="ink-b bg-white text-neutral-900 w-full max-w-lg rounded-sm shadow-2xl flex flex-col overflow-hidden">
-      <!-- 遊戲頂部狀態列 -->
-      <header class="flex justify-between items-center px-3 py-2 border-b border-neutral-300 bg-neutral-100 text-xs font-bold shrink-0">
-        <div class="flex items-center gap-2">
-          <span id="gameLevelBadge" class="bg-dark-tag text-white px-2 py-0.5 font-mono font-black rounded-xs text-[10px] tracking-wider">關卡 01/10</span>
-          <span class="font-black text-xs sm:text-sm flex items-center gap-1">
-            <i class="fa-solid fa-person-snowboarding"></i>
-            <span id="gameModeTitle">越浪起航 (PADDLE OUT)</span>
-          </span>
+  <div id="gameModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+    <div class="ink-b bg-white text-dark-tag w-full max-w-xl p-3 sm:p-4 rounded-sm shadow-2xl flex flex-col gap-2 relative">
+      <!-- 遊戲頂部控制列 -->
+      <div class="flex justify-between items-center border-b border-neutral-300 pb-1.5">
+        <div class="flex items-center gap-1.5">
+          <span class="bg-dark-tag text-white px-2 py-0.5 font-pixel text-[10px] rounded-xs font-black">PIXEL SURF</span>
+          <span id="gameLevelBadge" class="ink-b font-mono font-black text-xs px-1.5 py-0.5 rounded-xs bg-neutral-100">LVL: 01/10</span>
         </div>
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-1 font-mono font-black text-xs bg-white px-2 py-0.5 ink-b rounded-xs">
-            <i class="fa-regular fa-clock text-[10px] text-neutral-600"></i>
-            <span id="gameTimerText" class="text-neutral-800">35.0s</span>
+        <div class="flex items-center gap-2 font-mono text-xs font-black">
+          <div class="ink-b px-1.5 py-0.5 rounded-xs bg-neutral-100 flex items-center gap-1">
+            <i class="fa-regular fa-clock text-[10px]"></i>
+            <span id="gameTimerText" class="text-red-600">35.0s</span>
           </div>
-          <span id="gameProgressBadge" class="font-mono font-black text-neutral-700 text-xs">0%</span>
-          <button onclick="closeSurfGame()" class="ink-b bg-white px-2 py-0.5 text-xs font-black rounded-sm hover:bg-neutral-200 cursor-pointer">✕</button>
-        </div>
-      </header>
-
-      <!-- 遊戲主畫布區域 -->
-      <div id="gameViewport" class="relative w-full h-[260px] sm:h-[300px] game-viewport overflow-hidden border-b border-neutral-300">
-        <canvas id="surfGameCanvas" class="w-full h-full block"></canvas>
-
-        <!-- 遊戲開始/引導提示覆蓋層 -->
-        <div id="gameStartOverlay" class="absolute inset-0 bg-white/95 flex flex-col items-center justify-center p-4 text-center z-30">
-          <div class="w-12 h-12 rounded-full bg-dark-tag text-white flex items-center justify-center text-xl mb-2 ink-b">
-            <i class="fa-solid fa-water"></i>
-          </div>
-          <h3 class="text-base sm:text-lg font-black tracking-tight">越浪挑戰 · 奔向外海起浪區</h3>
-          <p id="gameStartDesc" class="text-xs text-neutral-600 font-bold max-w-xs my-2 leading-relaxed">
-            第 1 關：晨曦微波。限時 35 秒內避開方塊浪抵達起浪區！
-          </p>
-          <div class="text-[11px] font-mono font-bold bg-neutral-200 text-neutral-700 px-3 py-1 rounded-sm mb-3">
-            電腦：方向鍵 [▲ ▼ ◀ ▶ / WASD] · 手機：觸控按鈕或畫布直接拖曳
-          </div>
-          <button onclick="startSurfGamePlay()" class="ink-b bg-dark-tag text-white px-6 py-2 font-black text-sm rounded-sm hover:opacity-90 active:scale-95 cursor-pointer shadow-md">
-            立即起航 (START SURF)
-          </button>
-        </div>
-
-        <!-- 捉浪成功回程提示 -->
-        <div id="gameWaveCaughtToast" class="hidden absolute top-4 left-1/2 -translate-x-1/2 bg-dark-tag text-white px-4 py-1.5 rounded-sm font-black text-xs shadow-lg border border-white animate-bounce pointer-events-none z-20">
-          🌊 捉到靚浪！乘浪衝返起點 (SURFING BACK!) 🏄‍♂️
-        </div>
-
-        <!-- 被浪拍中提示 -->
-        <div id="gameToast" style="display: none;" class="absolute top-4 left-1/2 -translate-x-1/2 bg-dark-tag text-white px-3 py-1 rounded-sm font-black text-xs shadow-md border border-white pointer-events-none z-20">
-          🌊 遭遇拍浪！向左退後！
-        </div>
-
-        <!-- 超時失敗覆蓋層 -->
-        <div id="gameTimeoutOverlay" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center p-4 text-center z-30">
-          <div class="text-3xl mb-1">⏰ 💥</div>
-          <h3 id="timeoutTitle" class="text-lg font-black text-neutral-900">時間結束！挑戰失敗</h3>
-          <p id="timeoutDesc" class="text-xs font-bold text-neutral-600 my-2 max-w-xs">未能於限時內抵達起浪區。重振旗鼓再來一次！</p>
-          <button onclick="retryCurrentLevel()" class="ink-b bg-dark-tag text-white px-5 py-2 font-black text-xs rounded-sm hover:opacity-90 active:scale-95 cursor-pointer mt-1">
-            重試此關 (RETRY)
-          </button>
-        </div>
-
-        <!-- 成功通關結算覆蓋層 -->
-        <div id="gameVictoryOverlay" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center p-4 text-center z-30">
-          <div id="victoryIcon" class="text-3xl mb-1">🏆 🌊 🏄‍♂️</div>
-          <h3 id="victoryTitle" class="text-lg font-black text-neutral-900">恭喜！過關成功！</h3>
-          <p id="gameStatsSummary" class="text-xs font-mono font-bold text-neutral-600 my-2">
-            用時: 18.4s · 遭遇拍浪被推退: 2 次
-          </p>
-          <div class="flex items-center gap-2 mt-2">
-            <button id="victoryNextBtn" onclick="nextOrRestartGameLevel()" class="ink-b bg-dark-tag text-white px-4 py-1.5 font-black text-xs rounded-sm hover:opacity-90 active:scale-95 cursor-pointer">
-              挑戰下一關 ▶
-            </button>
-            <button onclick="closeSurfGame()" class="ink-b bg-white text-neutral-800 px-4 py-1.5 font-black text-xs rounded-sm hover:bg-neutral-100 active:scale-95 cursor-pointer">
-              返回看板
-            </button>
-          </div>
+          <button onclick="closeEasterEggGame()" class="ink-b px-2 py-0.5 rounded-xs font-black text-xs hover:bg-neutral-200 cursor-pointer">✕</button>
         </div>
       </div>
 
-      <!-- 手機/觸控專用虛擬方向鍵控制面板 -->
-      <footer class="p-2 sm:p-3 bg-white flex items-center justify-between gap-2 shrink-0 select-none">
-        <div class="text-[11px] font-bold text-neutral-500 hidden sm:block">
-          操作：畫布可直接手指拖曳，或使用方向鍵
+      <!-- 遊戲主畫布區域 (高度保證 250px) -->
+      <div class="relative w-full h-[250px] min-h-[240px] bg-slate-100 ink-b rounded-xs overflow-hidden" id="gameStage">
+        <canvas id="gameCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+
+        <!-- 超時/勝利遮罩 -->
+        <div id="gameOverOverlay" style="display: none;" class="absolute inset-0 bg-white/95 backdrop-blur-xs flex flex-col items-center justify-center p-3 text-center z-20">
+          <div id="gameOverIcon" class="text-3xl mb-1">⏰</div>
+          <h3 id="gameOverTitle" class="text-base font-black text-neutral-900 font-pixel">挑戰失敗</h3>
+          <p id="gameOverDesc" class="text-xs font-bold text-neutral-600 my-1.5 max-w-xs leading-relaxed">未能於限時內抵達起浪區！</p>
+          <div class="flex items-center gap-2 mt-1">
+            <button id="gameOverBtn" onclick="restartGameCurrentLevel()" class="ink-b bg-dark-tag text-white px-4 py-1.5 font-black text-xs rounded-sm hover:opacity-85 cursor-pointer">
+              重試此關 (RETRY)
+            </button>
+          </div>
         </div>
-        <div class="grid grid-cols-3 gap-1.5 mx-auto sm:mr-0 w-44">
-          <div></div>
-          <button id="gameBtnUp" class="ink-b bg-neutral-100 active:bg-dark-tag active:text-white py-1.5 rounded-sm text-center font-black text-xs">▲</button>
-          <div></div>
-          <button id="gameBtnLeft" class="ink-b bg-neutral-100 active:bg-dark-tag active:text-white py-1.5 rounded-sm text-center font-black text-xs">◀</button>
-          <button id="gameBtnDown" class="ink-b bg-neutral-100 active:bg-dark-tag active:text-white py-1.5 rounded-sm text-center font-black text-xs">▼</button>
-          <button id="gameBtnRight" class="ink-b bg-neutral-100 active:bg-dark-tag active:text-white py-1.5 rounded-sm text-center font-black text-xs">▶</button>
+
+        <!-- 碰撞提示 Toast -->
+        <div id="gameToast" style="display: none;" class="absolute top-2 left-1/2 -translate-x-1/2 bg-dark-tag text-white px-2.5 py-0.5 rounded-xs font-black text-[10px] pointer-events-none border border-white z-10">
+          🌊 遭遇巨浪拍擊！退後！
         </div>
-      </footer>
+
+        <!-- 進度標記 -->
+        <div class="absolute bottom-1 left-1.5 bg-dark-tag/80 text-white text-[9px] font-mono px-1.5 py-0.2 rounded-xs pointer-events-none z-10">
+          進度: <span id="gameProgressText">0%</span>
+        </div>
+      </div>
+
+      <!-- 遊戲底部方向鍵與提示 -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-1.5 text-xs pt-0.5">
+        <div class="text-neutral-600 font-bold text-[10px] leading-tight">
+          🎮 手指直接在畫布上<span class="text-neutral-900 font-black">滑動拖曳</span>衝浪者，或使用方向鍵 / [WASD]
+        </div>
+        <div class="grid grid-cols-3 gap-1 w-32 select-none shrink-0">
+          <div></div>
+          <button id="gBtnUp" class="ink-b bg-neutral-100 active:bg-dark-tag active:text-white py-1 rounded-xs text-center font-black text-xs cursor-pointer">▲</button>
+          <div></div>
+          <button id="gBtnLeft" class="ink-b bg-neutral-100 active:bg-dark-tag active:text-white py-1 rounded-xs text-center font-black text-xs cursor-pointer">◀</button>
+          <button id="gBtnDown" class="ink-b bg-neutral-100 active:bg-dark-tag active:text-white py-1 rounded-xs text-center font-black text-xs cursor-pointer">▼</button>
+          <button id="gBtnRight" class="ink-b bg-neutral-100 active:bg-dark-tag active:text-white py-1 rounded-xs text-center font-black text-xs cursor-pointer">▶</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -899,7 +856,7 @@
 
 <script>
   /* ========================================================= */
-  /* 0. 全球熱點配置與在地化氣象機構                             */
+  /* 0. 全球熱點配置資料庫                                      */
   /* ========================================================= */
   const SURF_SPOTS = [
     {
@@ -989,526 +946,7 @@
   let currentActiveView = 'surf'; // 'surf' | 'clock' | 'calendar'
 
   /* ========================================================= */
-  /* 彩蛋衝浪小遊戲邏輯 (款式 C 像素街機與十關限時機制引擎)     */
-  /* ========================================================= */
-  const GAME_LEVELS = [
-    { level: 1, name: '晨曦微波 (Dawn Glassy)', timeLimit: 35, waveSpeed: 2.2, waveInterval: 48, pushBack: 35 },
-    { level: 2, name: '長沙長湧 (Cheung Sha Swell)', timeLimit: 32, waveSpeed: 2.5, waveInterval: 44, pushBack: 38 },
-    { level: 3, name: '石澳岬角 (Cape Inflow)', timeLimit: 30, waveSpeed: 2.8, waveInterval: 40, pushBack: 40 },
-    { level: 4, name: '大浪灣空心浪 (Big Wave Barrel)', timeLimit: 28, waveSpeed: 3.1, waveInterval: 36, pushBack: 42 },
-    { level: 5, name: '東湧潮升 (Incoming Tide)', timeLimit: 26, waveSpeed: 3.4, waveInterval: 32, pushBack: 45 },
-    { level: 6, name: '西貢強瀾 (Sai Kung Chop)', timeLimit: 24, waveSpeed: 3.7, waveInterval: 28, pushBack: 48 },
-    { level: 7, name: '烏石定點浪 (Wushi Reef)', timeLimit: 22, waveSpeed: 4.0, waveInterval: 25, pushBack: 50 },
-    { level: 8, name: '蚺蛇外洋狂潮 (Sharps Peak Deep)', timeLimit: 20, waveSpeed: 4.3, waveInterval: 22, pushBack: 52 },
-    { level: 9, name: '烏魯瓦圖斷崖巨浪 (Uluwatu Bomb)', timeLimit: 18, waveSpeed: 4.7, waveInterval: 19, pushBack: 55 },
-    { level: 10, name: '魔鬼紅色代碼 (Code Red Swell)', timeLimit: 16, waveSpeed: 5.1, waveInterval: 16, pushBack: 60 }
-  ];
-
-  let currentGameLevel = 1;
-  let gameTimeLeft = 35.0;
-  let gameTimerInterval = null;
-  let gameRunning = false;
-  let gameLoopId = null;
-  let gameCanvas = null;
-  let gameCtx = null;
-  let gameStartTime = 0;
-  let hitCount = 0;
-  let gamePhase = 'paddle_out'; // 'paddle_out' | 'riding_back' | 'won' | 'failed'
-
-  const gamePlayer = {
-    x: 30,
-    y: 120,
-    width: 34,
-    height: 22,
-    speed: 3.8,
-    vx: 0,
-    vy: 0,
-    hitShakeTimer: 0
-  };
-
-  let gameWaves = [];
-  let nextWaveTimer = 0;
-  let rideBackProgress = 0;
-
-  // 觸控拖曳與方向鍵持續按壓狀態
-  let isGameDragging = false;
-  let gameDragTargetX = 30;
-  let gameDragTargetY = 120;
-  const gameHoldKeys = { up: false, down: false, left: false, right: false };
-
-  function setupSurferEasterEgg() {
-    const marker = document.getElementById('surferMarker');
-    if (!marker) return;
-
-    let pressTimer = null;
-    const startPress = () => {
-      marker.classList.add('surfer-charging');
-      pressTimer = setTimeout(() => {
-        marker.classList.remove('surfer-charging');
-        openSurfGame();
-      }, 1100);
-    };
-
-    const cancelPress = () => {
-      if (pressTimer) {
-        clearTimeout(pressTimer);
-        pressTimer = null;
-      }
-      marker.classList.remove('surfer-charging');
-    };
-
-    marker.addEventListener('mousedown', startPress);
-    marker.addEventListener('mouseup', cancelPress);
-    marker.addEventListener('mouseleave', cancelPress);
-
-    marker.addEventListener('touchstart', startPress, { passive: true });
-    marker.addEventListener('touchend', cancelPress);
-    marker.addEventListener('touchcancel', cancelPress);
-  }
-
-  function syncGameCanvasResolution() {
-    if (!gameCanvas) return;
-    const viewport = document.getElementById('gameViewport');
-    const rect = viewport ? viewport.getBoundingClientRect() : gameCanvas.getBoundingClientRect();
-    const w = rect.width > 50 ? rect.width : 500;
-    const h = rect.height > 50 ? rect.height : 280;
-    const dpr = window.devicePixelRatio || 1;
-
-    gameCanvas.width = Math.floor(w * dpr);
-    gameCanvas.height = Math.floor(h * dpr);
-
-    if (gameCtx) {
-      gameCtx.setTransform(1, 0, 0, 1, 0, 0);
-      gameCtx.scale(dpr, dpr);
-    }
-  }
-
-  function openSurfGame() {
-    const modal = document.getElementById('surfGameModal');
-    if (!modal) return;
-    modal.classList.remove('hidden');
-
-    gameCanvas = document.getElementById('surfGameCanvas');
-    if (gameCanvas) {
-      gameCtx = gameCanvas.getContext('2d');
-      syncGameCanvasResolution();
-      setupGameTouchAndInput();
-    }
-
-    currentGameLevel = 1;
-    showGameStartOverlay(1);
-  }
-
-  function closeSurfGame() {
-    gameRunning = false;
-    if (gameTimerInterval) clearInterval(gameTimerInterval);
-    if (gameLoopId) {
-      cancelAnimationFrame(gameLoopId);
-      gameLoopId = null;
-    }
-    const modal = document.getElementById('surfGameModal');
-    if (modal) modal.classList.add('hidden');
-  }
-
-  function showGameStartOverlay(lvl) {
-    const cfg = GAME_LEVELS[lvl - 1];
-    const lvlEl = document.getElementById('gameLevelBadge');
-    const timerEl = document.getElementById('gameTimerText');
-    if (lvlEl) lvlEl.innerText = `關卡 ${lvl < 10 ? '0' + lvl : lvl}/10`;
-    if (timerEl) {
-      timerEl.innerText = `${cfg.timeLimit}.0s`;
-      timerEl.classList.remove('timer-warning');
-    }
-
-    const descEl = document.getElementById('gameStartDesc');
-    if (descEl) {
-      descEl.innerText = `第 ${lvl} 關：${cfg.name}。限時 ${cfg.timeLimit} 秒內避開方塊浪抵達起浪區！`;
-    }
-
-    document.getElementById('gameStartOverlay')?.classList.remove('hidden');
-    document.getElementById('gameVictoryOverlay')?.classList.add('hidden');
-    document.getElementById('gameTimeoutOverlay')?.classList.add('hidden');
-    document.getElementById('gameWaveCaughtToast')?.classList.add('hidden');
-  }
-
-  function startSurfGamePlay(lvlNum) {
-    if (typeof lvlNum === 'number') currentGameLevel = lvlNum;
-    const cfg = GAME_LEVELS[currentGameLevel - 1];
-
-    syncGameCanvasResolution();
-    const rect = gameCanvas ? gameCanvas.getBoundingClientRect() : { width: 500, height: 280 };
-    const ch = rect.height > 50 ? rect.height : 280;
-
-    gamePlayer.x = 25;
-    gamePlayer.y = Math.floor(ch / 2 - gamePlayer.height / 2);
-    gamePlayer.vx = 0;
-    gamePlayer.vy = 0;
-    gamePlayer.hitShakeTimer = 0;
-    gameDragTargetX = gamePlayer.x;
-    gameDragTargetY = gamePlayer.y;
-
-    gameWaves = [];
-    nextWaveTimer = 20;
-    hitCount = 0;
-    rideBackProgress = 0;
-    gameTimeLeft = cfg.timeLimit;
-    gamePhase = 'paddle_out';
-    gameStartTime = Date.now();
-    gameRunning = true;
-
-    document.getElementById('gameStartOverlay')?.classList.add('hidden');
-    document.getElementById('gameVictoryOverlay')?.classList.add('hidden');
-    document.getElementById('gameTimeoutOverlay')?.classList.add('hidden');
-    document.getElementById('gameWaveCaughtToast')?.classList.add('hidden');
-
-    const lvlEl = document.getElementById('gameLevelBadge');
-    if (lvlEl) lvlEl.innerText = `關卡 ${currentGameLevel < 10 ? '0' + currentGameLevel : currentGameLevel}/10`;
-    const timerEl = document.getElementById('gameTimerText');
-    if (timerEl) {
-      timerEl.innerText = `${gameTimeLeft.toFixed(1)}s`;
-      timerEl.classList.remove('timer-warning');
-    }
-
-    if (gameTimerInterval) clearInterval(gameTimerInterval);
-    gameTimerInterval = setInterval(() => {
-      if (gamePhase !== 'paddle_out') return;
-      gameTimeLeft -= 0.1;
-      if (gameTimeLeft <= 0) {
-        gameTimeLeft = 0;
-        triggerTimeoutFailure();
-      }
-      if (timerEl) {
-        timerEl.innerText = `${gameTimeLeft.toFixed(1)}s`;
-        if (gameTimeLeft <= 5) timerEl.classList.add('timer-warning');
-        else timerEl.classList.remove('timer-warning');
-      }
-    }, 100);
-
-    if (gameLoopId) cancelAnimationFrame(gameLoopId);
-    gameLoop();
-  }
-
-  function triggerTimeoutFailure() {
-    gamePhase = 'failed';
-    gameRunning = false;
-    if (gameTimerInterval) clearInterval(gameTimerInterval);
-
-    const cfg = GAME_LEVELS[currentGameLevel - 1];
-    const title = document.getElementById('timeoutTitle');
-    const desc = document.getElementById('timeoutDesc');
-
-    if (title) title.innerText = `第 ${currentGameLevel} 關超時！挑戰失敗`;
-    if (desc) desc.innerText = `未能於 ${cfg.timeLimit} 秒內衝破浪區。點擊下方重試此關！`;
-
-    document.getElementById('gameTimeoutOverlay')?.classList.remove('hidden');
-  }
-
-  function retryCurrentLevel() {
-    startSurfGamePlay(currentGameLevel);
-  }
-
-  function nextOrRestartGameLevel() {
-    if (currentGameLevel < 10) {
-      currentGameLevel++;
-      startSurfGamePlay(currentGameLevel);
-    } else {
-      currentGameLevel = 1;
-      startSurfGamePlay(1);
-    }
-  }
-
-  function spawnWave(cw, ch) {
-    const cfg = GAME_LEVELS[currentGameLevel - 1];
-    const waveTypes = [
-      { height: 38, width: 22, speedMult: 1.0 },
-      { height: 26, width: 18, speedMult: 1.35 },
-      { height: 46, width: 26, speedMult: 0.85 },
-      { height: 22, width: 16, speedMult: 1.45 }
-    ];
-    const t = waveTypes[Math.floor(Math.random() * waveTypes.length)];
-    const yPos = Math.random() * (ch - t.height - 24) + 12;
-
-    gameWaves.push({
-      x: cw + 10,
-      y: yPos,
-      width: t.width,
-      height: t.height,
-      speed: cfg.waveSpeed * t.speedMult
-    });
-  }
-
-  function gameLoop() {
-    if (!gameRunning) return;
-    updateGameLogic();
-    renderGameCanvas();
-    gameLoopId = requestAnimationFrame(gameLoop);
-  }
-
-  function updateGameLogic() {
-    if (!gameCanvas) return;
-    const rect = gameCanvas.getBoundingClientRect();
-    const cw = rect.width > 50 ? rect.width : 500;
-    const ch = rect.height > 50 ? rect.height : 280;
-    const cfg = GAME_LEVELS[currentGameLevel - 1];
-
-    if (gamePhase === 'paddle_out') {
-      if (gameHoldKeys.up) gamePlayer.vy -= gamePlayer.speed * 0.45;
-      if (gameHoldKeys.down) gamePlayer.vy += gamePlayer.speed * 0.45;
-      if (gameHoldKeys.right) gamePlayer.vx += gamePlayer.speed * 0.48;
-      if (gameHoldKeys.left) gamePlayer.vx -= gamePlayer.speed * 0.45;
-
-      if (isGameDragging) {
-        gamePlayer.vx += (gameDragTargetX - gamePlayer.x) * 0.16;
-        gamePlayer.vy += (gameDragTargetY - gamePlayer.y) * 0.16;
-      }
-
-      gamePlayer.x += gamePlayer.vx;
-      gamePlayer.y += gamePlayer.vy;
-      gamePlayer.vx *= 0.82;
-      gamePlayer.vy *= 0.82;
-
-      if (gamePlayer.x < 12) gamePlayer.x = 12;
-      if (gamePlayer.y < 10) gamePlayer.y = 10;
-      if (gamePlayer.y > ch - gamePlayer.height - 10) gamePlayer.y = ch - gamePlayer.height - 10;
-
-      const targetX = Math.max(120, cw - gamePlayer.width - 35);
-      const progress = Math.min(100, Math.max(0, Math.round((gamePlayer.x / targetX) * 100)));
-      const progEl = document.getElementById('gameProgressBadge');
-      if (progEl) progEl.innerText = `${progress}%`;
-
-      nextWaveTimer--;
-      if (nextWaveTimer <= 0) {
-        spawnWave(cw, ch);
-        nextWaveTimer = Math.floor(Math.random() * (cfg.waveInterval * 0.4)) + (cfg.waveInterval * 0.8);
-      }
-
-      for (let i = gameWaves.length - 1; i >= 0; i--) {
-        const w = gameWaves[i];
-        w.x -= w.speed;
-
-        if (
-          gamePlayer.x < w.x + w.width &&
-          gamePlayer.x + gamePlayer.width > w.x &&
-          gamePlayer.y < w.y + w.height &&
-          gamePlayer.y + gamePlayer.height > w.y
-        ) {
-          hitCount++;
-          gamePlayer.x = Math.max(12, gamePlayer.x - cfg.pushBack);
-          gamePlayer.hitShakeTimer = 14;
-          gameWaves.splice(i, 1);
-          showHitToast();
-          continue;
-        }
-
-        if (w.x + w.width < -30) {
-          gameWaves.splice(i, 1);
-        }
-      }
-
-      if (gamePlayer.hitShakeTimer > 0) gamePlayer.hitShakeTimer--;
-      if (gamePlayer.x >= targetX) triggerRideBack(cw, ch);
-
-    } else if (gamePhase === 'riding_back') {
-      rideBackProgress += 0.015;
-      const startX = cw - 45;
-      const endX = 25;
-      gamePlayer.x = startX + (endX - startX) * rideBackProgress;
-      gamePlayer.y = (ch / 2) + Math.sin(rideBackProgress * Math.PI * 4) * 35;
-
-      const returnPct = Math.round((1 - rideBackProgress) * 100);
-      const progEl = document.getElementById('gameProgressBadge');
-      if (progEl) progEl.innerText = `🏄‍♂️ 衝回中: ${returnPct}%`;
-
-      if (rideBackProgress >= 1) {
-        triggerVictory();
-      }
-    }
-  }
-
-  function showHitToast() {
-    const t = document.getElementById('gameToast');
-    if (t) {
-      t.style.display = 'block';
-      setTimeout(() => { t.style.display = 'none'; }, 1000);
-    }
-  }
-
-  function triggerRideBack(cw, ch) {
-    gamePhase = 'riding_back';
-    rideBackProgress = 0;
-    gameWaves = [];
-
-    const toast = document.getElementById('gameWaveCaughtToast');
-    if (toast) {
-      toast.classList.remove('hidden');
-      setTimeout(() => toast.classList.add('hidden'), 2000);
-    }
-  }
-
-  function triggerVictory() {
-    gamePhase = 'won';
-    gameRunning = false;
-    if (gameTimerInterval) clearInterval(gameTimerInterval);
-
-    const totalSeconds = ((Date.now() - gameStartTime) / 1000).toFixed(1);
-    const summaryEl = document.getElementById('gameStatsSummary');
-    const titleEl = document.getElementById('victoryTitle');
-    const iconEl = document.getElementById('victoryIcon');
-    const nextBtn = document.getElementById('victoryNextBtn');
-
-    if (currentGameLevel < 10) {
-      if (iconEl) iconEl.innerText = '🏆 🌊 🏄‍♂️';
-      if (titleEl) titleEl.innerText = `第 ${currentGameLevel < 10 ? '0' + currentGameLevel : currentGameLevel} 關通過！`;
-      if (summaryEl) summaryEl.innerText = `用時: ${totalSeconds}s · 遭遇拍浪被推退: ${hitCount} 次`;
-      if (nextBtn) nextBtn.innerText = `挑戰第 ${currentGameLevel + 1} 關 ▶`;
-    } else {
-      if (iconEl) iconEl.innerText = '👑 🏄‍♂️ 🏆 👑';
-      if (titleEl) titleEl.innerText = `恭喜征服全 10 關！傳奇像素衝浪王！`;
-      if (summaryEl) summaryEl.innerText = `總結：成功征服全部 10 關外洋波濤！用時: ${totalSeconds}s · 被推退: ${hitCount} 次`;
-      if (nextBtn) nextBtn.innerText = `重新挑戰第 1 關`;
-    }
-
-    document.getElementById('gameVictoryOverlay')?.classList.remove('hidden');
-  }
-
-  /* ========================================================= */
-  /* 款式 C (8-Bit 像素街機風格) 核心繪製函數                  */
-  /* ========================================================= */
-  function renderGameCanvas() {
-    if (!gameCtx || !gameCanvas) return;
-    const rect = gameCanvas.getBoundingClientRect();
-    const cw = rect.width > 50 ? rect.width : 500;
-    const ch = rect.height > 50 ? rect.height : 280;
-
-    gameCtx.clearRect(0, 0, cw, ch);
-
-    gameCtx.strokeStyle = '#d5dbe3';
-    gameCtx.lineWidth = 1;
-    for (let y = 25; y < ch; y += 35) {
-      gameCtx.beginPath();
-      gameCtx.moveTo(0, y);
-      gameCtx.lineTo(cw, y);
-      gameCtx.stroke();
-    }
-
-    gameCtx.fillStyle = 'rgba(44, 50, 57, 0.05)';
-    gameCtx.fillRect(0, 0, 40, ch);
-    gameCtx.fillStyle = '#64748b';
-    gameCtx.font = 'bold 9px monospace';
-    gameCtx.fillText('◀ START', 6, 16);
-
-    const targetX = Math.max(120, cw - 38);
-    gameCtx.fillStyle = 'rgba(44, 50, 57, 0.1)';
-    gameCtx.fillRect(targetX, 0, 38, ch);
-    gameCtx.strokeStyle = '#2c3239';
-    gameCtx.setLineDash([4, 4]);
-    gameCtx.beginPath();
-    gameCtx.moveTo(targetX, 0);
-    gameCtx.lineTo(targetX, ch);
-    gameCtx.stroke();
-    gameCtx.setLineDash([]);
-
-    gameCtx.fillStyle = '#334155';
-    gameCtx.font = 'bold 9px monospace';
-    gameCtx.fillText('LINEUP ▶', targetX - 58, 16);
-
-    gameWaves.forEach(w => {
-      gameCtx.fillStyle = '#2c3239';
-      gameCtx.fillRect(w.x + 10, w.y, Math.max(8, w.width - 10), w.height);
-      gameCtx.fillRect(w.x + 5, w.y + 6, 8, Math.max(6, w.height - 6));
-      gameCtx.fillRect(w.x, w.y + 12, 6, Math.max(4, w.height - 12));
-      gameCtx.fillStyle = '#ffffff';
-      gameCtx.fillRect(w.x + 8, w.y + 3, 4, 4);
-      gameCtx.fillRect(w.x + 3, w.y + 8, 3, 3);
-    });
-
-    let drawX = gamePlayer.x;
-    let drawY = gamePlayer.y;
-    if (gamePlayer.hitShakeTimer > 0) {
-      drawX += (Math.random() - 0.5) * 8;
-      drawY += (Math.random() - 0.5) * 6;
-    }
-
-    gameCtx.fillStyle = '#1e293b';
-    if (gamePhase === 'paddle_out') {
-      gameCtx.fillRect(drawX, drawY + 14, 34, 5);
-      gameCtx.fillRect(drawX + 12, drawY + 8, 16, 6);
-      gameCtx.fillRect(drawX + 22, drawY + 2, 7, 7);
-      gameCtx.fillStyle = '#ffffff';
-      gameCtx.fillRect(drawX + 25, drawY + 4, 2, 2);
-    } else {
-      gameCtx.fillRect(drawX + 4, drawY + 20, 30, 5);
-      gameCtx.fillRect(drawX + 16, drawY, 8, 8);
-      gameCtx.fillRect(drawX + 14, drawY + 8, 12, 8);
-      gameCtx.fillRect(drawX + 10, drawY + 16, 7, 6);
-      gameCtx.fillRect(drawX + 20, drawY + 16, 7, 6);
-      gameCtx.fillStyle = '#ffffff';
-      gameCtx.fillRect(drawX + 18, drawY + 2, 2, 2);
-    }
-  }
-
-  /* 綁定手指觸控拖曳與方向鍵長按 */
-  function setupGameTouchAndInput() {
-    const viewport = document.getElementById('gameViewport');
-    if (viewport && !viewport.dataset.touchBound) {
-      viewport.dataset.touchBound = 'true';
-
-      const handlePointerMove = (e) => {
-        if (!isGameDragging || gamePhase !== 'paddle_out') return;
-        const rect = viewport.getBoundingClientRect();
-        gameDragTargetX = e.clientX - rect.left - gamePlayer.width / 2;
-        gameDragTargetY = e.clientY - rect.top - gamePlayer.height / 2;
-      };
-
-      viewport.addEventListener('pointerdown', (e) => {
-        if (gamePhase !== 'paddle_out') return;
-        isGameDragging = true;
-        handlePointerMove(e);
-      });
-
-      window.addEventListener('pointermove', handlePointerMove);
-      window.addEventListener('pointerup', () => { isGameDragging = false; });
-      window.addEventListener('pointercancel', () => { isGameDragging = false; });
-    }
-
-    const bindBtn = (id, key) => {
-      const el = document.getElementById(id);
-      if (!el || el.dataset.bound) return;
-      el.dataset.bound = 'true';
-      const start = (e) => { e.preventDefault(); gameHoldKeys[key] = true; };
-      const stop = () => { gameHoldKeys[key] = false; };
-      el.addEventListener('pointerdown', start);
-      el.addEventListener('pointerup', stop);
-      el.addEventListener('pointerleave', stop);
-      el.addEventListener('pointercancel', stop);
-    };
-
-    bindBtn('gameBtnUp', 'up');
-    bindBtn('gameBtnDown', 'down');
-    bindBtn('gameBtnLeft', 'left');
-    bindBtn('gameBtnRight', 'right');
-  }
-
-  window.addEventListener('keydown', (e) => {
-    if (!gameRunning || gamePhase !== 'paddle_out') return;
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd'].includes(e.key)) {
-      e.preventDefault();
-    }
-    if (e.key === 'ArrowUp' || e.key === 'w') gameHoldKeys.up = true;
-    if (e.key === 'ArrowDown' || e.key === 's') gameHoldKeys.down = true;
-    if (e.key === 'ArrowRight' || e.key === 'd') gameHoldKeys.right = true;
-    if (e.key === 'ArrowLeft' || e.key === 'a') gameHoldKeys.left = true;
-  });
-
-  window.addEventListener('keyup', (e) => {
-    if (e.key === 'ArrowUp' || e.key === 'w') gameHoldKeys.up = false;
-    if (e.key === 'ArrowDown' || e.key === 's') gameHoldKeys.down = false;
-    if (e.key === 'ArrowRight' || e.key === 'd') gameHoldKeys.right = false;
-    if (e.key === 'ArrowLeft' || e.key === 'a') gameHoldKeys.left = false;
-  });
-
-  /* ========================================================= */
-  /* 畫面切換控制 (View Switcher: 浪況 / 時鐘 / 日曆)             */
+  /* 畫面切換控制 (View Switcher)                              */
   /* ========================================================= */
   function hideAllViews() {
     const surf = document.getElementById('surfView');
@@ -1526,28 +964,23 @@
   }
 
   function updateNavTabs(activeView) {
-    const activeClasses = ['bg-dark-tag', 'text-white'];
-    const inactiveClasses = ['bg-white', 'text-dark-tag'];
-
     const applyTabStyle = (el, isActive) => {
       if (!el) return;
       if (isActive) {
-        el.classList.add(...activeClasses);
-        el.classList.remove(...inactiveClasses);
+        el.classList.add('bg-dark-tag', 'text-white');
+        el.classList.remove('bg-white', 'text-dark-tag');
       } else {
-        el.classList.add(...inactiveClasses);
-        el.classList.remove(...activeClasses);
+        el.classList.add('bg-white', 'text-dark-tag');
+        el.classList.remove('bg-dark-tag', 'text-white');
       }
     };
 
     document.querySelectorAll('#tabBtnSurf, .tab-clone-surf').forEach(btn => {
       applyTabStyle(btn, activeView === 'surf');
     });
-
     document.querySelectorAll('#tabBtnClock, .tab-clone-clock').forEach(btn => {
       applyTabStyle(btn, activeView === 'clock');
     });
-
     document.querySelectorAll('#tabBtnCal, .tab-clone-cal').forEach(btn => {
       applyTabStyle(btn, activeView === 'calendar');
     });
@@ -1661,7 +1094,7 @@
   }
 
   /* ========================================================= */
-  /* 時鐘心跳迴圈與衝浪進度條                                  */
+  /* 時鐘心跳迴圈與衝浪者滑動進度條                             */
   /* ========================================================= */
   function runClock() {
     const now = new Date();
@@ -1689,11 +1122,12 @@
     if (ambientDateEl) ambientDateEl.innerText = dateStr;
     if (ambientWkdayEl) ambientWkdayEl.innerText = wkStr;
 
-    // 0 到 59 秒平滑移動衝浪者
-    const sec = now.getSeconds();
-    const pct = (sec / 59) * 100;
-    if (progressBar) progressBar.style.width = `${pct}%`;
-    if (surferMarker) surferMarker.style.left = `${pct}%`;
+    if (progressBar && surferMarker) {
+      const sec = now.getSeconds();
+      const pct = (sec / 59) * 100;
+      progressBar.style.width = `${pct}%`;
+      surferMarker.style.left = `${pct}%`;
+    }
 
     checkAlarmTrigger(now, rawHours, now.getMinutes(), now.getSeconds(), ampm);
   }
@@ -1705,86 +1139,40 @@
   }
 
   /* ========================================================= */
-  /* 香港公眾假期與電子日曆引擎 (2024 - 2027)                  */
+  /* 香港公眾假期與電子墨水屏日曆引擎                           */
   /* ========================================================= */
   let calDisplayYear = new Date().getFullYear();
-  let calDisplayMonth = new Date().getMonth();
+  let calDisplayMonth = new Date().getMonth(); // 0 - 11
 
   const HK_HOLIDAYS = {
-    // 2024 年
-    '2024-01-01': '元旦',
-    '2024-02-10': '農曆年初一',
-    '2024-02-12': '農曆年初三',
-    '2024-02-13': '農曆年初四',
-    '2024-03-29': '耶穌受難節',
-    '2024-03-30': '受難節翌日',
-    '2024-04-01': '復活節星期一',
-    '2024-04-04': '清明節',
-    '2024-05-01': '勞動節',
-    '2024-05-15': '佛誕',
-    '2024-06-10': '端午節',
-    '2024-07-01': '特區成立日',
-    '2024-09-18': '中秋節翌日',
-    '2024-10-01': '國慶日',
-    '2024-10-11': '重陽節',
-    '2024-12-25': '聖誕節',
-    '2024-12-26': '節禮日',
-
-    // 2025 年
-    '2025-01-01': '元旦',
-    '2025-01-29': '農曆年初一',
-    '2025-01-30': '農曆年初二',
-    '2025-01-31': '農曆年初三',
-    '2025-04-04': '清明節',
-    '2025-04-18': '耶穌受難節',
-    '2025-04-19': '受難節翌日',
-    '2025-04-21': '復活節星期一',
-    '2025-05-01': '勞動節',
-    '2025-05-05': '佛誕',
-    '2025-05-31': '端午節',
-    '2025-07-01': '特區成立日',
-    '2025-10-01': '國慶日',
-    '2025-10-07': '中秋節翌日',
-    '2025-10-29': '重陽節',
-    '2025-12-25': '聖誕節',
-    '2025-12-26': '節禮日',
-
-    // 2026 年
-    '2026-01-01': '元旦',
-    '2026-02-17': '農曆年初一',
-    '2026-02-18': '農曆年初二',
-    '2026-02-19': '農曆年初三',
-    '2026-04-03': '耶穌受難節',
-    '2026-04-04': '清明節',
-    '2026-04-06': '復活節星期一',
-    '2026-05-01': '勞動節',
-    '2026-05-24': '佛誕翌日',
-    '2026-06-19': '端午節',
-    '2026-07-01': '特區成立日',
-    '2026-09-26': '中秋節翌日',
-    '2026-10-01': '國慶日',
-    '2026-10-19': '重陽節',
-    '2026-12-25': '聖誕節',
+    // 2024
+    '2024-01-01': '元旦', '2024-02-10': '農曆年初一', '2024-02-12': '農曆年初三',
+    '2024-02-13': '農曆年初四', '2024-03-29': '耶穌受難節', '2024-03-30': '受難節翌日',
+    '2024-04-01': '復活節星期一', '2024-04-04': '清明節', '2024-05-01': '勞動節',
+    '2024-05-15': '佛誕', '2024-06-10': '端午節', '2024-07-01': '特區成立日',
+    '2024-09-18': '中秋節翌日', '2024-10-01': '國慶日', '2024-10-11': '重陽節',
+    '2024-12-25': '聖誕節', '2024-12-26': '節禮日',
+    // 2025
+    '2025-01-01': '元旦', '2025-01-29': '農曆年初一', '2025-01-30': '農曆年初二',
+    '2025-01-31': '農曆年初三', '2025-04-04': '清明節', '2025-04-18': '耶穌受難節',
+    '2025-04-19': '受難節翌日', '2025-04-21': '復活節星期一', '2025-05-01': '勞動節',
+    '2025-05-05': '佛誕', '2025-05-31': '端午節', '2025-07-01': '特區成立日',
+    '2025-10-01': '國慶日', '2025-10-07': '中秋節翌日', '2025-10-29': '重陽節',
+    '2025-12-25': '聖誕節', '2025-12-26': '節禮日',
+    // 2026
+    '2026-01-01': '元旦', '2026-02-17': '農曆年初一', '2026-02-18': '農曆年初二',
+    '2026-02-19': '農曆年初三', '2026-04-03': '耶穌受難節', '2026-04-04': '清明節',
+    '2026-04-06': '復活節星期一', '2026-05-01': '勞動節', '2026-05-24': '佛誕翌日',
+    '2026-06-19': '端午節', '2026-07-01': '特區成立日', '2026-09-26': '中秋節翌日',
+    '2026-10-01': '國慶日', '2026-10-19': '重陽節', '2026-12-25': '聖誕節',
     '2026-12-26': '節禮日',
-
-    // 2027 年
-    '2027-01-01': '元旦',
-    '2027-02-06': '農曆年初一',
-    '2027-02-08': '農曆年初二',
-    '2027-02-09': '農曆年初三',
-    '2027-03-26': '耶穌受難節',
-    '2027-03-27': '受難節翌日',
-    '2027-03-29': '復活節星期一',
-    '2027-04-05': '清明節',
-    '2027-05-01': '勞動節',
-    '2027-05-13': '佛誕',
-    '2027-06-09': '端午節',
-    '2027-07-01': '特區成立日',
-    '2027-09-16': '中秋節翌日',
-    '2027-10-01': '國慶日',
-    '2027-10-08': '重陽節',
-    '2027-12-25': '聖誕節',
-    '2027-12-27': '節禮日翌日'
+    // 2027
+    '2027-01-01': '元旦', '2027-02-06': '農曆年初一', '2027-02-08': '農曆年初二',
+    '2027-02-09': '農曆年初三', '2027-03-26': '耶穌受難節', '2027-03-27': '受難節翌日',
+    '2027-03-29': '復活節星期一', '2027-04-05': '清明節', '2027-05-01': '勞動節',
+    '2027-05-13': '佛誕', '2027-06-09': '端午節', '2027-07-01': '特區成立日',
+    '2027-09-16': '中秋節翌日', '2027-10-01': '國慶日', '2027-10-08': '重陽節',
+    '2027-12-25': '聖誕節', '2027-12-27': '節禮日翌日'
   };
 
   function getHkHoliday(year, monthIndex, day) {
@@ -1796,26 +1184,13 @@
   function getShortHolidayName(fullName) {
     if (!fullName) return '';
     const SHORT_MAP = {
-      '元旦': '元旦',
-      '農曆年初一': '年初一',
-      '農曆年初二': '年初二',
-      '農曆年初三': '年初三',
-      '農曆年初四': '年初四',
-      '耶穌受難節': '受難節',
-      '受難節翌日': '受難翌日',
-      '復活節星期一': '復活節',
-      '清明節': '清明節',
-      '勞動節': '勞動節',
-      '佛誕': '佛誕',
-      '佛誕翌日': '佛誕翌日',
-      '端午節': '端午節',
-      '特區成立日': '特區成立',
-      '中秋節翌日': '中秋翌日',
-      '國慶日': '國慶日',
-      '重陽節': '重陽節',
-      '聖誕節': '聖誕節',
-      '節禮日': '節禮日',
-      '節禮日翌日': '節禮翌日'
+      '元旦': '元旦', '農曆年初一': '年初一', '農曆年初二': '年初二',
+      '農曆年初三': '年初三', '農曆年初四': '年初四', '耶穌受難節': '受難節',
+      '受難節翌日': '受難翌日', '復活節星期一': '復活節', '清明節': '清明節',
+      '勞動節': '勞動節', '佛誕': '佛誕', '佛誕翌日': '佛誕翌日',
+      '端午節': '端午節', '特區成立日': '特區成立', '中秋節翌日': '中秋翌日',
+      '國慶日': '國慶日', '重陽節': '重陽節', '聖誕節': '聖誕節',
+      '節禮日': '節禮日', '節禮日翌日': '節禮翌日'
     };
     return SHORT_MAP[fullName] || fullName;
   }
@@ -1841,7 +1216,7 @@
     grid.innerHTML = '';
     const currentMonthHolidays = [];
 
-    // 1. 上個月補位格
+    // 1. 上月補位
     for (let i = firstDayIndex - 1; i >= 0; i--) {
       const d = daysInPrevMonth - i;
       const prevMonthIndex = calDisplayMonth === 0 ? 11 : calDisplayMonth - 1;
@@ -1849,18 +1224,18 @@
       const hol = getHkHoliday(prevYear, prevMonthIndex, d);
       const shortHol = getShortHolidayName(hol);
 
-      grid.innerHTML += `
-        <div class="cal-cell other-month">
-          <div class="flex justify-between items-center w-full leading-none shrink-0">
-            <span class="font-mono text-xs sm:text-sm font-black leading-none">${d}</span>
-          </div>
-          <div class="cal-holiday-slot">
-            ${hol ? `<span class="cal-holiday-tag" title="${hol}">${shortHol}</span>` : ''}
-          </div>
-        </div>`;
+      grid.innerHTML += 
+        '<div class="cal-cell other-month">' +
+          '<div class="flex justify-between items-center w-full leading-none shrink-0">' +
+            '<span class="font-mono text-xs font-black leading-none">' + d + '</span>' +
+          '</div>' +
+          '<div class="cal-holiday-slot">' +
+            (hol ? '<span class="cal-holiday-tag" title="' + hol + '">' + shortHol + '</span>' : '') +
+          '</div>' +
+        '</div>';
     }
 
-    // 2. 當月日期格
+    // 2. 當月
     for (let d = 1; d <= daysInMonth; d++) {
       const isToday = isCurrentYearMonth && (d === todayDate);
       const hol = getHkHoliday(calDisplayYear, calDisplayMonth, d);
@@ -1877,19 +1252,19 @@
       const holidayClass = hol ? 'cal-holiday' : '';
       const weekendHeaderColor = isToday ? 'text-white' : (isWeekend ? 'opacity-90' : '');
 
-      grid.innerHTML += `
-        <div class="cal-cell ${todayClass} ${holidayClass}" title="${calDisplayYear}-${pad(calDisplayMonth + 1)}-${pad(d)} ${hol ? `· ${hol}` : ''}">
-          <div class="flex justify-between items-center w-full leading-none shrink-0">
-            <span class="font-mono font-black text-[11px] sm:text-xs ${weekendHeaderColor}">${d}</span>
-            ${isToday ? '<span class="text-[7.5px] sm:text-[8.5px] bg-white text-dark-tag px-1 font-black rounded-xs leading-none">今日</span>' : ''}
-          </div>
-          <div class="cal-holiday-slot">
-            ${hol ? `<span class="cal-holiday-tag" title="${hol}">${shortHol}</span>` : ''}
-          </div>
-        </div>`;
+      grid.innerHTML += 
+        '<div class="cal-cell ' + todayClass + ' ' + holidayClass + '" title="' + calDisplayYear + '-' + pad(calDisplayMonth + 1) + '-' + pad(d) + (hol ? ' · ' + hol : '') + '">' +
+          '<div class="flex justify-between items-center w-full leading-none shrink-0">' +
+            '<span class="font-mono font-black text-[11px] sm:text-xs ' + weekendHeaderColor + '">' + d + '</span>' +
+            (isToday ? '<span class="text-[7.5px] bg-white text-dark-tag px-1 font-black rounded-xs leading-none">今日</span>' : '') +
+          '</div>' +
+          '<div class="cal-holiday-slot">' +
+            (hol ? '<span class="cal-holiday-tag" title="' + hol + '">' + shortHol + '</span>' : '') +
+          '</div>' +
+        '</div>';
     }
 
-    // 3. 下個月補位格：嚴格固定 42 格 (6 週 × 7 天)
+    // 3. 下月補齊 42 格
     const totalRendered = firstDayIndex + daysInMonth;
     const targetCells = 42;
     const nextDays = targetCells - totalRendered;
@@ -1900,32 +1275,30 @@
       const hol = getHkHoliday(nextYear, nextMonthIndex, d);
       const shortHol = getShortHolidayName(hol);
 
-      grid.innerHTML += `
-        <div class="cal-cell other-month">
-          <div class="flex justify-between items-center w-full leading-none shrink-0">
-            <span class="font-mono text-xs sm:text-sm font-black leading-none">${d}</span>
-          </div>
-          <div class="cal-holiday-slot">
-            ${hol ? `<span class="cal-holiday-tag" title="${hol}">${shortHol}</span>` : ''}
-          </div>
-        </div>`;
+      grid.innerHTML += 
+        '<div class="cal-cell other-month">' +
+          '<div class="flex justify-between items-center w-full leading-none shrink-0">' +
+            '<span class="font-mono text-xs font-black leading-none">' + d + '</span>' +
+          '</div>' +
+          '<div class="cal-holiday-slot">' +
+            (hol ? '<span class="cal-holiday-tag" title="' + hol + '">' + shortHol + '</span>' : '') +
+          '</div>' +
+        '</div>';
     }
 
-    // 4. 更新底部公眾假期明細卡片
+    // 4. 底部假期清單
     if (listEl && countEl) {
-      countEl.innerText = `本月共 ${currentMonthHolidays.length} 天假期`;
+      countEl.innerText = '本月共 ' + currentMonthHolidays.length + ' 天假期';
       if (currentMonthHolidays.length === 0) {
-        listEl.innerHTML = `<span class="text-xs font-bold opacity-75 py-1">本月份沒有公眾假期</span>`;
+        listEl.innerHTML = '<span class="text-xs font-bold opacity-75 py-1">本月份沒有公眾假期</span>';
       } else {
         const weekDayShort = ['日', '一', '二', '三', '四', '五', '六'];
         listEl.innerHTML = currentMonthHolidays.map(h => {
           const wk = weekDayShort[h.dayOfWeek];
-          return `
-            <div class="ink-b bg-white text-dark-tag px-1.5 py-0.5 text-[10.5px] sm:text-xs font-black rounded-xs inline-flex items-center gap-1.5 leading-none shrink-0">
-              <span class="bg-dark-tag text-white font-mono px-1 py-0.5 rounded-2xs text-[9px] sm:text-[10px] leading-none">${calDisplayMonth + 1}/${h.day} (${wk})</span>
-              <span class="truncate max-w-[140px] sm:max-w-[200px]">${h.name}</span>
-            </div>
-          `;
+          return '<div class="ink-b bg-white text-dark-tag px-1.5 py-0.5 text-[10px] sm:text-xs font-black rounded-xs inline-flex items-center gap-1 leading-none shrink-0">' +
+                   '<span class="bg-dark-tag text-white font-mono px-1 py-0.2 rounded-2xs text-[9px] leading-none">' + (calDisplayMonth + 1) + '/' + h.day + ' (' + wk + ')</span>' +
+                   '<span class="truncate max-w-[130px] sm:max-w-[180px]">' + h.name + '</span>' +
+                 '</div>';
         }).join('');
       }
     }
@@ -1955,6 +1328,56 @@
     calDisplayMonth = now.getMonth();
     renderCalendar();
   }
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  const mainContainer = document.getElementById('mainContainer');
+  if (mainContainer) {
+    mainContainer.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+      touchStartTime = Date.now();
+    }, { passive: true });
+
+    mainContainer.addEventListener('touchend', (e) => {
+      const endX = e.changedTouches[0].screenX;
+      const endY = e.changedTouches[0].screenY;
+      const diffX = endX - touchStartX;
+      const diffY = endY - touchStartY;
+      const duration = Date.now() - touchStartTime;
+
+      if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.3 && duration < 600) {
+        if (currentActiveView === 'clock') {
+          if (diffX > 0) switchToSurfView();
+          else switchToCalendarView();
+        } else if (currentActiveView === 'calendar') {
+          if (diffX > 0) switchToClockView();
+          else switchToSurfView();
+        } else {
+          if (diffX > 0) nextSpot();
+          else prevSpot();
+        }
+      }
+    }, { passive: true });
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') {
+      if (currentActiveView === 'calendar') nextCalendarMonth();
+      else nextSpot();
+    }
+    if (e.key === 'ArrowLeft') {
+      if (currentActiveView === 'calendar') prevCalendarMonth();
+      else prevSpot();
+    }
+    if (e.key === 'c' || e.key === 'C') {
+      if (currentActiveView === 'clock') switchToCalendarView();
+      else if (currentActiveView === 'calendar') switchToSurfView();
+      else switchToClockView();
+    }
+  });
 
   /* ========================================================= */
   /* 鬧鐘設定與 Web Audio 原生大自然音效合成系統                 */
@@ -2005,14 +1428,12 @@
     const pad = (n) => n.toString().padStart(2, '0');
     if (alarmConfig.enabled) {
       textEl.innerText = `${pad(alarmConfig.hour)}:${pad(alarmConfig.minute)} ${alarmConfig.ampm}`;
-      btn.className = "unified-tab-btn ink-b bg-dark-tag text-white font-fluid-label hover:opacity-80 transition-all";
-      iconEl.className = "fa-solid fa-bell text-xs";
-      btn.title = `鬧鐘已開啟：${textEl.innerText}`;
+      btn.className = "unified-tab-btn ink-b bg-dark-tag text-white hover:opacity-90";
+      iconEl.className = "fa-solid fa-bell text-[10px] sm:text-xs";
     } else {
       textEl.innerText = "鬧鐘關閉";
-      btn.className = "unified-tab-btn ink-b bg-white text-dark-tag font-fluid-label hover:opacity-80 transition-all";
-      iconEl.className = "fa-regular fa-bell text-xs";
-      btn.title = "鬧鐘已關閉，點擊設定";
+      btn.className = "unified-tab-btn ink-b bg-white text-dark-tag hover:opacity-80";
+      iconEl.className = "fa-regular fa-bell text-[10px] sm:text-xs";
     }
   }
 
@@ -2023,15 +1444,15 @@
     if (!toggleBtn || !toggleKnob || !toggleBadge) return;
 
     if (enabled) {
-      toggleBtn.className = "alarm-toggle-box toggle-on ink-b w-16 h-8 rounded-full relative p-[2px] cursor-pointer bg-dark-tag transition-all flex items-center select-none";
-      toggleKnob.className = "alarm-knob w-6 h-6 rounded-full bg-white block transition-transform duration-200 translate-x-8";
+      toggleBtn.className = "ink-b w-14 h-7 rounded-full relative p-[2px] cursor-pointer bg-dark-tag transition-all flex items-center select-none";
+      toggleKnob.className = "w-5 h-5 rounded-full bg-white block transition-transform duration-200 translate-x-7";
       toggleBadge.innerText = "ON 開啟";
-      toggleBadge.className = "font-mono font-black text-xs sm:text-sm px-2.5 py-1 ink-b bg-dark-tag text-white rounded-sm select-none tracking-wider";
+      toggleBadge.className = "font-mono font-black text-xs px-2 py-0.5 ink-b bg-dark-tag text-white rounded-sm select-none";
     } else {
-      toggleBtn.className = "alarm-toggle-box toggle-off ink-b w-16 h-8 rounded-full relative p-[2px] cursor-pointer bg-white transition-all flex items-center select-none";
-      toggleKnob.className = "alarm-knob w-6 h-6 rounded-full bg-dark-tag block transition-transform duration-200 translate-x-0";
+      toggleBtn.className = "ink-b w-14 h-7 rounded-full relative p-[2px] cursor-pointer bg-white transition-all flex items-center select-none";
+      toggleKnob.className = "w-5 h-5 rounded-full bg-dark-tag block transition-transform duration-200 translate-x-0";
       toggleBadge.innerText = "OFF 關閉";
-      toggleBadge.className = "font-mono font-black text-xs sm:text-sm px-2.5 py-1 ink-b bg-white text-dark-tag rounded-sm select-none tracking-wider";
+      toggleBadge.className = "font-mono font-black text-xs px-2 py-0.5 ink-b bg-white text-dark-tag rounded-sm select-none";
     }
   }
 
@@ -2286,17 +1707,17 @@
     initAudioContext();
     if (!isTestingSound) {
       isTestingSound = true;
-      if (btn) btn.innerHTML = `<i class="fa-solid fa-stop text-[10px]"></i> <span>停止試聽</span>`;
+      if (btn) btn.innerHTML = `<i class="fa-solid fa-stop text-[9px]"></i> <span>停止試聽</span>`;
       playSelectedSoundPattern();
       const testDuration = (alarmConfig.sound === 'ocean' || alarmConfig.sound === 'ocean_birds') ? 4200 : 2200;
       setTimeout(() => {
         isTestingSound = false;
-        if (btn) btn.innerHTML = `<i class="fa-solid fa-play text-[10px]"></i> <span>試聽鈴聲</span>`;
+        if (btn) btn.innerHTML = `<i class="fa-solid fa-play text-[9px]"></i> <span>試聽鈴聲</span>`;
       }, testDuration);
     } else {
       isTestingSound = false;
       stopAlarmSound();
-      if (btn) btn.innerHTML = `<i class="fa-solid fa-play text-[10px]"></i> <span>試聽鈴聲</span>`;
+      if (btn) btn.innerHTML = `<i class="fa-solid fa-play text-[9px]"></i> <span>試聽鈴聲</span>`;
     }
   }
 
@@ -2461,7 +1882,7 @@
       return;
     }
 
-    // 海外浪點 Open-Meteo
+    // 海外浪點
     try {
       const tz = spot.timezone ? encodeURIComponent(spot.timezone) : 'auto';
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}&current=temperature_2m,relative_humidity_2m,weather_code,uv_index&timezone=${tz}`;
@@ -2483,7 +1904,7 @@
       const agencyShort = (spot.agency === 'CWA') ? '中央氣象署' : '印尼 BMKG';
       const targetUrl = spot.officialUrl || '#';
       container.innerHTML = `
-        <a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="bg-dark-tag text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 rounded-sm max-w-full truncate hover:opacity-80 transition-opacity" title="點擊前往 ${spot.agencyName} 官方即時警特報網站手動查閱">
+        <a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="bg-dark-tag text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 rounded-sm max-w-full truncate hover:opacity-80 transition-opacity" title="前往官方網站查閱">
           <i class="fa-solid fa-triangle-exclamation shrink-0 text-xs"></i>
           <span class="truncate font-black font-fluid-label">海外浪點無法直連警報 · 查閱${agencyShort}</span>
           <i class="fa-solid fa-arrow-up-right-from-square text-[9px] shrink-0 ml-0.5"></i>
@@ -2527,12 +1948,12 @@
               const iconCode = f.ForecastIcon;
               const weatherIcon = getWeatherIcon(wDesc, iconCode);
 
-              container.innerHTML += `
-                <div class="f-mini-cell ${isToday ? 'active-f' : ''}">
-                  <div class="font-fluid-forecast font-black">${wk}</div>
-                  <div class="my-0.5 font-fluid-forecast flex items-center justify-center h-[1.3em]">${weatherIcon}</div>
-                  <div class="font-mono font-fluid-footer font-black tracking-tighter truncate">${f.forecastMintemp.value}-${f.forecastMaxtemp.value}°</div>
-                </div>`;
+              container.innerHTML += 
+                '<div class="f-mini-cell ' + (isToday ? 'active-f' : '') + '">' +
+                  '<div class="font-fluid-forecast font-black">' + wk + '</div>' +
+                  '<div class="my-0.5 font-fluid-forecast flex items-center justify-center h-[1.2em]">' + weatherIcon + '</div>' +
+                  '<div class="font-mono font-fluid-footer font-black tracking-tighter truncate">' + f.forecastMintemp.value + '-' + f.forecastMaxtemp.value + '°</div>' +
+                '</div>';
             });
             return;
           }
@@ -2559,12 +1980,12 @@
               const minT = Math.round(daily.temperature_2m_min[i]);
               const maxT = Math.round(daily.temperature_2m_max[i]);
 
-              container.innerHTML += `
-                <div class="f-mini-cell ${i === 0 ? 'active-f' : ''}">
-                  <div class="font-fluid-forecast font-black">${wk}</div>
-                  <div class="my-0.5 font-fluid-forecast flex items-center justify-center h-[1.3em]">${weatherIcon}</div>
-                  <div class="font-mono font-fluid-footer font-black tracking-tighter truncate">${minT}-${maxT}°</div>
-                </div>`;
+              container.innerHTML += 
+                '<div class="f-mini-cell ' + (i === 0 ? 'active-f' : '') + '">' +
+                  '<div class="font-fluid-forecast font-black">' + wk + '</div>' +
+                  '<div class="my-0.5 font-fluid-forecast flex items-center justify-center h-[1.2em]">' + weatherIcon + '</div>' +
+                  '<div class="font-mono font-fluid-footer font-black tracking-tighter truncate">' + minT + '-' + maxT + '°</div>' +
+                '</div>';
             }
             return;
           }
@@ -2619,8 +2040,8 @@
       return `${pad(h % 24)}:${pad(m % 60)}`;
     };
     
-    const highStr = highTides.map(formatTime).join('  ');
-    const lowStr = lowTides.map(formatTime).join('  ');
+    const highStr = highTides.map(formatTime).join(' ');
+    const lowStr = lowTides.map(formatTime).join(' ');
     
     const tideEl = document.getElementById('tideTimes');
     if (tideEl) {
@@ -2702,27 +2123,28 @@
             const isToday = (day === 0);
             const isFullSwell = parseFloat(avg) >= 1.5;
             const waveVisual = isFullSwell
-              ? `<i class="fa-solid fa-water text-xs leading-none" title="滿格浪況 (≥1.5m)"></i>`
+              ? '<i class="fa-solid fa-water text-[9px] sm:text-xs leading-none" title="滿格浪況 (≥1.5m)"></i>'
               : '';
 
-            statsGrid.innerHTML += `
-              <div class="stats-cell ${isToday ? 'active-day' : ''}">
-                <div class="font-fluid-label font-black leading-tight pt-0.5 truncate w-full text-center">
-                  ${m}/${d}(${wk})
-                </div>
-                <div class="w-full flex items-center justify-center h-3 my-0.5">
-                  ${waveVisual}
-                </div>
-                <div class="font-mono font-fluid-value font-black leading-none my-0.5 text-base sm:text-xl">
-                  ${avg}<span class="font-fluid-footer font-black ml-0.5">m</span>
-                </div>
-                <div class="font-fluid-footer font-mono font-black leading-tight truncate">
-                  ${min}-${max}m
-                </div>
-                <div class="font-fluid-footer font-mono font-black border-t-2 ${isToday ? 'border-white' : 'border-neutral-800'} border-solid w-full pt-1 mt-0.5 leading-none truncate text-[0.8rem] sm:text-[0.95rem]">
-                  ${avgPd}s
-                </div>
-              </div>`;
+            // 手機窄屏防重疊排版
+            statsGrid.innerHTML += 
+              '<div class="stats-cell ' + (isToday ? 'active-day' : '') + ' px-0.5 py-1 min-w-0 overflow-hidden">' +
+                '<div class="font-black leading-tight truncate w-full text-center text-[10px] sm:text-xs tracking-tighter">' +
+                  m + '/' + d + ' ' + wk +
+                '</div>' +
+                '<div class="w-full flex items-center justify-center h-2.5 my-0.5">' +
+                  waveVisual +
+                '</div>' +
+                '<div class="font-mono font-black leading-none my-0.5 text-xs sm:text-base flex items-baseline justify-center truncate w-full">' +
+                  avg + '<span class="font-black text-[9px] sm:text-[10px] ml-0.5">m</span>' +
+                '</div>' +
+                '<div class="font-mono font-black leading-tight truncate w-full text-center text-[9px] sm:text-[11px] tracking-tighter opacity-90">' +
+                  min + '~' + max +
+                '</div>' +
+                '<div class="font-mono font-black border-t ' + (isToday ? 'border-white' : 'border-neutral-500') + ' border-solid w-full pt-0.5 mt-0.5 leading-none truncate text-center text-[10px] sm:text-xs">' +
+                  avgPd + 's' +
+                '</div>' +
+              '</div>';
           }
         }
         updateAmbientSpotSummary();
@@ -2766,72 +2188,467 @@
   }
 
   /* ========================================================= */
-  /* 手勢滑動切換與快捷鍵                                      */
+  /* 彩蛋小遊戲邏輯 (款式 C：8-Bit 像素街機風格 + 10 關挑戰)      */
   /* ========================================================= */
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchStartTime = 0;
+  const GAME_LEVEL_CONFIGS = [
+    { level: 1, name: '晨曦微波', timeLimit: 35, waveSpeed: 2.2, waveInterval: 48, pushBack: 35 },
+    { level: 2, name: '長沙長湧', timeLimit: 32, waveSpeed: 2.5, waveInterval: 44, pushBack: 38 },
+    { level: 3, name: '石澳岬角', timeLimit: 30, waveSpeed: 2.8, waveInterval: 40, pushBack: 40 },
+    { level: 4, name: '大浪灣空心浪', timeLimit: 28, waveSpeed: 3.1, waveInterval: 36, pushBack: 42 },
+    { level: 5, name: '東湧潮升', timeLimit: 26, waveSpeed: 3.4, waveInterval: 32, pushBack: 45 },
+    { level: 6, name: '西貢強瀾', timeLimit: 24, waveSpeed: 3.7, waveInterval: 28, pushBack: 48 },
+    { level: 7, name: '烏石定點浪', timeLimit: 22, waveSpeed: 4.0, waveInterval: 25, pushBack: 50 },
+    { level: 8, name: '蚺蛇外洋狂潮', timeLimit: 20, waveSpeed: 4.3, waveInterval: 22, pushBack: 52 },
+    { level: 9, name: '烏魯瓦圖斷崖浪', timeLimit: 18, waveSpeed: 4.7, waveInterval: 19, pushBack: 55 },
+    { level: 10, name: '魔鬼紅色代碼', timeLimit: 16, waveSpeed: 5.1, waveInterval: 16, pushBack: 60 }
+  ];
 
-  const mainContainer = document.getElementById('mainContainer');
-  if (mainContainer) {
-    mainContainer.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].screenX;
-      touchStartY = e.changedTouches[0].screenY;
-      touchStartTime = Date.now();
-    }, { passive: true });
+  let gameLevel = 1;
+  let gameTimeLeft = 35.0;
+  let gameTimerInterval = null;
+  let gameLoopId = null;
+  let gameCanvas = null;
+  let gameCtx = null;
+  let gameStageEl = null;
 
-    mainContainer.addEventListener('touchend', (e) => {
-      const endX = e.changedTouches[0].screenX;
-      const endY = e.changedTouches[0].screenY;
-      const diffX = endX - touchStartX;
-      const diffY = endY - touchStartY;
-      const duration = Date.now() - touchStartTime;
+  const gamePlayer = {
+    x: 30,
+    y: 110,
+    width: 32,
+    height: 22,
+    speed: 3.8,
+    vx: 0,
+    vy: 0,
+    shakeTimer: 0
+  };
 
-      if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.3 && duration < 600) {
-        if (currentActiveView === 'clock') {
-          if (diffX > 0) switchToSurfView();
-          else switchToCalendarView();
-        } else if (currentActiveView === 'calendar') {
-          if (diffX > 0) switchToClockView();
-          else switchToSurfView();
-        } else {
-          if (diffX > 0) nextSpot();
-          else prevSpot();
-        }
+  let gameWaves = [];
+  let gameNextWaveTimer = 0;
+  let gamePhase = 'paddle_out'; // 'paddle_out' | 'riding_back' | 'won' | 'failed'
+  let rideBackProgress = 0;
+
+  let isGameDragging = false;
+  let gameDragTargetX = 30;
+  let gameDragTargetY = 110;
+  const gameHoldKeys = { up: false, down: false, left: false, right: false };
+
+  function initEasterEggTrigger() {
+    const marker = document.getElementById('surferMarker');
+    if (!marker) return;
+
+    let pressTimer = null;
+
+    const startLongPress = (e) => {
+      marker.classList.add('charging-active');
+      pressTimer = setTimeout(() => {
+        marker.classList.remove('charging-active');
+        openEasterEggGame();
+      }, 1100);
+    };
+
+    const cancelLongPress = () => {
+      marker.classList.remove('charging-active');
+      if (pressTimer) clearTimeout(pressTimer);
+    };
+
+    marker.addEventListener('touchstart', startLongPress, { passive: true });
+    marker.addEventListener('touchend', cancelLongPress, { passive: true });
+    marker.addEventListener('touchcancel', cancelLongPress, { passive: true });
+
+    marker.addEventListener('mousedown', startLongPress);
+    marker.addEventListener('mouseup', cancelLongPress);
+    marker.addEventListener('mouseleave', cancelLongPress);
+  }
+
+  function openEasterEggGame() {
+    const modal = document.getElementById('gameModal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+
+    gameCanvas = document.getElementById('gameCanvas');
+    gameStageEl = document.getElementById('gameStage');
+    if (gameCanvas) {
+      gameCtx = gameCanvas.getContext('2d');
+    }
+
+    setupGameControls();
+    startGameLevel(1);
+
+    if (gameLoopId) cancelAnimationFrame(gameLoopId);
+    gameLoop();
+  }
+
+  function closeEasterEggGame() {
+    const modal = document.getElementById('gameModal');
+    if (modal) modal.classList.add('hidden');
+    if (gameTimerInterval) clearInterval(gameTimerInterval);
+    if (gameLoopId) cancelAnimationFrame(gameLoopId);
+  }
+
+  function syncGameCanvasResolution() {
+    if (!gameCanvas || !gameStageEl) return;
+    const rect = gameStageEl.getBoundingClientRect();
+    const w = rect.width > 50 ? rect.width : 600;
+    const h = rect.height > 50 ? rect.height : 250;
+    const dpr = window.devicePixelRatio || 1;
+
+    gameCanvas.width = Math.floor(w * dpr);
+    gameCanvas.height = Math.floor(h * dpr);
+
+    if (gameCtx) {
+      gameCtx.setTransform(1, 0, 0, 1, 0, 0);
+      gameCtx.scale(dpr, dpr);
+    }
+  }
+
+  function startGameLevel(lvl) {
+    gameLevel = Math.max(1, Math.min(10, lvl));
+    const cfg = GAME_LEVEL_CONFIGS[gameLevel - 1];
+    gameTimeLeft = cfg.timeLimit;
+    gamePhase = 'paddle_out';
+    rideBackProgress = 0;
+    gameWaves = [];
+    gameNextWaveTimer = 20;
+
+    syncGameCanvasResolution();
+    const rect = gameStageEl ? gameStageEl.getBoundingClientRect() : { width: 600, height: 250 };
+    const ch = rect.height > 50 ? rect.height : 250;
+
+    gamePlayer.x = 30;
+    gamePlayer.y = Math.floor(ch / 2 - gamePlayer.height / 2);
+    gamePlayer.vx = 0;
+    gamePlayer.vy = 0;
+    gamePlayer.shakeTimer = 0;
+
+    gameDragTargetX = gamePlayer.x;
+    gameDragTargetY = gamePlayer.y;
+
+    const lvlEl = document.getElementById('gameLevelBadge');
+    if (lvlEl) lvlEl.innerText = `LVL: ${gameLevel < 10 ? '0' + gameLevel : gameLevel}/10`;
+
+    const timerEl = document.getElementById('gameTimerText');
+    if (timerEl) {
+      timerEl.innerText = `${gameTimeLeft.toFixed(1)}s`;
+      timerEl.classList.remove('timer-warning');
+    }
+
+    const overlay = document.getElementById('gameOverOverlay');
+    if (overlay) overlay.style.display = 'none';
+
+    const toast = document.getElementById('gameToast');
+    if (toast) toast.style.display = 'none';
+
+    if (gameTimerInterval) clearInterval(gameTimerInterval);
+    gameTimerInterval = setInterval(() => {
+      if (gamePhase !== 'paddle_out') return;
+      gameTimeLeft -= 0.1;
+      if (gameTimeLeft <= 0) {
+        gameTimeLeft = 0;
+        triggerGameTimeout();
       }
-    }, { passive: true });
+      if (timerEl) {
+        timerEl.innerText = `${gameTimeLeft.toFixed(1)}s`;
+        if (gameTimeLeft <= 5) timerEl.classList.add('timer-warning');
+        else timerEl.classList.remove('timer-warning');
+      }
+    }, 100);
+  }
+
+  function triggerGameTimeout() {
+    gamePhase = 'failed';
+    clearInterval(gameTimerInterval);
+    const overlay = document.getElementById('gameOverOverlay');
+    const title = document.getElementById('gameOverTitle');
+    const desc = document.getElementById('gameOverDesc');
+    const icon = document.getElementById('gameOverIcon');
+    const btn = document.getElementById('gameOverBtn');
+
+    if (icon) icon.innerText = '⏰ 💥';
+    if (title) title.innerText = `第 ${gameLevel} 關超時！挑戰失敗`;
+    if (desc) desc.innerText = `未能於 ${GAME_LEVEL_CONFIGS[gameLevel - 1].timeLimit} 秒內划抵起浪區。重振旗鼓再來！`;
+    if (btn) {
+      btn.innerText = '重試此關 (RETRY)';
+      btn.onclick = () => startGameLevel(gameLevel);
+    }
+    if (overlay) overlay.style.display = 'flex';
+  }
+
+  function triggerGameWin() {
+    gamePhase = 'won';
+    clearInterval(gameTimerInterval);
+    const overlay = document.getElementById('gameOverOverlay');
+    const title = document.getElementById('gameOverTitle');
+    const desc = document.getElementById('gameOverDesc');
+    const icon = document.getElementById('gameOverIcon');
+    const btn = document.getElementById('gameOverBtn');
+
+    if (gameLevel < 10) {
+      if (icon) icon.innerText = '🏆 🌊 🏄‍♂️';
+      if (title) title.innerText = `第 ${gameLevel} 關通過！`;
+      if (desc) desc.innerText = `成功在限時內頂浪出海並乘浪衝回！`;
+      if (btn) {
+        btn.innerText = `挑戰第 ${gameLevel + 1} 關 ▶`;
+        btn.onclick = () => startGameLevel(gameLevel + 1);
+      }
+    } else {
+      if (icon) icon.innerText = '👑 🏄‍♂️ 🏆 👑';
+      if (title) title.innerText = `恭喜征服全 10 關！傳奇浪尖之王！`;
+      if (desc) desc.innerText = `你成功戰勝了所有外洋狂濤與極限時限！`;
+      if (btn) {
+        btn.innerText = `重新挑戰第 1 關`;
+        btn.onclick = () => startGameLevel(1);
+      }
+    }
+    if (overlay) overlay.style.display = 'flex';
+  }
+
+  function restartGameCurrentLevel() {
+    startGameLevel(gameLevel);
+  }
+
+  function setupGameControls() {
+    if (!gameStageEl) return;
+
+    const handlePointerMove = (e) => {
+      if (!isGameDragging || gamePhase !== 'paddle_out') return;
+      const rect = gameStageEl.getBoundingClientRect();
+      gameDragTargetX = e.clientX - rect.left - gamePlayer.width / 2;
+      gameDragTargetY = e.clientY - rect.top - gamePlayer.height / 2;
+    };
+
+    gameStageEl.addEventListener('pointerdown', (e) => {
+      if (gamePhase !== 'paddle_out') return;
+      isGameDragging = true;
+      handlePointerMove(e);
+    });
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', () => { isGameDragging = false; });
+    window.addEventListener('pointercancel', () => { isGameDragging = false; });
+
+    const bindBtn = (id, key) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const start = (e) => { e.preventDefault(); gameHoldKeys[key] = true; };
+      const stop = () => { gameHoldKeys[key] = false; };
+      el.addEventListener('pointerdown', start);
+      el.addEventListener('pointerup', stop);
+      el.addEventListener('pointerleave', stop);
+      el.addEventListener('pointercancel', stop);
+    };
+
+    bindBtn('gBtnUp', 'up');
+    bindBtn('gBtnDown', 'down');
+    bindBtn('gBtnLeft', 'left');
+    bindBtn('gBtnRight', 'right');
   }
 
   window.addEventListener('keydown', (e) => {
-    if (gameRunning) return; // 遊戲中優先留給遊戲
-    if (e.key === 'ArrowRight') {
-      if (currentActiveView === 'calendar') nextCalendarMonth();
-      else nextSpot();
+    const modal = document.getElementById('gameModal');
+    if (!modal || modal.classList.contains('hidden')) return;
+
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd'].includes(e.key)) {
+      e.preventDefault();
     }
-    if (e.key === 'ArrowLeft') {
-      if (currentActiveView === 'calendar') prevCalendarMonth();
-      else prevSpot();
-    }
-    if (e.key === 'c' || e.key === 'C') {
-      if (currentActiveView === 'clock') switchToCalendarView();
-      else if (currentActiveView === 'calendar') switchToSurfView();
-      else switchToClockView();
-    }
+    if (e.key === 'ArrowUp' || e.key === 'w') gameHoldKeys.up = true;
+    if (e.key === 'ArrowDown' || e.key === 's') gameHoldKeys.down = true;
+    if (e.key === 'ArrowRight' || e.key === 'd') gameHoldKeys.right = true;
+    if (e.key === 'ArrowLeft' || e.key === 'a') gameHoldKeys.left = true;
   });
 
-  /* ========================================================= */
-  /* 應用程序全域初始化進入點                                   */
-  /* ========================================================= */
+  window.addEventListener('keyup', (e) => {
+    if (e.key === 'ArrowUp' || e.key === 'w') gameHoldKeys.up = false;
+    if (e.key === 'ArrowDown' || e.key === 's') gameHoldKeys.down = false;
+    if (e.key === 'ArrowRight' || e.key === 'd') gameHoldKeys.right = false;
+    if (e.key === 'ArrowLeft' || e.key === 'a') gameHoldKeys.left = false;
+  });
+
+  function gameLoop() {
+    updateGamePhysics();
+    renderGameGraphics();
+    gameLoopId = requestAnimationFrame(gameLoop);
+  }
+
+  function updateGamePhysics() {
+    if (!gameStageEl) return;
+    const rect = gameStageEl.getBoundingClientRect();
+    const cw = rect.width > 50 ? rect.width : 600;
+    const ch = rect.height > 50 ? rect.height : 250;
+    const cfg = GAME_LEVEL_CONFIGS[gameLevel - 1];
+
+    if (gamePhase === 'paddle_out') {
+      if (gameHoldKeys.up) gamePlayer.vy -= gamePlayer.speed * 0.4;
+      if (gameHoldKeys.down) gamePlayer.vy += gamePlayer.speed * 0.4;
+      if (gameHoldKeys.right) gamePlayer.vx += gamePlayer.speed * 0.45;
+      if (gameHoldKeys.left) gamePlayer.vx -= gamePlayer.speed * 0.4;
+
+      if (isGameDragging) {
+        gamePlayer.vx += (gameDragTargetX - gamePlayer.x) * 0.15;
+        gamePlayer.vy += (gameDragTargetY - gamePlayer.y) * 0.15;
+      }
+
+      gamePlayer.x += gamePlayer.vx;
+      gamePlayer.y += gamePlayer.vy;
+      gamePlayer.vx *= 0.82;
+      gamePlayer.vy *= 0.82;
+
+      if (gamePlayer.x < 15) gamePlayer.x = 15;
+      if (gamePlayer.y < 10) gamePlayer.y = 10;
+      if (gamePlayer.y > ch - gamePlayer.height - 10) gamePlayer.y = ch - gamePlayer.height - 10;
+
+      const targetX = Math.max(140, cw - gamePlayer.width - 40);
+      const progress = Math.min(100, Math.max(0, Math.round((gamePlayer.x / targetX) * 100)));
+      const progEl = document.getElementById('gameProgressText');
+      if (progEl) progEl.innerText = `${progress}%`;
+
+      gameNextWaveTimer--;
+      if (gameNextWaveTimer <= 0) {
+        const waveH = [34, 26, 44, 22][Math.floor(Math.random() * 4)];
+        const waveW = 20;
+        const waveY = Math.random() * (ch - waveH - 20) + 10;
+        gameWaves.push({
+          x: cw + 10,
+          y: waveY,
+          width: waveW,
+          height: waveH,
+          speed: cfg.waveSpeed * (0.85 + Math.random() * 0.3)
+        });
+        gameNextWaveTimer = Math.floor(Math.random() * (cfg.waveInterval * 0.4)) + (cfg.waveInterval * 0.8);
+      }
+
+      for (let i = gameWaves.length - 1; i >= 0; i--) {
+        const w = gameWaves[i];
+        w.x -= w.speed;
+
+        if (
+          gamePlayer.x < w.x + w.width &&
+          gamePlayer.x + gamePlayer.width > w.x &&
+          gamePlayer.y < w.y + w.height &&
+          gamePlayer.y + gamePlayer.height > w.y
+        ) {
+          gamePlayer.x = Math.max(15, gamePlayer.x - cfg.pushBack);
+          gamePlayer.shakeTimer = 14;
+          gameWaves.splice(i, 1);
+          showGameToast();
+          continue;
+        }
+
+        if (w.x + w.width < -20) {
+          gameWaves.splice(i, 1);
+        }
+      }
+
+      if (gamePlayer.shakeTimer > 0) gamePlayer.shakeTimer--;
+      if (gamePlayer.x >= targetX) {
+        gamePhase = 'riding_back';
+        rideBackProgress = 0;
+        gameWaves = [];
+      }
+
+    } else if (gamePhase === 'riding_back') {
+      rideBackProgress += 0.015;
+      const startX = cw - 50;
+      const endX = 30;
+      gamePlayer.x = startX + (endX - startX) * rideBackProgress;
+      gamePlayer.y = (ch / 2) + Math.sin(rideBackProgress * Math.PI * 4) * 35;
+
+      const returnPct = Math.round((1 - rideBackProgress) * 100);
+      const progEl = document.getElementById('gameProgressText');
+      if (progEl) progEl.innerText = `🏄‍♂️ 衝回中: ${returnPct}%`;
+
+      if (rideBackProgress >= 1) {
+        triggerGameWin();
+      }
+    }
+  }
+
+  function showGameToast() {
+    const t = document.getElementById('gameToast');
+    if (t) {
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 900);
+    }
+  }
+
+  function renderGameGraphics() {
+    if (!gameCtx || !gameStageEl) return;
+    const rect = gameStageEl.getBoundingClientRect();
+    const cw = rect.width > 50 ? rect.width : 600;
+    const ch = rect.height > 50 ? rect.height : 250;
+
+    gameCtx.clearRect(0, 0, cw, ch);
+
+    // 水流橫紋
+    gameCtx.strokeStyle = '#cbd5e1';
+    gameCtx.lineWidth = 1;
+    for (let y = 25; y < ch; y += 35) {
+      gameCtx.beginPath();
+      gameCtx.moveTo(0, y);
+      gameCtx.lineTo(cw, y);
+      gameCtx.stroke();
+    }
+
+    // 左側起點
+    gameCtx.fillStyle = 'rgba(51, 65, 85, 0.06)';
+    gameCtx.fillRect(0, 0, 40, ch);
+    gameCtx.fillStyle = '#64748b';
+    gameCtx.font = 'bold 9px monospace';
+    gameCtx.fillText('◀ BEACH', 4, 18);
+
+    // 右側終點線
+    const targetX = Math.max(140, cw - 40);
+    gameCtx.fillStyle = 'rgba(30, 41, 59, 0.08)';
+    gameCtx.fillRect(targetX, 0, 40, ch);
+    gameCtx.fillStyle = '#334155';
+    gameCtx.font = 'bold 9px monospace';
+    gameCtx.fillText('LINEUP ▶', targetX - 60, 18);
+
+    // 繪製海浪 (款式 C：8-Bit 階梯像素浪)
+    gameWaves.forEach(w => {
+      gameCtx.fillStyle = '#2c3239';
+      gameCtx.fillRect(w.x + 8, w.y, w.width - 8, w.height);
+      gameCtx.fillRect(w.x + 4, w.y + 5, 6, w.height - 5);
+      gameCtx.fillRect(w.x, w.y + 10, 5, w.height - 10);
+      gameCtx.fillStyle = '#ffffff';
+      gameCtx.fillRect(w.x + 6, w.y + 2, 3, 3);
+      gameCtx.fillRect(w.x + 2, w.y + 7, 3, 3);
+    });
+
+    // 繪製衝浪者 (款式 C：8-Bit 街機像素人)
+    let drawX = gamePlayer.x;
+    let drawY = gamePlayer.y;
+    if (gamePlayer.shakeTimer > 0) {
+      drawX += (Math.random() - 0.5) * 6;
+      drawY += (Math.random() - 0.5) * 5;
+    }
+
+    gameCtx.fillStyle = '#1e293b';
+    if (gamePhase === 'paddle_out') {
+      gameCtx.fillRect(drawX, drawY + 13, 32, 5);
+      gameCtx.fillRect(drawX + 11, drawY + 7, 15, 6);
+      gameCtx.fillRect(drawX + 21, drawY + 2, 7, 7);
+      gameCtx.fillStyle = '#ffffff';
+      gameCtx.fillRect(drawX + 25, drawY + 4, 2, 2);
+    } else {
+      gameCtx.fillRect(drawX + 3, drawY + 18, 28, 5);
+      gameCtx.fillRect(drawX + 14, drawY, 8, 8);
+      gameCtx.fillRect(drawX + 12, drawY + 7, 12, 7);
+      gameCtx.fillRect(drawX + 9, drawY + 14, 6, 5);
+      gameCtx.fillRect(drawX + 19, drawY + 14, 6, 5);
+      gameCtx.fillStyle = '#ffffff';
+      gameCtx.fillRect(drawX + 18, drawY + 2, 2, 2);
+    }
+  }
+
   window.addEventListener('DOMContentLoaded', () => {
     loadAlarmConfig();
     updateSpotUI();
     updateNavTabs('surf');
     runClock();
-    renderCalendar();
     fetchAllData();
+    initEasterEggTrigger();
     setInterval(fetchAllData, 15 * 60 * 1000);
     setInterval(triggerAutoInversion, 30 * 60 * 1000);
-    setupSurferEasterEgg();
   });
 </script>
 
