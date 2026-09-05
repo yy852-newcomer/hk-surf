@@ -99,6 +99,9 @@
     .inverted .border-black { border-color: #ffffff !important; }
     .inverted .border-white { border-color: #000000 !important; }
 
+    /* 水印背景在反色模式下的專屬適配 */
+    .inverted svg { stroke: #ffffff; }
+
     /* 針對中性灰底與微白底的墨水屏補救 (防止反色時白底白字) */
     .inverted .bg-neutral-50,
     .inverted .bg-neutral-100,
@@ -144,6 +147,18 @@
     .inverted .f-mini-cell.active-f { background-color: #ffffff !important; color: #000000 !important; }
     .inverted .spot-dot.active { background-color: #ffffff !important; }
     .inverted .spot-dot { border-color: #ffffff !important; }
+
+    /* 電子墨水屏翻頁微動效 (E-Ink Flash) */
+    @keyframes einkPageFlash {
+      0% { opacity: 1; filter: invert(0); }
+      35% { opacity: 0.15; filter: invert(1); }
+      70% { opacity: 0.65; filter: invert(0.4); }
+      100% { opacity: 1; filter: invert(0); }
+    }
+
+    .eink-page-flash {
+      animation: einkPageFlash 0.18s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+    }
 
     /* P5 優化：去雜線/純留白設計 */
     .stats-grid {
@@ -227,6 +242,19 @@
     .alarm-ringing-card {
       animation: alarmPulse 1.2s infinite ease-in-out;
     }
+
+    /* 衝浪者隨海浪起伏微動態 */
+    @keyframes surferBobbing {
+      0%, 100% { transform: translate(-50%, 0) rotate(0deg); }
+      50% { transform: translate(-50%, -3px) rotate(4deg); }
+    }
+    .surfer-riding {
+      animation: surferBobbing 1.6s ease-in-out infinite;
+    }
+
+    /* 反色模式下衝浪者與海浪顏色反轉 */
+    .inverted #surferMarker svg { fill: #ffffff !important; }
+    .inverted .wave-border { border-color: #ffffff !important; }
   </style>
 </head>
 <body>
@@ -309,8 +337,8 @@
       </div>
     </section>
 
-    <!-- 3. 即時第一湧浪核心卡片 (P2 浪向旋轉箭頭 + 無外框大氣置中) -->
-    <section class="py-1 px-2 bg-white shrink-0 flex flex-col justify-center items-center min-h-0">
+    <!-- 3. 即時第一湧浪核心卡片 (已加入第一湧浪高度數值 ＋ 週期/浪向/總浪翻頁微動效綁定區) -->
+    <section id="heroSwellCard" class="py-1 px-2 bg-white shrink-0 flex flex-col justify-center items-center min-h-0 transition-opacity">
       <div class="w-full max-w-[92%] sm:max-w-[82%] mx-auto grid grid-cols-12 items-center gap-3 sm:gap-6">
         <!-- 左側：湧浪數值主區 -->
         <div class="col-span-7 flex flex-col items-center justify-center text-center h-full min-w-0 py-0.5">
@@ -326,7 +354,7 @@
           </div>
         </div>
         
-        <!-- 右側：指標列表 (P2 旋轉箭頭) -->
+        <!-- 右側：指標列表 (週期 / 浪向 / 總浪) -->
         <div class="col-span-5 pl-3 sm:pl-4 ink-b-l grid grid-rows-3 gap-y-1.5 h-full py-1 min-w-0 justify-center">
           <!-- 週期 -->
           <div class="grid grid-cols-[clamp(40px,6cqi,58px)_1fr] items-center gap-x-2 min-w-0">
@@ -420,9 +448,35 @@
         </span>
       </div>
 
-      <!-- 秒數極簡進度條 -->
-      <div class="w-48 sm:w-64 h-2 bg-white progress-track mt-4 mx-auto rounded-full overflow-hidden ink-b p-[1px]">
-        <div id="secondProgressBar" class="h-full bg-black transition-all duration-300 w-0 rounded-full"></div>
+      <!-- 海洋衝浪者秒數動態進度條 (0s 至 60s 破浪滑行) -->
+      <div class="w-64 sm:w-80 mx-auto mt-4 px-1 select-none">
+        <!-- 軌道與滑行衝浪者容器 -->
+        <div class="relative w-full pt-6 pb-1">
+          <!-- 沿著海浪前進的衝浪者剪影 (動態綁定 left 百分比) -->
+          <div id="surferMarker" class="absolute bottom-2 left-0 transition-all duration-300 pointer-events-none surfer-riding z-10" style="left: 0%;">
+            <svg class="w-7 h-7 -mb-0.5 text-black" viewBox="0 0 64 64" fill="currentColor">
+              <!-- 衝浪板 -->
+              <path d="M4 56 C14 53, 36 53, 58 56 C52 59, 16 59, 4 56 Z" />
+              <!-- 衝浪者身姿 (壓低重心、單臂展開保持平衡) -->
+              <circle cx="28" cy="18" r="4.5" />
+              <path d="M25 24 L34 26 L42 22 L44 25 L36 30 L35 38 L43 45 L38 48 L30 40 L24 43 L17 50 L13 47 L21 38 L23 30 L16 32 L14 28 Z" />
+            </svg>
+          </div>
+
+          <!-- 海浪進度條底槽 (外框與波浪線) -->
+          <div class="w-full h-2 bg-white progress-track rounded-full overflow-hidden ink-b p-[1px] relative">
+            <div id="secondProgressBar" class="h-full bg-black transition-all duration-300 w-0 rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- 刻度標示：00s 與海浪圖示 60s -->
+        <div class="flex justify-between items-center text-[10px] font-mono font-black opacity-75 px-0.5 -mt-0.5">
+          <span>00s</span>
+          <span class="inline-flex items-center gap-1">
+            <i class="fa-solid fa-water text-[9px]"></i>
+            <span>60s</span>
+          </span>
+        </div>
       </div>
 
       <!-- 置中日期與星期 -->
@@ -688,8 +742,24 @@
     if (index < 0) index = SURF_SPOTS.length - 1;
     if (index >= SURF_SPOTS.length) index = 0;
     currentSpotIdx = index;
+
+    // 觸發「即時第一湧浪高度數值 ＋ 週期/浪向/總浪」專屬墨水屏翻頁微動效
+    triggerHeroEinkFlash();
+
     updateSpotUI();
     fetchAllData();
+  }
+
+  function triggerHeroEinkFlash() {
+    const hero = document.getElementById('heroSwellCard');
+    if (!hero) return;
+    hero.classList.remove('eink-page-flash');
+    // 強制重繪 (Reflow) 確保動畫每次切換都能穩定重新觸發
+    void hero.offsetWidth;
+    hero.classList.add('eink-page-flash');
+    setTimeout(() => {
+      hero.classList.remove('eink-page-flash');
+    }, 220);
   }
 
   function nextSpot() { switchSpot(currentSpotIdx + 1); }
@@ -769,16 +839,23 @@
     const ambientDateEl = document.getElementById('ambientDate');
     const ambientWkdayEl = document.getElementById('ambientWkday');
     const progressBar = document.getElementById('secondProgressBar');
+    const surferMarker = document.getElementById('surferMarker');
 
     if (ambientClockEl) ambientClockEl.innerText = timeStr;
     if (ambientAmPmEl) ambientAmPmEl.innerText = ampm;
     if (ambientDateEl) ambientDateEl.innerText = dateStr;
     if (ambientWkdayEl) ambientWkdayEl.innerText = wkStr;
 
+    const sec = now.getSeconds();
+    const pct = (sec / 59) * 100;
+
     if (progressBar) {
-      const sec = now.getSeconds();
-      const pct = (sec / 59) * 100;
       progressBar.style.width = `${pct}%`;
+    }
+
+    if (surferMarker) {
+      // 衝浪者沿著海浪軌道自左向右破浪前進
+      surferMarker.style.left = `${pct}%`;
     }
 
     // 檢查鬧鐘觸發
