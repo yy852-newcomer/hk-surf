@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <!-- 支援全螢幕瀏海屏，鎖定雙擊與視窗變形 -->
+  <!-- 全設備防變形與防雙擊縮放設定 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="香港與海外熱點即時第一湧浪浪況、5天深度趨勢統計與全屏沉浸式電子時鐘">
-  <title>衝浪浪況 & 天氣時鐘儀表板 (Surf & Clock Dashboard)</title>
+  <meta name="description" content="香港與海外熱點即時第一湧浪浪況、5天深度趨勢統計、官方氣象局直連與大自然鬧鐘時鐘">
+  <title>衝浪浪況 & 天氣大自然時鐘儀表板</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -27,16 +27,15 @@
 
     /* 全域流體排版與間距系統 (CSS Clamp) */
     :root {
-      --space-page: clamp(4px, 0.9vh, 10px);
-      --gap-main: clamp(3px, 0.6vh, 8px);
+      --space-page: clamp(3px, 0.8vh, 8px);
+      --gap-main: clamp(2px, 0.45vh, 5px);
       --gap-grid: clamp(2px, 0.6vw, 6px);
       --border-thick: clamp(1.5px, 0.22vmin, 2.5px);
 
       /* 字體流體 Clamp 系統：確保跨設備字體不變形、不縮成郵票亦不爆版 */
-      --fs-ambient-clock: clamp(4.2rem, 16vmin + 1.2rem, 8.8rem);
-      --fs-ambient-ampm: clamp(1.4rem, 4vmin, 2.4rem);
-      --fs-ambient-date: clamp(1.05rem, 2.5vmin, 1.6rem);
-      
+      --fs-clock: clamp(3.2rem, 8vmin + 1rem, 5.8rem);
+      --fs-ampm: clamp(0.95rem, 2vmin, 1.4rem);
+      --fs-date: clamp(0.88rem, 1.8vmin, 1.25rem);
       --fs-swell-main: clamp(3.4rem, 8.5vmin + 1rem, 5.8rem);
       --fs-unit: clamp(1.1rem, 2.2vmin, 1.6rem);
       --fs-subtitle: clamp(0.85rem, 1.8vmin, 1.2rem);
@@ -54,7 +53,7 @@
       height: 100dvh;
       background-color: #ffffff; 
       color: #000000;
-      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "PingFang HK", "PingFang SC", "Microsoft JhengHei", "微軟正黑體", sans-serif;
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "PingFang HK", "PingFang SC", "Microsoft JhengHei", sans-serif;
       user-select: none;
       touch-action: pan-y pinch-zoom;
       -webkit-text-size-adjust: 100%;
@@ -72,10 +71,10 @@
       height: 100vh;
       height: 100dvh;
       margin: 0 auto;
-      padding: clamp(4px, env(safe-area-inset-top, 6px), 12px) 
-               clamp(6px, env(safe-area-inset-right, 10px), 16px) 
-               clamp(4px, env(safe-area-inset-bottom, 6px), 12px) 
-               clamp(6px, env(safe-area-inset-left, 10px), 16px);
+      padding: clamp(3px, env(safe-area-inset-top, 4px), 8px) 
+               clamp(5px, env(safe-area-inset-right, 8px), 14px) 
+               clamp(3px, env(safe-area-inset-bottom, 4px), 8px) 
+               clamp(5px, env(safe-area-inset-left, 8px), 14px);
       display: flex; 
       flex-direction: column;
       justify-content: space-between;
@@ -105,10 +104,10 @@
     .inverted .f-mini-cell.active-f { background-color: #ffffff !important; color: #000000 !important; }
     .inverted .spot-dot.active { background-color: #ffffff !important; }
     .inverted .spot-dot { border-color: #ffffff !important; }
-    .inverted .warn-link { background-color: #ffffff !important; color: #000000 !important; border-color: #ffffff !important; }
-    .inverted .clock-pill { background-color: #ffffff !important; color: #000000 !important; }
+    .inverted .alarm-modal-box { background-color: #000000 !important; color: #ffffff !important; border-color: #ffffff !important; }
+    .inverted .alarm-select { background-color: #111111 !important; color: #ffffff !important; border-color: #ffffff !important; }
 
-    /* 5 天第一湧浪深度趨勢統計網格 (去線留白版) */
+    /* P5 優化：去雜線/純留白設計 */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -133,7 +132,7 @@
       color: #ffffff;
     }
 
-    /* 5 天天文台/氣象局微型預報條 (去線留白版) */
+    /* 5 天微型預報條 (去線留白版) */
     .f-mini-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -158,8 +157,8 @@
 
     /* 據點指示點 */
     .spot-dot {
-      width: clamp(6px, 0.9vmin, 9px);
-      height: clamp(6px, 0.9vmin, 9px);
+      width: clamp(5px, 0.8vmin, 8px);
+      height: clamp(5px, 0.8vmin, 8px);
       border: var(--border-thick) solid #000000;
       border-radius: 9999px;
       display: inline-block;
@@ -169,21 +168,10 @@
       background-color: #000000;
     }
 
-    /* 海外天文台超連結樣式 */
-    .warn-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      text-decoration: none;
-      cursor: pointer;
-      transition: opacity 0.2s ease;
-    }
-    .warn-link:hover {
-      opacity: 0.85;
-      text-decoration: underline;
-    }
-
     /* 動態字體綁定 class */
+    .font-fluid-clock { font-size: var(--fs-clock); line-height: 0.9; }
+    .font-fluid-ampm { font-size: var(--fs-ampm); }
+    .font-fluid-date { font-size: var(--fs-date); }
     .font-fluid-swell { font-size: var(--fs-swell-main); line-height: 0.9; }
     .font-fluid-unit { font-size: var(--fs-unit); }
     .font-fluid-subtitle { font-size: var(--fs-subtitle); }
@@ -193,16 +181,13 @@
     .font-fluid-forecast { font-size: var(--fs-forecast-day); }
     .font-fluid-footer { font-size: var(--fs-footer); }
 
-    /* 模式切換轉場效果 */
-    .mode-view {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-      width: 100%;
+    /* 鬧鐘響起時的微閃動畫 */
+    @keyframes alarmPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
     }
-    .mode-view.hidden-view {
-      display: none !important;
+    .alarm-ringing-card {
+      animation: alarmPulse 1.2s infinite ease-in-out;
     }
   </style>
 </head>
@@ -210,26 +195,24 @@
 
 <div class="screen-container" id="mainContainer">
 
-  <!-- ========================================== -->
-  <!-- 視圖一：衝浪浪況與氣候主看板 (SURF VIEW)  -->
-  <!-- ========================================== -->
-  <main id="surfView" class="mode-view">
+  <!-- ========================================================= -->
+  <!-- 檢視畫面 A：衝浪浪況主儀表板 (SURF DASHBOARD VIEW)          -->
+  <!-- ========================================================= -->
+  <main id="surfView" class="flex flex-col justify-between h-full w-full gap-[var(--gap-main)]">
 
-    <!-- 1. 頂部抬頭區：據點導航、警告標籤與快速切換至時鐘按鈕 (移除常駐大時鐘，空間極度寬敞) -->
-    <header class="flex justify-between items-center shrink-0 pt-0.5 ink-b-b pb-1.5">
-      <div class="flex flex-col gap-1.5 min-w-0 pr-2 flex-grow">
+    <!-- 1. 頂部抬頭區：據點導航、警告標籤與模式切換按鈕 -->
+    <header class="flex justify-between items-center shrink-0 pt-0.5">
+      <div class="flex flex-col gap-1 min-w-0 pr-2">
         <div class="flex items-center gap-1.5 flex-wrap">
-          <!-- 浪點切換器 (◀ HK SURF ▶) -->
+          <!-- 點擊或滑動切換的據點導航 -->
           <div class="inline-flex items-center bg-black text-white px-2 py-0.5 font-black tracking-wider select-none shrink-0 font-fluid-label rounded-sm">
             <button onclick="prevSpot()" class="px-1 font-black hover:opacity-75 cursor-pointer" title="上一個浪點" aria-label="上一個浪點">◀</button>
             <span class="mx-1 cursor-pointer font-black" id="spotNavTitle" onclick="nextSpot()">HK SURF</span>
             <button onclick="nextSpot()" class="px-1 font-black hover:opacity-75 cursor-pointer" title="下一個浪點" aria-label="下一個浪點">▶</button>
           </div>
           
-          <!-- 6 個浪點指示圓點 -->
-          <div class="flex items-center gap-1.5 px-0.5 shrink-0 flex-wrap" id="spotDots">
-            <!-- 由 JS 動態產生 -->
-          </div>
+          <!-- 6 個浪點的位置圓點指示器 -->
+          <div class="flex items-center gap-1 px-0.5 shrink-0 flex-wrap max-w-[120px]" id="spotDots"></div>
 
           <button onclick="toggleTheme()" title="反色模式切換" aria-label="反色切換" class="ink-b px-1.5 py-0.5 font-black font-fluid-label active:bg-black active:text-white cursor-pointer shrink-0 rounded-sm">
             <i class="fa-solid fa-circle-half-stroke"></i>
@@ -239,25 +222,25 @@
           </button>
         </div>
         
-        <!-- 特別天氣警告標籤容器 (香港直接顯示，海外轉為官方外鏈按鈕) -->
-        <div id="warnContainer" class="max-w-[480px] truncate">
-          <!-- 由 JS 動態渲染 Badge 或 Anchor -->
+        <!-- 特別天氣警告標籤容器 (香港為文字，海外為安全直連按鈕) -->
+        <div id="warnBadgeContainer" class="max-w-[360px] truncate">
+          <div id="warnBadge" class="bg-black text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 rounded-sm max-w-full truncate">
+            <i id="warnIcon" class="fa-solid fa-shield-halved shrink-0 text-xs"></i>
+            <span id="warnText" class="truncate font-black font-fluid-label">現在並沒有任何警告信號</span>
+          </div>
         </div>
       </div>
       
-      <!-- 右側：進入「時鐘模式」的大按鈕與小型迷你時鐘膠囊 -->
-      <div class="flex flex-col items-end justify-center shrink-0 pl-2">
-        <button onclick="switchView('clock')" 
-                title="點擊進入全螢幕時鐘顯示模式"
-                class="ink-b bg-black text-white hover:bg-neutral-800 active:scale-95 transition-transform px-2.5 py-1.5 rounded-sm flex items-center gap-1.5 cursor-pointer shadow-sm">
-          <i class="fa-regular fa-clock text-sm"></i>
-          <span class="font-black font-fluid-label whitespace-nowrap">時鐘模式</span>
-          <span id="surfHeaderMiniClock" class="font-mono text-xs font-bold opacity-85 ml-0.5 hidden sm:inline">--:--</span>
+      <!-- 右側切換至全螢幕時鐘模式按鈕 -->
+      <div class="shrink-0 flex flex-col items-end justify-center pl-1">
+        <button onclick="switchToClockView()" class="ink-b bg-black text-white px-2.5 py-1 font-black font-fluid-label rounded-sm cursor-pointer hover:bg-neutral-800 flex items-center gap-1.5 shadow-sm active:scale-95 transition-transform" title="切換至全螢幕時鐘模式">
+          <i class="fa-regular fa-clock"></i>
+          <span>時鐘模式</span>
         </button>
       </div>
     </header>
 
-    <!-- 2. 實時氣候速報 (動態即時潮位狀態徽章) -->
+    <!-- 2. 實時氣候速報 (整合 P1：動態即時潮位狀態徽章) -->
     <section class="ink-b grid grid-cols-[0.85fr_1.1fr_0.85fr_0.75fr_2.7fr] text-center items-center py-1 bg-white shrink-0">
       <div class="ink-b-r px-0.5 min-w-0">
         <p class="font-fluid-label font-black uppercase">氣溫</p>
@@ -276,6 +259,7 @@
         <p id="uv" class="font-mono font-fluid-value font-black mt-0.5 leading-none">6</p>
       </div>
       <div class="px-1 min-w-0">
+        <!-- P1: 標題整合當前即時潮況徽章 -->
         <div class="flex items-center justify-center gap-1 font-fluid-label font-black">
           <span class="uppercase">潮汐</span>
           <span id="tideNowBadge" class="bg-black text-white text-[0.74rem] px-1.5 py-0.2 font-black rounded-sm leading-none whitespace-nowrap">計算中</span>
@@ -287,7 +271,7 @@
       </div>
     </section>
 
-    <!-- 3. 即時第一湧浪核心卡片 (無外框大氣設計，動態方位箭頭) -->
+    <!-- 3. 即時第一湧浪核心卡片 (P2 浪向旋轉箭頭 + 無外框大氣置中) -->
     <section class="py-1 px-2 bg-white shrink-0 flex flex-col justify-center items-center min-h-0">
       <div class="w-full max-w-[92%] sm:max-w-[82%] mx-auto grid grid-cols-12 items-center gap-3 sm:gap-6">
         <!-- 左側：湧浪數值主區 -->
@@ -304,14 +288,14 @@
           </div>
         </div>
         
-        <!-- 右側：指標列表 (週期、浪向旋轉箭頭、總浪) -->
+        <!-- 右側：指標列表 (P2 旋轉箭頭) -->
         <div class="col-span-5 pl-3 sm:pl-4 ink-b-l grid grid-rows-3 gap-y-1.5 h-full py-1 min-w-0 justify-center">
           <!-- 週期 -->
           <div class="grid grid-cols-[clamp(40px,6cqi,58px)_1fr] items-center gap-x-2 min-w-0">
             <span class="font-fluid-label font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight rounded-sm">週期</span>
             <span id="cs_pd" class="font-mono font-fluid-value font-black text-right leading-none truncate">7s</span>
           </div>
-          <!-- 浪向 (旋轉箭頭) -->
+          <!-- 浪向 (P2 旋轉箭頭) -->
           <div class="grid grid-cols-[clamp(40px,6cqi,58px)_1fr] items-center gap-x-2 min-w-0">
             <span class="font-fluid-label font-black bg-black text-white py-0.5 text-center shrink-0 leading-tight rounded-sm">浪向</span>
             <div class="flex items-center justify-end gap-1 min-w-0 leading-none">
@@ -328,7 +312,7 @@
       </div>
     </section>
 
-    <!-- 4. 未來 5 天第一湧浪深度趨勢統計 (去雜線純留白版) -->
+    <!-- 4. 未來 5 天第一湧浪深度趨勢統計 (P5 去雜線純留白版) -->
     <section class="flex flex-col justify-center min-h-0 py-0.5 shrink-0">
       <div class="flex justify-between items-center ink-b-b pb-0.5 mb-1 shrink-0">
         <span class="font-fluid-label font-black tracking-wider flex items-center gap-1.5">
@@ -339,8 +323,6 @@
           ≥1.5m 滿浪圖 <i class="fa-solid fa-water text-[10px]"></i>
         </span>
       </div>
-      
-      <!-- 5 天趨勢卡片網格 -->
       <div class="stats-grid" id="cs_stats">
         <div class="col-span-5 text-center py-2 font-mono font-bold text-xs">載入 5 天湧浪數據中...</div>
       </div>
@@ -351,93 +333,203 @@
       <div class="flex justify-between items-center mb-0.5">
         <span id="forecastTitle" class="font-fluid-label font-black tracking-wider">HKO 5-DAY FORECAST (香港天文台五日預測)</span>
       </div>
-      <div class="f-mini-grid" id="f_mini">
-        <!-- 由 JS 動態產生 -->
-      </div>
+      <div class="f-mini-grid" id="f_mini"></div>
     </section>
 
-    <!-- 6. 頁尾：浪點座標與更新時間戳 -->
+    <!-- 6. 頁尾：浪點資訊與更新時間 -->
     <footer class="flex justify-between items-center font-fluid-footer font-mono font-bold px-0.5 shrink-0 ink-b-t pt-1 pb-0.5">
       <span class="truncate max-w-[65%]" id="footerSpotDesc">熱點: 下長沙 (22.2312°N, 113.9472°E) · 香港天文台</span>
       <span id="lastUpdated" class="shrink-0 ml-1">UPDATED: --:--:--</span>
     </footer>
-
   </main>
 
-
   <!-- ========================================================= -->
-  <!-- 視圖二：專屬極簡沉浸式全螢幕時鐘模式 (FULLSCREEN CLOCK VIEW) -->
+  <!-- 檢視畫面 B：全螢幕極簡電子時鐘模式 (AMBIENT CLOCK VIEW)      -->
   <!-- ========================================================= -->
-  <section id="clockView" class="mode-view hidden-view">
-    
-    <!-- 時鐘頂部控制條：快速返回按鈕、浪況膠囊與反色/刷新切換 -->
-    <div class="flex justify-between items-center shrink-0 pt-0.5 pb-1 ink-b-b">
-      <button onclick="switchView('surf')" 
-              class="ink-b bg-black text-white hover:bg-neutral-800 active:scale-95 transition-transform px-3 py-1 font-black text-xs rounded-sm flex items-center gap-1.5 cursor-pointer shadow-sm"
-              title="返回衝浪浪況看板">
+  <main id="clockView" class="hidden flex-col justify-between h-full w-full py-2">
+    <!-- 時鐘頂部控制列 -->
+    <header class="flex justify-between items-center w-full px-1">
+      <button onclick="switchToSurfView()" class="ink-b bg-white text-black px-2.5 py-1 font-black font-fluid-label rounded-sm cursor-pointer hover:bg-neutral-100 flex items-center gap-1.5 shadow-sm active:scale-95 transition-transform">
         <i class="fa-solid fa-water"></i>
-        <span>看浪況看板</span>
-        <span class="text-[10px] opacity-75">◀</span>
+        <span>返回浪況看板 ◀</span>
       </button>
 
-      <!-- 當前浪點與湧浪狀態膠囊提示 -->
-      <div class="clock-pill bg-neutral-100 text-black px-2.5 py-0.5 rounded-full font-bold text-xs flex items-center gap-1.5 truncate max-w-[200px] sm:max-w-none">
-        <span id="ambientSpotName" class="font-black">下長沙</span>
-        <span class="opacity-40">|</span>
-        <span id="ambientSpotSwell" class="font-mono font-black">0.8m</span>
-        <span id="ambientTideBadge" class="bg-black text-white text-[10px] px-1 rounded-sm leading-tight">漲潮中</span>
-      </div>
-
-      <div class="flex items-center gap-1">
-        <button onclick="toggleTheme()" title="反色切換" class="ink-b px-2 py-0.5 font-bold text-xs rounded-sm cursor-pointer active:bg-black active:text-white">
+      <!-- 鬧鐘狀態按鈕與設定呼出 -->
+      <div class="flex items-center gap-2">
+        <button id="alarmClockBtn" onclick="openAlarmSettings()" class="ink-b bg-neutral-100 text-black px-2 py-0.5 font-black text-xs rounded-sm cursor-pointer flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-all">
+          <i id="alarmBellIcon" class="fa-regular fa-bell"></i>
+          <span id="alarmStatusText">鬧鐘關閉</span>
+        </button>
+        <button onclick="toggleTheme()" class="ink-b px-2 py-0.5 font-black text-xs rounded-sm cursor-pointer hover:bg-neutral-100" title="反色切換">
           <i class="fa-solid fa-circle-half-stroke"></i>
         </button>
       </div>
-    </div>
+    </header>
 
-    <!-- 時鐘中央核心展示區 (100% 絕對水平垂直置中) -->
-    <div class="flex-grow flex flex-col justify-center items-center text-center my-auto py-2 w-full">
-      <!-- AM / PM 標籤 (居中膠囊，不再將時間數字推向右側) -->
-      <div class="flex items-center justify-center mb-1 sm:mb-2">
-        <span id="ambientAmPm" class="font-mono font-black tracking-widest text-xs sm:text-sm px-3 py-0.5 bg-black text-white rounded-full leading-none">AM</span>
+    <!-- 時鐘核心數字區 (嚴格 100% 水平絕對置中) -->
+    <section class="flex flex-col items-center justify-center my-auto w-full text-center">
+      <!-- 置中 AM/PM 膠囊 -->
+      <div class="mb-2">
+        <span id="ambientAmPm" class="bg-black text-white px-3 py-0.5 font-mono font-black text-sm sm:text-base tracking-widest rounded-sm">
+          AM
+        </span>
       </div>
 
-      <!-- 時間核心數字 (絕對水平居中) -->
-      <div class="w-full flex items-center justify-center text-center leading-none">
-        <span id="ambientTime" class="font-mono font-black tracking-tighter leading-none inline-block text-center" style="font-size: var(--fs-ambient-clock);">--:--</span>
+      <!-- 特大置中時間 (時:分) -->
+      <div class="w-full text-center">
+        <span id="ambientClock" class="font-mono font-black tracking-tighter text-center inline-block leading-none" style="font-size: clamp(4.4rem, 16vw, 9.5rem);">
+          --:--
+        </span>
       </div>
 
-      <!-- 秒數極簡進度線 (完全居中) -->
-      <div class="w-48 sm:w-64 h-1 bg-neutral-200 mt-3 sm:mt-5 rounded-full overflow-hidden mx-auto">
-        <div id="ambientSecondBar" class="h-full bg-black transition-all duration-300" style="width: 0%;"></div>
+      <!-- 秒數極簡進度條 -->
+      <div class="w-48 sm:w-64 h-1.5 bg-neutral-200 mt-4 mx-auto rounded-full overflow-hidden ink-b">
+        <div id="secondProgressBar" class="h-full bg-black transition-all duration-300 w-0"></div>
       </div>
 
-      <!-- 日期、農曆/星期與天氣摘要 (嚴格全面置中) -->
-      <div class="mt-4 sm:mt-6 flex flex-col items-center justify-center text-center w-full gap-1.5">
-        <div class="font-black tracking-tight text-center flex items-center justify-center flex-wrap gap-2" style="font-size: var(--fs-ambient-date);">
-          <span id="ambientDate">----年--月--日</span>
-          <span id="ambientWkday" class="border-b-2 border-black pb-0.5">星期-</span>
+      <!-- 置中日期與星期 -->
+      <div class="flex justify-center items-center gap-2 mt-4 font-black text-base sm:text-xl tracking-tight">
+        <span id="ambientDate">----/--/--</span>
+        <span class="text-neutral-400">·</span>
+        <span id="ambientWkday" class="border-b-2 border-black">星期-</span>
+      </div>
+
+      <!-- 當前浪況速報膠囊摘要 (置中，預設無波浪圖案，待超過 1.5m 時動態注入) -->
+      <div class="mt-4">
+        <div id="ambientSpotSummary" class="ink-b inline-flex items-center gap-1.5 px-3 py-1 font-black text-xs sm:text-sm bg-neutral-50 rounded-sm">
+          <span>下長沙 · 第一湧浪 0.8m · 潮汐計算中</span>
         </div>
-        <div id="ambientWeatherSummary" class="text-xs sm:text-sm font-bold opacity-85 mt-1 text-center w-full max-w-[90%] mx-auto truncate">
-          載入天氣中...
-        </div>
       </div>
-    </div>
+    </section>
 
-    <!-- 時鐘底部指引：全居中對齊指引 -->
-    <footer class="shrink-0 text-center ink-b-t pt-2 pb-1 flex flex-col sm:flex-row justify-center items-center gap-1 sm:gap-3 font-mono text-[10px] font-bold opacity-80">
-      <button onclick="switchView('surf')" class="underline hover:opacity-100 font-black text-xs cursor-pointer">
-        [ 按此進入浪況資訊看板 ]
-      </button>
-      <span class="opacity-75">· 左右滑動或按 C 鍵切換模式 ·</span>
+    <!-- 時鐘底部指引 -->
+    <footer class="text-center font-mono font-bold text-xs opacity-75 pb-1">
+      <span onclick="switchToSurfView()" class="cursor-pointer hover:underline">
+        [ 點擊此處或左右滑動螢幕返回浪況看板 ]
+      </span>
     </footer>
+  </main>
 
-  </section>
+  <!-- ========================================================= -->
+  <!-- 鬧鐘設定彈窗 (ALARM SETTINGS MODAL)                        -->
+  <!-- ========================================================= -->
+  <div id="alarmModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="alarm-modal-box ink-b bg-white text-black w-full max-w-sm p-4 rounded-sm shadow-2xl flex flex-col gap-3">
+      <!-- 彈窗頂部 -->
+      <div class="flex justify-between items-center ink-b-b pb-2">
+        <span class="font-black text-sm flex items-center gap-2">
+          <i class="fa-solid fa-bell"></i>
+          <span>晨曦醒腦鬧鐘設定</span>
+        </span>
+        <button onclick="closeAlarmSettings()" class="font-black text-base px-2 hover:opacity-75 cursor-pointer">✕</button>
+      </div>
+
+      <!-- 開關 -->
+      <div class="flex items-center justify-between py-1">
+        <span class="font-black text-xs">啟用此鬧鐘</span>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="alarmEnableToggle" class="sr-only peer" onchange="toggleAlarmEnabled(this.checked)">
+          <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
+        </label>
+      </div>
+
+      <!-- 時間選擇 (時、分、AM/PM) -->
+      <div class="grid grid-cols-3 gap-2 text-center py-1">
+        <div>
+          <label class="block text-[10px] font-black uppercase text-neutral-500 mb-1">小時 (Hour)</label>
+          <select id="alarmHourSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-mono font-black text-center text-sm bg-white cursor-pointer"></select>
+        </div>
+        <div>
+          <label class="block text-[10px] font-black uppercase text-neutral-500 mb-1">分鐘 (Min)</label>
+          <select id="alarmMinuteSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-mono font-black text-center text-sm bg-white cursor-pointer"></select>
+        </div>
+        <div>
+          <label class="block text-[10px] font-black uppercase text-neutral-500 mb-1">時段 (AM/PM)</label>
+          <select id="alarmAmPmSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-black text-center text-sm bg-white cursor-pointer">
+            <option value="AM">AM (上午)</option>
+            <option value="PM">PM (下午)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 重複頻率與貪睡設定 -->
+      <div class="grid grid-cols-2 gap-2 text-xs py-1">
+        <div>
+          <label class="block text-[10px] font-black uppercase text-neutral-500 mb-1">重複頻率</label>
+          <select id="alarmRepeatSelect" class="alarm-select w-full ink-b p-1 rounded-sm font-bold bg-white cursor-pointer">
+            <option value="daily">每天重複</option>
+            <option value="weekdays">僅工作日 (一至五)</option>
+            <option value="once">僅響一次</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[10px] font-black uppercase text-neutral-500 mb-1">貪睡時間 (Snooze)</label>
+          <select id="alarmSnoozeSelect" class="alarm-select w-full ink-b p-1 rounded-sm font-bold bg-white cursor-pointer">
+            <option value="5">5 分鐘</option>
+            <option value="9">9 分鐘</option>
+            <option value="15">15 分鐘</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 自然鈴聲選擇 (海浪、雀鳥、和弦) -->
+      <div class="py-1">
+        <label class="block text-[10px] font-black uppercase text-neutral-500 mb-1">喚醒鈴聲選擇</label>
+        <select id="alarmSoundSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-bold text-xs bg-white cursor-pointer">
+          <option value="ocean_birds">🌊 🐦 海浪伴隨晨鳥 (衝浪首選)</option>
+          <option value="ocean">🌊 純淨海浪潮水 (大自然白噪音)</option>
+          <option value="birds">🐦 清晨雀鳥啼鳴 (林間晨光)</option>
+          <option value="chime">🔔 悠揚晨曦和弦 (經典木琴音)</option>
+        </select>
+      </div>
+
+      <!-- 音效試聽與解鎖音訊 -->
+      <div class="flex items-center justify-between ink-b-t pt-2 mt-1">
+        <span class="text-[11px] font-bold opacity-80">原生自然合成 (無網絡延遲)</span>
+        <button onclick="testAlarmSound()" id="alarmTestBtn" class="ink-b text-xs px-2.5 py-1 font-black rounded-sm cursor-pointer hover:bg-neutral-100 flex items-center gap-1.5">
+          <i class="fa-solid fa-play text-[10px]"></i>
+          <span>試聽鈴聲</span>
+        </button>
+      </div>
+
+      <!-- 底部按鈕 -->
+      <div class="grid grid-cols-2 gap-2 pt-2 ink-b-t mt-1">
+        <button onclick="closeAlarmSettings()" class="ink-b py-1.5 font-black text-xs rounded-sm cursor-pointer hover:bg-neutral-100">取消</button>
+        <button onclick="saveAlarmSettings()" class="ink-b bg-black text-white py-1.5 font-black text-xs rounded-sm cursor-pointer hover:bg-neutral-800">保存設定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 鬧鐘響起全螢幕警示彈窗 (ALARM RINGING MODAL)                -->
+  <!-- ========================================================= -->
+  <div id="alarmRingingModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="alarm-ringing-card ink-b bg-white text-black p-6 rounded-sm max-w-sm w-full text-center shadow-2xl flex flex-col items-center gap-4">
+      <div class="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-2xl animate-bounce">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+      <div>
+        <h2 class="text-xl font-black">晨曦睇浪時間到了！</h2>
+        <p id="alarmRingingTimeText" class="font-mono text-3xl font-black my-2">06:30 AM</p>
+        <p class="text-xs font-bold text-neutral-600">已為你自動播放晨間自然鈴聲</p>
+      </div>
+      <div class="grid grid-cols-2 gap-3 w-full mt-2">
+        <button onclick="snoozeAlarm()" class="ink-b bg-neutral-100 text-black py-3 font-black text-sm rounded-sm cursor-pointer hover:bg-neutral-200">
+          貪睡 (Snooze)
+        </button>
+        <button onclick="dismissAlarm()" class="ink-b bg-black text-white py-3 font-black text-sm rounded-sm cursor-pointer hover:bg-neutral-800">
+          關閉鬧鐘
+        </button>
+      </div>
+    </div>
+  </div>
 
 </div>
 
 <script>
-  // 0. 全球衝浪熱點配置（以各國官方氣象局為標準）
+  // =========================================================
+  // 0. 全球熱點配置與在地化氣象機構
+  // =========================================================
   const SURF_SPOTS = [
     {
       id: 'cheung_sha',
@@ -450,9 +542,7 @@
       lon: 113.9472,
       tideStation: '石壁 / 芝麻灣',
       tideOffsetHours: 0,
-      timezone: 'Asia/Hong_Kong',
-      hasOfficialApi: true,
-      officialWarningUrl: 'https://www.hko.gov.hk/tc/wxinfo/currwx/flw.htm'
+      timezone: 'Asia/Hong_Kong'
     },
     {
       id: 'hk_big_wave_bay',
@@ -465,9 +555,7 @@
       lon: 114.2492,
       tideStation: '橫瀾島 / 鰂魚涌',
       tideOffsetHours: -0.5,
-      timezone: 'Asia/Hong_Kong',
-      hasOfficialApi: true,
-      officialWarningUrl: 'https://www.hko.gov.hk/tc/wxinfo/currwx/flw.htm'
+      timezone: 'Asia/Hong_Kong'
     },
     {
       id: 'sk_tai_long_wan',
@@ -480,9 +568,7 @@
       lon: 114.3752,
       tideStation: '塔門 / 橫瀾島',
       tideOffsetHours: -0.8,
-      timezone: 'Asia/Hong_Kong',
-      hasOfficialApi: true,
-      officialWarningUrl: 'https://www.hko.gov.hk/tc/wxinfo/currwx/flw.htm'
+      timezone: 'Asia/Hong_Kong'
     },
     {
       id: 'tw_wushi',
@@ -496,8 +582,7 @@
       tideStation: '頭城 / 烏石港',
       tideOffsetHours: -0.3,
       timezone: 'Asia/Taipei',
-      hasOfficialApi: false,
-      officialWarningUrl: 'https://www.cwa.gov.tw/V8/C/P/Warning/W26.html'
+      officialUrl: 'https://www.cwa.gov.tw/V8/C/P/Warning/W26.html'
     },
     {
       id: 'bali_kuta',
@@ -511,8 +596,7 @@
       tideStation: 'Benoa / Kuta',
       tideOffsetHours: 1.5,
       timezone: 'Asia/Makassar',
-      hasOfficialApi: false,
-      officialWarningUrl: 'https://maritim.bmkg.go.id/cuaca/perairan/selat-bali-bagian-selatan'
+      officialUrl: 'https://maritim.bmkg.go.id/cuaca/perairan/selat-bali-bagian-selatan'
     },
     {
       id: 'bali_uluwatu',
@@ -526,48 +610,38 @@
       tideStation: 'Padang Padang / Uluwatu',
       tideOffsetHours: 1.4,
       timezone: 'Asia/Makassar',
-      hasOfficialApi: false,
-      officialWarningUrl: 'https://bbmkg3.bmkg.go.id/prakiraan-cuaca-umum'
+      officialUrl: 'https://bbmkg3.bmkg.go.id/prakiraan-cuaca-umum'
     }
   ];
 
   let currentSpotIdx = 0;
-  let currentMode = 'surf'; // 'surf' 或 'clock'
+  let currentActiveView = 'surf'; // 'surf' | 'clock'
 
-  // 切換視圖模式：'surf' (衝浪看板) 或 'clock' (全螢幕時鐘)
-  function switchView(mode) {
-    currentMode = mode;
-    const surfEl = document.getElementById('surfView');
-    const clockEl = document.getElementById('clockView');
-    
-    if (mode === 'clock') {
-      surfEl.classList.add('hidden-view');
-      clockEl.classList.remove('hidden-view');
-      syncAmbientClockSwellBadge();
-    } else {
-      clockEl.classList.add('hidden-view');
-      surfEl.classList.remove('hidden-view');
+  // =========================================================
+  // 畫面切換控制 (View Switcher)
+  // =========================================================
+  function switchToClockView() {
+    currentActiveView = 'clock';
+    const surf = document.getElementById('surfView');
+    const clock = document.getElementById('clockView');
+    if (surf) surf.classList.add('hidden');
+    if (clock) {
+      clock.classList.remove('hidden');
+      clock.classList.add('flex');
     }
+    updateAmbientSpotSummary();
+    runClock();
   }
 
-  // 同步時鐘頁頂部的小膠囊數據
-  function syncAmbientClockSwellBadge() {
-    const spot = SURF_SPOTS[currentSpotIdx];
-    const nameEl = document.getElementById('ambientSpotName');
-    const swellEl = document.getElementById('ambientSpotSwell');
-    const csNowEl = document.getElementById('cs_now');
-    const tideBadgeEl = document.getElementById('tideNowBadge');
-    const ambientTideBadgeEl = document.getElementById('ambientTideBadge');
-    const weatherSummaryEl = document.getElementById('ambientWeatherSummary');
-    const tempEl = document.getElementById('temp');
-    const condEl = document.getElementById('cond');
-
-    if (nameEl) nameEl.innerText = spot.name;
-    if (swellEl && csNowEl) swellEl.innerText = csNowEl.innerText + 'm';
-    if (ambientTideBadgeEl && tideBadgeEl) ambientTideBadgeEl.innerText = tideBadgeEl.innerText;
-    if (weatherSummaryEl && tempEl && condEl) {
-      weatherSummaryEl.innerText = `${spot.name} · ${tempEl.innerText}°C · ${condEl.innerText}`;
+  function switchToSurfView() {
+    currentActiveView = 'surf';
+    const surf = document.getElementById('surfView');
+    const clock = document.getElementById('clockView');
+    if (clock) {
+      clock.classList.add('hidden');
+      clock.classList.remove('flex');
     }
+    if (surf) surf.classList.remove('hidden');
   }
 
   function switchSpot(index) {
@@ -613,11 +687,71 @@
         `<span class="spot-dot ${idx === currentSpotIdx ? 'active' : ''}" onclick="switchSpot(${idx})" title="${s.name} (${s.agency})"></span>`
       ).join('');
     }
-
-    syncAmbientClockSwellBadge();
   }
 
-  // 觸控滑動手勢：在時鐘模式下滑動會返回看板；看板模式下滑動切換浪點
+  function updateAmbientSpotSummary() {
+    const el = document.getElementById('ambientSpotSummary');
+    if (!el) return;
+    const spot = SURF_SPOTS[currentSpotIdx];
+    const swell = document.getElementById('cs_now')?.innerText || '0.8';
+    const swellVal = parseFloat(swell) || 0;
+    const temp = document.getElementById('temp')?.innerText || '28';
+    const tideBadge = document.getElementById('tideNowBadge')?.innerText || '潮汐計算中';
+    
+    // 僅在湧浪浪高達到或超過 1.5 米 (≥ 1.5m) 時才顯示波浪圖案
+    const waveIcon = swellVal >= 1.5 
+      ? '<i class="fa-solid fa-water text-xs shrink-0" title="浪高超過 1.5 米"></i>' 
+      : '';
+      
+    el.innerHTML = `${waveIcon}<span>${spot.name} · 湧浪 ${swell}m · ${tideBadge} · ${temp}°C</span>`;
+  }
+
+  // =========================================================
+  // 時鐘心跳迴圈與秒數進度條
+  // =========================================================
+  function runClock() {
+    const now = new Date();
+    const pad = (n) => n.toString().padStart(2, '0');
+    let hours = now.getHours();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const rawHours = hours;
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    
+    const timeStr = `${pad(hours)}:${pad(now.getMinutes())}`;
+    const dateStr = `${now.getFullYear()}/${pad(now.getMonth() + 1)}/${pad(now.getDate())}`;
+    const wkDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    const wkStr = wkDays[now.getDay()];
+
+    // 時鐘模式元素更新
+    const ambientClockEl = document.getElementById('ambientClock');
+    const ambientAmPmEl = document.getElementById('ambientAmPm');
+    const ambientDateEl = document.getElementById('ambientDate');
+    const ambientWkdayEl = document.getElementById('ambientWkday');
+    const progressBar = document.getElementById('secondProgressBar');
+
+    if (ambientClockEl) ambientClockEl.innerText = timeStr;
+    if (ambientAmPmEl) ambientAmPmEl.innerText = ampm;
+    if (ambientDateEl) ambientDateEl.innerText = dateStr;
+    if (ambientWkdayEl) ambientWkdayEl.innerText = wkStr;
+
+    if (progressBar) {
+      const sec = now.getSeconds();
+      const pct = (sec / 59) * 100;
+      progressBar.style.width = `${pct}%`;
+    }
+
+    // 檢查鬧鐘觸發
+    checkAlarmTrigger(now, rawHours, now.getMinutes(), now.getSeconds(), ampm);
+  }
+
+  setInterval(runClock, 1000);
+
+  function toggleTheme() {
+    document.body.classList.toggle('inverted');
+  }
+
+  // 觸控滑動手勢
   let touchStartX = 0;
   let touchStartY = 0;
   let touchStartTime = 0;
@@ -637,69 +771,421 @@
       const diffY = endY - touchStartY;
       const duration = Date.now() - touchStartTime;
 
-      if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY) * 1.2 && duration < 600) {
-        if (currentMode === 'clock') {
-          // 在時鐘模式下滑動，切換回看板
-          switchView('surf');
+      if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY) * 1.3 && duration < 600) {
+        if (currentActiveView === 'clock') {
+          switchToSurfView();
         } else {
-          // 在看板模式下滑動切換浪點
-          if (diffX > 0) {
-            nextSpot();
-          } else {
-            prevSpot();
-          }
+          if (diffX > 0) nextSpot();
+          else prevSpot();
         }
       }
     }, { passive: true });
   }
 
-  // 鍵盤支援：按 C 或 空格 切換時鐘/看板；左右箭頭切換浪點
+  // 鍵盤方向鍵與快捷鍵支援
   window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') nextSpot();
+    if (e.key === 'ArrowLeft') prevSpot();
     if (e.key === 'c' || e.key === 'C') {
-      switchView(currentMode === 'surf' ? 'clock' : 'surf');
-    }
-    if (currentMode === 'surf') {
-      if (e.key === 'ArrowRight') nextSpot();
-      if (e.key === 'ArrowLeft') prevSpot();
+      if (currentActiveView === 'clock') switchToSurfView();
+      else switchToClockView();
     }
   });
 
-  // 全時鐘驅動 (同時更新時鐘模式的特大時間與浪況頁的小時鐘)
-  function runClock() {
-    const now = new Date();
+  // =========================================================
+  // 鬧鐘設定與 Web Audio 原生大自然音效合成系統
+  // =========================================================
+  let alarmConfig = {
+    enabled: false,
+    hour: 6,
+    minute: 30,
+    ampm: 'AM',
+    repeat: 'daily',
+    snoozeMinutes: 5,
+    sound: 'ocean_birds'
+  };
+
+  let isAlarmRinging = false;
+  let audioContext = null;
+  let alarmAudioInterval = null;
+  let alarmSnoozeUntil = null;
+  let lastTriggeredMinuteKey = '';
+
+  function loadAlarmConfig() {
+    try {
+      const saved = localStorage.getItem('hk_surf_alarm_config');
+      if (saved) {
+        alarmConfig = Object.assign(alarmConfig, JSON.parse(saved));
+      }
+    } catch (e) {
+      console.warn('載入鬧鐘設定失敗:', e);
+    }
+    updateAlarmBadgeUI();
+  }
+
+  function saveAlarmConfigToStorage() {
+    try {
+      localStorage.setItem('hk_surf_alarm_config', JSON.stringify(alarmConfig));
+    } catch (e) {
+      console.warn('保存鬧鐘設定失敗:', e);
+    }
+    updateAlarmBadgeUI();
+  }
+
+  function updateAlarmBadgeUI() {
+    const btn = document.getElementById('alarmClockBtn');
+    const textEl = document.getElementById('alarmStatusText');
+    const iconEl = document.getElementById('alarmBellIcon');
+    if (!btn || !textEl || !iconEl) return;
+
     const pad = (n) => n.toString().padStart(2, '0');
-    let hours = now.getHours();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    const timeStr = `${pad(hours)}:${pad(now.getMinutes())}`;
-    const seconds = now.getSeconds();
-    
-    // 浪況頁頂部的微型時鐘
-    const miniClockEl = document.getElementById('surfHeaderMiniClock');
-    if (miniClockEl) miniClockEl.innerText = `${ampm} ${timeStr}`;
-
-    // 時鐘模式的核心特大時間
-    const ambAmPmEl = document.getElementById('ambientAmPm');
-    const ambTimeEl = document.getElementById('ambientTime');
-    const ambDateEl = document.getElementById('ambientDate');
-    const ambWkdayEl = document.getElementById('ambientWkday');
-    const ambSecBar = document.getElementById('ambientSecondBar');
-
-    if (ambAmPmEl) ambAmPmEl.innerText = ampm;
-    if (ambTimeEl) ambTimeEl.innerText = timeStr;
-    if (ambDateEl) ambDateEl.innerText = `${now.getFullYear()}年${pad(now.getMonth() + 1)}月${pad(now.getDate())}日`;
-    if (ambWkdayEl) ambWkdayEl.innerText = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][now.getDay()];
-    if (ambSecBar) ambSecBar.style.width = `${((seconds + 1) / 60) * 100}%`;
-  }
-  setInterval(runClock, 1000);
-  runClock();
-
-  function toggleTheme() {
-    document.body.classList.toggle('inverted');
+    if (alarmConfig.enabled) {
+      textEl.innerText = `${pad(alarmConfig.hour)}:${pad(alarmConfig.minute)} ${alarmConfig.ampm}`;
+      btn.className = "ink-b bg-black text-white px-2 py-0.5 font-black text-xs rounded-sm cursor-pointer flex items-center gap-1.5 shadow-sm";
+      iconEl.className = "fa-solid fa-bell";
+      btn.title = `鬧鐘已開啟：${textEl.innerText}`;
+    } else {
+      textEl.innerText = "鬧鐘關閉";
+      btn.className = "ink-b bg-neutral-100 text-black px-2 py-0.5 font-black text-xs rounded-sm cursor-pointer flex items-center gap-1.5 opacity-80 hover:opacity-100";
+      iconEl.className = "fa-regular fa-bell";
+      btn.title = "鬧鐘已關閉，點擊設定";
+    }
   }
 
-  // WMO 國際氣象代碼轉向量圖標與描述
+  function openAlarmSettings() {
+    initAudioContext();
+    const modal = document.getElementById('alarmModal');
+    const toggle = document.getElementById('alarmEnableToggle');
+    const hourSelect = document.getElementById('alarmHourSelect');
+    const minSelect = document.getElementById('alarmMinuteSelect');
+    const ampmSelect = document.getElementById('alarmAmPmSelect');
+    const repeatSelect = document.getElementById('alarmRepeatSelect');
+    const snoozeSelect = document.getElementById('alarmSnoozeSelect');
+    const soundSelect = document.getElementById('alarmSoundSelect');
+
+    if (modal) {
+      if (hourSelect && hourSelect.children.length === 0) {
+        for (let h = 1; h <= 12; h++) {
+          const opt = document.createElement('option');
+          opt.value = h;
+          opt.innerText = h.toString().padStart(2, '0');
+          hourSelect.appendChild(opt);
+        }
+      }
+      if (minSelect && minSelect.children.length === 0) {
+        for (let m = 0; m < 60; m++) {
+          const opt = document.createElement('option');
+          opt.value = m;
+          opt.innerText = m.toString().padStart(2, '0');
+          minSelect.appendChild(opt);
+        }
+      }
+
+      if (toggle) toggle.checked = !!alarmConfig.enabled;
+      if (hourSelect) hourSelect.value = alarmConfig.hour;
+      if (minSelect) minSelect.value = alarmConfig.minute;
+      if (ampmSelect) ampmSelect.value = alarmConfig.ampm;
+      if (repeatSelect) repeatSelect.value = alarmConfig.repeat;
+      if (snoozeSelect) snoozeSelect.value = alarmConfig.snoozeMinutes;
+      if (soundSelect) soundSelect.value = alarmConfig.sound || 'ocean_birds';
+
+      modal.classList.remove('hidden');
+    }
+  }
+
+  function closeAlarmSettings() {
+    stopAlarmSound();
+    const modal = document.getElementById('alarmModal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  function toggleAlarmEnabled(enabled) {
+    alarmConfig.enabled = enabled;
+  }
+
+  function saveAlarmSettings() {
+    const toggle = document.getElementById('alarmEnableToggle');
+    const hourSelect = document.getElementById('alarmHourSelect');
+    const minSelect = document.getElementById('alarmMinuteSelect');
+    const ampmSelect = document.getElementById('alarmAmPmSelect');
+    const repeatSelect = document.getElementById('alarmRepeatSelect');
+    const snoozeSelect = document.getElementById('alarmSnoozeSelect');
+    const soundSelect = document.getElementById('alarmSoundSelect');
+
+    if (toggle) alarmConfig.enabled = toggle.checked;
+    if (hourSelect) alarmConfig.hour = parseInt(hourSelect.value, 10);
+    if (minSelect) alarmConfig.minute = parseInt(minSelect.value, 10);
+    if (ampmSelect) alarmConfig.ampm = ampmSelect.value;
+    if (repeatSelect) alarmConfig.repeat = repeatSelect.value;
+    if (snoozeSelect) alarmConfig.snoozeMinutes = parseInt(snoozeSelect.value, 10);
+    if (soundSelect) alarmConfig.sound = soundSelect.value;
+
+    alarmSnoozeUntil = null;
+    saveAlarmConfigToStorage();
+    closeAlarmSettings();
+  }
+
+  // Web Audio 原生音訊解鎖與合成
+  function initAudioContext() {
+    if (!audioContext) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) audioContext = new AudioCtx();
+    }
+    if (audioContext && audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+  }
+
+  // 1. 生成海浪粉紅噪聲 (Pink Noise for Surf Ocean Waves)
+  let noiseBufferCache = null;
+  function getPinkNoiseBuffer(ctx) {
+    if (noiseBufferCache) return noiseBufferCache;
+    const bufferSize = ctx.sampleRate * 4.5;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = buffer.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.96900 * b2 + white * 0.1538520;
+      b3 = 0.86650 * b3 + white * 0.3104856;
+      b4 = 0.55000 * b4 + white * 0.5329522;
+      b5 = -0.7616 * b5 - white * 0.0168980;
+      output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.12;
+      b6 = white * 0.115926;
+    }
+    noiseBufferCache = buffer;
+    return buffer;
+  }
+
+  function playSingleOceanWave(startTime, waveDuration = 4.2) {
+    if (!audioContext) return;
+    try {
+      const noiseNode = audioContext.createBufferSource();
+      noiseNode.buffer = getPinkNoiseBuffer(audioContext);
+
+      const filter = audioContext.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.Q.value = 1.8;
+
+      const gain = audioContext.createGain();
+      const t0 = startTime;
+      const tPeak = startTime + (waveDuration * 0.38);
+      const tEnd = startTime + waveDuration;
+
+      filter.frequency.setValueAtTime(140, t0);
+      filter.frequency.exponentialRampToValueAtTime(750, tPeak);
+      filter.frequency.exponentialRampToValueAtTime(120, tEnd);
+
+      gain.gain.setValueAtTime(0.001, t0);
+      gain.gain.exponentialRampToValueAtTime(0.42, tPeak);
+      gain.gain.exponentialRampToValueAtTime(0.001, tEnd);
+
+      noiseNode.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioContext.destination);
+
+      noiseNode.start(t0);
+      noiseNode.stop(tEnd);
+    } catch (e) {
+      console.warn('海浪合成錯誤:', e);
+    }
+  }
+
+  // 2. 雀鳥啁啾 (FM sweep)
+  function playSingleBirdChirp(startTime, baseFreq = 3400) {
+    if (!audioContext) return;
+    try {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(baseFreq, startTime);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, startTime + 0.035);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.75, startTime + 0.075);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.25, startTime + 0.115);
+
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.18, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.14);
+
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.15);
+    } catch (e) {
+      console.warn('雀鳥合成錯誤:', e);
+    }
+  }
+
+  function playBirdSongPhrase(startTime) {
+    const freqs = [3200, 3850, 4400, 3600];
+    freqs.forEach((f, i) => {
+      playSingleBirdChirp(startTime + (i * 0.085), f);
+    });
+    setTimeout(() => {
+      if (!isAlarmRinging && !isTestingSound) return;
+      if (!audioContext) return;
+      const t = audioContext.currentTime;
+      [4200, 4800, 3900].forEach((f, i) => {
+        playSingleBirdChirp(t + (i * 0.09), f);
+      });
+    }, 450);
+  }
+
+  // 3. 晨曦五度和弦 (Chime)
+  function playMelodicChimeNote(frequency, startTime, duration, gainLevel = 0.25) {
+    if (!audioContext) return;
+    try {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(frequency, startTime);
+
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.exponentialRampToValueAtTime(gainLevel, startTime + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    } catch (err) {
+      console.warn('和弦合成錯誤:', err);
+    }
+  }
+
+  function playSingleChimeChord() {
+    if (!audioContext) return;
+    const now = audioContext.currentTime;
+    const notes = [523.25, 659.25, 783.99, 987.77, 1046.50];
+    notes.forEach((freq, idx) => {
+      playMelodicChimeNote(freq, now + (idx * 0.16), 1.2, 0.28);
+    });
+  }
+
+  function playSelectedSoundPattern() {
+    initAudioContext();
+    if (!audioContext) return;
+    const now = audioContext.currentTime;
+    const soundType = alarmConfig.sound || 'ocean_birds';
+
+    if (soundType === 'ocean') {
+      playSingleOceanWave(now, 4.0);
+    } else if (soundType === 'birds') {
+      playBirdSongPhrase(now);
+    } else if (soundType === 'chime') {
+      playSingleChimeChord();
+    } else {
+      playSingleOceanWave(now, 4.2);
+      playBirdSongPhrase(now + 1.2);
+    }
+  }
+
+  function startAlarmSoundLoop() {
+    stopAlarmSound();
+    playSelectedSoundPattern();
+    const intervalMs = (alarmConfig.sound === 'ocean' || alarmConfig.sound === 'ocean_birds') ? 4300 : 2800;
+    alarmAudioInterval = setInterval(playSelectedSoundPattern, intervalMs);
+  }
+
+  function stopAlarmSound() {
+    if (alarmAudioInterval) {
+      clearInterval(alarmAudioInterval);
+      alarmAudioInterval = null;
+    }
+  }
+
+  let isTestingSound = false;
+  function testAlarmSound() {
+    const btn = document.getElementById('alarmTestBtn');
+    const soundSelect = document.getElementById('alarmSoundSelect');
+    if (soundSelect) alarmConfig.sound = soundSelect.value;
+
+    initAudioContext();
+    if (!isTestingSound) {
+      isTestingSound = true;
+      if (btn) btn.innerHTML = `<i class="fa-solid fa-stop text-[10px]"></i> <span>停止試聽</span>`;
+      playSelectedSoundPattern();
+      const testDuration = (alarmConfig.sound === 'ocean' || alarmConfig.sound === 'ocean_birds') ? 4200 : 2200;
+      setTimeout(() => {
+        isTestingSound = false;
+        if (btn) btn.innerHTML = `<i class="fa-solid fa-play text-[10px]"></i> <span>試聽鈴聲</span>`;
+      }, testDuration);
+    } else {
+      isTestingSound = false;
+      stopAlarmSound();
+      if (btn) btn.innerHTML = `<i class="fa-solid fa-play text-[10px]"></i> <span>試聽鈴聲</span>`;
+    }
+  }
+
+  // 鬧鐘觸發與貪睡機制
+  function checkAlarmTrigger(now, rawHour, minute, second, ampm) {
+    if (!alarmConfig.enabled) return;
+    if (second !== 0) return;
+
+    if (alarmSnoozeUntil && now < alarmSnoozeUntil) return;
+
+    let target24Hour = alarmConfig.hour;
+    if (alarmConfig.ampm === 'PM' && target24Hour < 12) target24Hour += 12;
+    if (alarmConfig.ampm === 'AM' && target24Hour === 12) target24Hour = 0;
+
+    const currentMinuteKey = `${now.toDateString()}_${rawHour}:${minute}`;
+    if (currentMinuteKey === lastTriggeredMinuteKey) return;
+
+    const dayOfWeek = now.getDay();
+    if (alarmConfig.repeat === 'weekdays' && (dayOfWeek === 0 || dayOfWeek === 6)) return;
+
+    if (rawHour === target24Hour && minute === alarmConfig.minute) {
+      lastTriggeredMinuteKey = currentMinuteKey;
+      triggerAlarmRinging();
+    }
+  }
+
+  function triggerAlarmRinging() {
+    isAlarmRinging = true;
+    startAlarmSoundLoop();
+
+    const ringingModal = document.getElementById('alarmRingingModal');
+    const timeText = document.getElementById('alarmRingingTimeText');
+    const pad = (n) => n.toString().padStart(2, '0');
+
+    if (timeText) {
+      timeText.innerText = `${pad(alarmConfig.hour)}:${pad(alarmConfig.minute)} ${alarmConfig.ampm}`;
+    }
+    if (ringingModal) ringingModal.classList.remove('hidden');
+
+    if (alarmConfig.repeat === 'once') {
+      alarmConfig.enabled = false;
+      saveAlarmConfigToStorage();
+    }
+  }
+
+  function snoozeAlarm() {
+    isAlarmRinging = false;
+    stopAlarmSound();
+    const ringingModal = document.getElementById('alarmRingingModal');
+    if (ringingModal) ringingModal.classList.add('hidden');
+
+    const snoozeMins = alarmConfig.snoozeMinutes || 5;
+    alarmSnoozeUntil = new Date(Date.now() + snoozeMins * 60 * 1000);
+  }
+
+  function dismissAlarm() {
+    isAlarmRinging = false;
+    stopAlarmSound();
+    alarmSnoozeUntil = null;
+    const ringingModal = document.getElementById('alarmRingingModal');
+    if (ringingModal) ringingModal.classList.add('hidden');
+  }
+
+  // =========================================================
+  // 氣象、湧浪與潮汐數據獲取引擎
+  // =========================================================
   function getWmoWeatherInfo(code) {
     if (code === 0) return { icon: '<i class="fa-solid fa-sun" title="天晴"></i>', text: '天晴' };
     if ([1, 2].includes(code)) return { icon: '<i class="fa-solid fa-cloud-sun" title="大致天晴"></i>', text: '大致天晴' };
@@ -710,38 +1196,15 @@
     return { icon: '<i class="fa-solid fa-cloud-sun" title="晴朗"></i>', text: '晴朗' };
   }
 
-  // 渲染警告標籤：香港直接顯示官方文字，海外浪點顯示直連天文台超連結
-  function renderWarningBadge(htmlContent, isLink = false, linkUrl = '#', linkTitle = '') {
-    const warnBox = document.getElementById('warnContainer');
-    if (!warnBox) return;
-
-    if (isLink) {
-      warnBox.innerHTML = `
-        <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" 
-           title="${linkTitle}"
-           class="warn-link bg-black text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 max-w-[340px] truncate rounded-sm ink-b">
-          <i class="fa-solid fa-triangle-exclamation text-xs shrink-0"></i>
-          <span class="truncate font-black font-fluid-label">${htmlContent}</span>
-          <i class="fa-solid fa-arrow-up-right-from-square text-[10px] shrink-0 opacity-80"></i>
-        </a>`;
-    } else {
-      warnBox.innerHTML = `
-        <div class="bg-black text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 max-w-[340px] truncate rounded-sm ink-b">
-          <i class="fa-solid fa-shield-halved text-xs shrink-0"></i>
-          <span class="truncate font-black font-fluid-label">${htmlContent}</span>
-        </div>`;
-    }
-  }
-
-  // 根據浪點加載實時天氣與官方警報
   async function loadWeatherAndWarnings() {
     const spot = SURF_SPOTS[currentSpotIdx];
+    const container = document.getElementById('warnBadgeContainer');
     const tempEl = document.getElementById('temp');
     const humiEl = document.getElementById('humi');
     const uvEl = document.getElementById('uv');
     const condEl = document.getElementById('cond');
 
-    // 1. 香港浪點：香港天文台 (HKO) 官方 API 直連
+    // 1. 香港熱點：香港天文台 (HKO) 官方標準
     if (spot.agency === 'HKO') {
       try {
         const res = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=rhrread&lang=tc');
@@ -761,7 +1224,7 @@
 
       try {
         const wRes = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warnsum&lang=tc');
-        if (wRes.ok) {
+        if (wRes.ok && container) {
           const wData = await wRes.json();
           const keys = Object.keys(wData);
           if (keys.length > 0) {
@@ -786,35 +1249,47 @@
               .filter(k => k !== 'WTS' && wData[k]?.code !== 'WTS')
               .map(k => {
                 const item = wData[k];
-                const code = item.code || '';
-                return WARN_NAMES[code] || item.type || item.name || '特別天氣警告';
+                return WARN_NAMES[item.code] || item.type || item.name || '特別天氣警告';
               });
 
             const boltIcon = '<i class="fa-solid fa-bolt text-[10px] text-white"></i>';
-
+            let displayText = '現在並沒有任何警告信號';
             if (otherWarnings.length > 0) {
               const textPart = otherWarnings.slice(0, 2).join(' · ');
-              renderWarningBadge(hasThunderstorm ? `${textPart} ${boltIcon}` : textPart, false);
+              displayText = hasThunderstorm ? `${textPart} ${boltIcon}` : textPart;
             } else if (hasThunderstorm) {
-              renderWarningBadge(`${boltIcon} 雷暴生效中`, false);
-            } else {
-              renderWarningBadge('現在並沒有任何警告信號', false);
+              displayText = `${boltIcon} 雷暴生效中`;
             }
+
+            container.innerHTML = `
+              <div id="warnBadge" class="bg-black text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 rounded-sm max-w-full truncate">
+                <i class="fa-solid fa-triangle-exclamation shrink-0 text-xs"></i>
+                <span class="truncate font-black font-fluid-label">${displayText}</span>
+              </div>`;
           } else {
-            renderWarningBadge('現在並沒有任何警告信號', false);
+            container.innerHTML = `
+              <div id="warnBadge" class="bg-black text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 rounded-sm max-w-full truncate">
+                <i class="fa-solid fa-shield-halved shrink-0 text-xs"></i>
+                <span class="truncate font-black font-fluid-label">現在並沒有任何警告信號</span>
+              </div>`;
           }
         }
       } catch (e) {
-        renderWarningBadge('現在並沒有任何警告信號', false);
+        if (container) {
+          container.innerHTML = `
+            <div id="warnBadge" class="bg-black text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 rounded-sm max-w-full truncate">
+              <i class="fa-solid fa-shield-halved shrink-0 text-xs"></i>
+              <span class="truncate font-black font-fluid-label">現在並沒有任何警告信號</span>
+            </div>`;
+        }
       }
-      syncAmbientClockSwellBadge();
       return;
     }
 
-    // 2. 海外浪點（台灣 CWA、印尼 BMKG 等）：Open-Meteo 獲取天氣，警報轉為官方直連按鈕
+    // 2. 海外熱點 (台灣 CWA、印尼 BMKG)
     try {
-      const tz = spot.timezone || 'auto';
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}&current=temperature_2m,relative_humidity_2m,weather_code,uv_index,wind_speed_10m&timezone=${encodeURIComponent(tz)}`;
+      const tz = spot.timezone ? encodeURIComponent(spot.timezone) : 'auto';
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${spot.lat}&longitude=${spot.lon}&current=temperature_2m,relative_humidity_2m,weather_code,uv_index&timezone=${tz}`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
@@ -826,18 +1301,19 @@
         }
       }
     } catch (e) {
-      console.warn('Regional weather API fallback:', e);
+      console.warn('海外實時天氣獲取失敗:', e);
     }
 
-    const agencyLabel = spot.agency === 'CWA' ? '中央氣象署' : '印尼 BMKG';
-    const warningPrompt = `海外浪點無法直連警報 · 查閱${agencyLabel}`;
-    renderWarningBadge(
-      warningPrompt, 
-      true, 
-      spot.officialWarningUrl, 
-      `點此前往 ${spot.agencyName} 官方網站查看最新警特報`
-    );
-    syncAmbientClockSwellBadge();
+    if (container) {
+      const agencyShort = (spot.agency === 'CWA') ? '中央氣象署' : '印尼 BMKG';
+      const targetUrl = spot.officialUrl || '#';
+      container.innerHTML = `
+        <a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="bg-black text-white px-2 py-0.5 font-black inline-flex items-center gap-1.5 rounded-sm max-w-full truncate hover:opacity-80 transition-opacity" title="點擊前往 ${spot.agencyName} 官方即時警特報網站手動查閱">
+          <i class="fa-solid fa-triangle-exclamation shrink-0 text-xs"></i>
+          <span class="truncate font-black font-fluid-label">海外浪點無法直連警報 · 查閱${agencyShort}</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[9px] shrink-0 ml-0.5"></i>
+        </a>`;
+    }
   }
 
   function getWeatherIcon(desc, iconCode) {
@@ -922,31 +1398,9 @@
         console.warn('Regional forecast API fallback:', e);
       }
     }
-    renderFallbackForecast();
   }
 
-  function renderFallbackForecast() {
-    const container = document.getElementById('f_mini');
-    if (!container) return;
-    container.innerHTML = '';
-    const fallbackList = [
-      { d: '今', icon: '<i class="fa-solid fa-sun"></i>', temp: '26-31°' },
-      { d: '明', icon: '<i class="fa-solid fa-cloud-sun"></i>', temp: '26-31°' },
-      { d: 'D3', icon: '<i class="fa-solid fa-cloud-showers-heavy"></i>', temp: '25-29°' },
-      { d: 'D4', icon: '<i class="fa-solid fa-cloud"></i>', temp: '25-30°' },
-      { d: 'D5', icon: '<i class="fa-solid fa-sun"></i>', temp: '26-31°' }
-    ];
-    fallbackList.forEach((item, i) => {
-      container.innerHTML += `
-        <div class="f-mini-cell ${i === 0 ? 'active-f' : ''}">
-          <div class="font-fluid-forecast font-black">${item.d}</div>
-          <div class="my-0.5 font-fluid-forecast flex items-center justify-center h-[1.3em]">${item.icon}</div>
-          <div class="font-mono font-fluid-footer font-black tracking-tighter truncate">${item.temp}</div>
-        </div>`;
-    });
-  }
-
-  // 計算全日潮時與即時潮況趨勢
+  // 潮位預報與即時潮況走向 (P1)
   function loadTideTimes() {
     const now = new Date();
     const pad = (n) => n.toString().padStart(2, '0');
@@ -957,7 +1411,7 @@
     const moonAge = (diffDays % 29.53058867 + 29.53058867) % 29.53058867;
     
     const period = 12.4206;
-    const baseHigh = ((moonAge * 0.84 + 8.6 + spot.tideOffsetHours) % period + period) % period;
+    const baseHigh = ((moonAge * 0.84 + 8.6 + (spot.tideOffsetHours || 0)) % period + period) % period;
     
     const events = [];
     for (let k = -2; k <= 3; k++) {
@@ -977,10 +1431,8 @@
       const diffHours = (nextEvent.time - nowFloat).toFixed(1);
       if (isRising) {
         badgeEl.innerHTML = `▲ 漲潮中 (${diffHours}h滿)`;
-        badgeEl.className = "bg-black text-white text-[0.74rem] px-1.5 py-0.2 font-black rounded-sm leading-none whitespace-nowrap";
       } else {
         badgeEl.innerHTML = `▼ 退潮中 (${diffHours}h乾)`;
-        badgeEl.className = "bg-black text-white text-[0.74rem] px-1.5 py-0.2 font-black rounded-sm leading-none whitespace-nowrap";
       }
     }
 
@@ -999,12 +1451,12 @@
     const tideEl = document.getElementById('tideTimes');
     if (tideEl) {
       tideEl.innerHTML = `<span class="block truncate">▲ ${highStr || '--:--'}</span><span class="block truncate">▼ ${lowStr || '--:--'}</span>`;
-      tideEl.title = `今日天文潮位預測：漲潮 ${highTides.map(formatTime).join(', ')} | 退潮 ${lowTides.map(formatTime).join(', ')}`;
     }
 
-    syncAmbientClockSwellBadge();
+    updateAmbientSpotSummary();
   }
 
+  // 浪向動態旋轉箭頭更新 (P2)
   function updateWaveDirectionUI(dirDegrees) {
     const arrowEl = document.getElementById('cs_dr_arrow');
     const dirEl = document.getElementById('cs_dr');
@@ -1018,7 +1470,7 @@
     dirEl.innerText = dirs[idx];
   }
 
-  // 獲取 5 天第一湧浪深度趨勢統計
+  // 湧浪深度趨勢統計
   async function loadSwellStats() {
     const spot = SURF_SPOTS[currentSpotIdx];
     const statsGrid = document.getElementById('cs_stats');
@@ -1029,16 +1481,20 @@
       
       if (res.ok) {
         const data = await res.json();
-        
         const curSwell = (typeof data.current?.swell_wave_height === 'number') ? data.current.swell_wave_height : 0.8;
         const curPeriod = (typeof data.current?.swell_wave_period === 'number') ? Math.round(data.current.swell_wave_period) : 7;
         const curDir = (typeof data.current?.swell_wave_direction === 'number') ? data.current.swell_wave_direction : 180;
         const curTotal = (typeof data.current?.wave_height === 'number') ? data.current.wave_height : 1.0;
 
-        document.getElementById('cs_now').innerText = curSwell.toFixed(1);
-        document.getElementById('cs_now_ft').innerText = `(${(curSwell * 3.28).toFixed(1)}呎)`;
-        document.getElementById('cs_pd').innerText = curPeriod + 's';
-        document.getElementById('cs_total').innerText = curTotal.toFixed(1) + 'm';
+        const nowEl = document.getElementById('cs_now');
+        const ftEl = document.getElementById('cs_now_ft');
+        const pdEl = document.getElementById('cs_pd');
+        const totalEl = document.getElementById('cs_total');
+
+        if (nowEl) nowEl.innerText = curSwell.toFixed(1);
+        if (ftEl) ftEl.innerText = `(${(curSwell * 3.28).toFixed(1)}呎)`;
+        if (pdEl) pdEl.innerText = curPeriod + 's';
+        if (totalEl) totalEl.innerText = curTotal.toFixed(1) + 'm';
         
         updateWaveDirectionUI(curDir);
 
@@ -1097,67 +1553,15 @@
               </div>`;
           }
         }
-        syncAmbientClockSwellBadge();
+        updateAmbientSpotSummary();
         return;
       }
     } catch (e) {
       console.warn('Swell stats fallback for spot:', spot.name, e);
     }
-    
-    renderFallbackSwellStats();
   }
 
-  function renderFallbackSwellStats() {
-    const statsGrid = document.getElementById('cs_stats');
-    if (!statsGrid) return;
-    statsGrid.innerHTML = '';
-    
-    const spot = SURF_SPOTS[currentSpotIdx];
-    const isEastCoast = currentSpotIdx > 0;
-    const baseAvg = isEastCoast ? '1.1' : '0.8';
-    const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
-    const baseDate = new Date();
-
-    const fallbackData = [
-      { avg: baseAvg, min: '0.6', max: '1.2', pd: 7, active: true },
-      { avg: isEastCoast ? '1.5' : '1.0', min: '0.8', max: '1.6', pd: 8, active: false },
-      { avg: isEastCoast ? '1.6' : '1.2', min: '1.0', max: '1.8', pd: 9, active: false },
-      { avg: '0.7', min: '0.5', max: '0.9', pd: 6, active: false },
-      { avg: '0.6', min: '0.4', max: '0.8', pd: 6, active: false }
-    ];
-
-    updateWaveDirectionUI(180);
-
-    fallbackData.forEach((item, day) => {
-      const targetDate = new Date(baseDate);
-      targetDate.setDate(baseDate.getDate() + day);
-      const m = targetDate.getMonth() + 1;
-      const d = targetDate.getDate();
-      const wk = weekDays[targetDate.getDay()];
-
-      const isFullSwell = parseFloat(item.avg) >= 1.5;
-      const waveVisual = isFullSwell
-        ? `<i class="fa-solid fa-water text-xs leading-none" title="滿格浪況 (≥1.5m)"></i>`
-        : '';
-
-      statsGrid.innerHTML += `
-        <div class="stats-cell ${item.active ? 'active-day' : ''}">
-          <div class="font-fluid-label font-black leading-tight pt-0.5 truncate w-full text-center">
-            ${m}/${d}(${wk})
-          </div>
-          <div class="w-full flex items-center justify-center h-3 my-0.5">
-            ${waveVisual}
-          </div>
-          <div class="font-mono font-fluid-value font-black leading-none my-0.5 text-base sm:text-xl">
-            ${item.avg}<span class="font-fluid-footer font-black ml-0.5">m</span>
-          </div>
-          <div class="font-fluid-footer font-mono font-black leading-tight truncate">${item.min}-${item.max}m</div>
-          <div class="font-fluid-footer font-mono font-black border-t-2 ${item.active ? 'border-white' : 'border-black'} border-solid w-full pt-1 mt-0.5 leading-none truncate text-[0.8rem] sm:text-[0.95rem]">${item.pd}s</div>
-        </div>`;
-    });
-    syncAmbientClockSwellBadge();
-  }
-
+  // 手動或定時數據全量刷新
   async function fetchAllData() {
     const icon = document.getElementById('syncIcon');
     if (icon) icon.classList.add('fa-spin');
@@ -1179,26 +1583,22 @@
     if (icon) setTimeout(() => icon.classList.remove('fa-spin'), 500);
   }
 
-  // 墨水屏防殘影：每 30 分鐘自動快閃反色一次
+  // 墨水屏防殘影：每 30 分鐘自動快閃反色
   function triggerAutoInversion() {
     const wasInverted = document.body.classList.contains('inverted');
-    if (!wasInverted) {
-      document.body.classList.add('inverted');
-    } else {
-      document.body.classList.remove('inverted');
-    }
+    if (!wasInverted) document.body.classList.add('inverted');
+    else document.body.classList.remove('inverted');
 
     setTimeout(() => {
-      if (!wasInverted) {
-        document.body.classList.remove('inverted');
-      } else {
-        document.body.classList.add('inverted');
-      }
+      if (!wasInverted) document.body.classList.remove('inverted');
+      else document.body.classList.add('inverted');
     }, 1200);
   }
 
   window.addEventListener('DOMContentLoaded', () => {
+    loadAlarmConfig();
     updateSpotUI();
+    runClock();
     fetchAllData();
     setInterval(fetchAllData, 15 * 60 * 1000);
     setInterval(triggerAutoInversion, 30 * 60 * 1000);
