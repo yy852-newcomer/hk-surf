@@ -89,7 +89,7 @@
     .ink-b-t { border-top: var(--border-thick) solid #000000; }
     .ink-b-l { border-left: var(--border-thick) solid #000000; }
 
-    /* 反色模式支援 (Night / Inverted E-Ink) */
+    /* 反色模式支援 (Night / Inverted E-Ink) - 純黑白對稱映射，徹底杜絕白底白字 */
     .inverted { background-color: #000000 !important; color: #ffffff !important; }
     .inverted .ink-b, .inverted .ink-b-b, .inverted .ink-b-r, .inverted .ink-b-t, .inverted .ink-b-l { border-color: #ffffff !important; }
     .inverted .bg-white { background-color: #000000 !important; color: #ffffff !important; }
@@ -98,14 +98,52 @@
     .inverted .text-white { color: #000000 !important; }
     .inverted .border-black { border-color: #ffffff !important; }
     .inverted .border-white { border-color: #000000 !important; }
+
+    /* 針對中性灰底與微白底的墨水屏補救 (防止反色時白底白字) */
+    .inverted .bg-neutral-50,
+    .inverted .bg-neutral-100,
+    .inverted .bg-neutral-200 {
+      background-color: #111111 !important;
+      color: #ffffff !important;
+      border-color: #ffffff !important;
+    }
+    .inverted .text-neutral-400,
+    .inverted .text-neutral-500,
+    .inverted .text-neutral-600 {
+      color: #cccccc !important;
+    }
+
+    /* 鬧鐘開關在反色模式下的專屬黑白翻轉 */
+    .inverted .alarm-toggle-box.toggle-off {
+      background-color: #000000 !important;
+      border-color: #ffffff !important;
+    }
+    .inverted .alarm-toggle-box.toggle-off .alarm-knob {
+      background-color: #ffffff !important;
+    }
+    .inverted .alarm-toggle-box.toggle-on {
+      background-color: #ffffff !important;
+      border-color: #ffffff !important;
+    }
+    .inverted .alarm-toggle-box.toggle-on .alarm-knob {
+      background-color: #000000 !important;
+    }
+
+    /* 鬧鐘彈窗與各項輸入框 */
+    .inverted .alarm-modal-box { background-color: #000000 !important; color: #ffffff !important; border-color: #ffffff !important; }
+    .inverted .alarm-select { background-color: #111111 !important; color: #ffffff !important; border-color: #ffffff !important; }
+    .inverted .alarm-ringing-card { background-color: #000000 !important; color: #ffffff !important; border-color: #ffffff !important; }
+
+    /* 時鐘秒數進度條 */
+    .inverted #secondProgressBar { background-color: #ffffff !important; }
+    .inverted .progress-track { background-color: #222222 !important; border-color: #ffffff !important; }
+
     .inverted .stats-cell { background-color: #111111 !important; color: #ffffff !important; }
     .inverted .stats-cell.active-day { background-color: #ffffff !important; color: #000000 !important; }
     .inverted .f-mini-cell { background-color: #111111 !important; color: #ffffff !important; }
     .inverted .f-mini-cell.active-f { background-color: #ffffff !important; color: #000000 !important; }
     .inverted .spot-dot.active { background-color: #ffffff !important; }
     .inverted .spot-dot { border-color: #ffffff !important; }
-    .inverted .alarm-modal-box { background-color: #000000 !important; color: #ffffff !important; border-color: #ffffff !important; }
-    .inverted .alarm-select { background-color: #111111 !important; color: #ffffff !important; border-color: #ffffff !important; }
 
     /* P5 優化：去雜線/純留白設計 */
     .stats-grid {
@@ -356,11 +394,11 @@
 
       <!-- 鬧鐘狀態按鈕與設定呼出 -->
       <div class="flex items-center gap-2">
-        <button id="alarmClockBtn" onclick="openAlarmSettings()" class="ink-b bg-neutral-100 text-black px-2 py-0.5 font-black text-xs rounded-sm cursor-pointer flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-all">
+        <button id="alarmClockBtn" onclick="openAlarmSettings()" class="ink-b bg-white text-black px-2.5 py-1 font-black text-xs rounded-sm cursor-pointer flex items-center gap-1.5 hover:opacity-80 transition-all">
           <i id="alarmBellIcon" class="fa-regular fa-bell"></i>
           <span id="alarmStatusText">鬧鐘關閉</span>
         </button>
-        <button onclick="toggleTheme()" class="ink-b px-2 py-0.5 font-black text-xs rounded-sm cursor-pointer hover:bg-neutral-100" title="反色切換">
+        <button onclick="toggleTheme()" class="ink-b bg-white text-black px-2.5 py-1 font-black text-xs rounded-sm cursor-pointer hover:opacity-80" title="反色切換">
           <i class="fa-solid fa-circle-half-stroke"></i>
         </button>
       </div>
@@ -383,20 +421,20 @@
       </div>
 
       <!-- 秒數極簡進度條 -->
-      <div class="w-48 sm:w-64 h-1.5 bg-neutral-200 mt-4 mx-auto rounded-full overflow-hidden ink-b">
-        <div id="secondProgressBar" class="h-full bg-black transition-all duration-300 w-0"></div>
+      <div class="w-48 sm:w-64 h-2 bg-white progress-track mt-4 mx-auto rounded-full overflow-hidden ink-b p-[1px]">
+        <div id="secondProgressBar" class="h-full bg-black transition-all duration-300 w-0 rounded-full"></div>
       </div>
 
       <!-- 置中日期與星期 -->
       <div class="flex justify-center items-center gap-2 mt-4 font-black text-base sm:text-xl tracking-tight">
         <span id="ambientDate">----/--/--</span>
-        <span class="text-neutral-400">·</span>
+        <span class="opacity-60">·</span>
         <span id="ambientWkday" class="border-b-2 border-black">星期-</span>
       </div>
 
-      <!-- 當前浪況速報膠囊摘要 (置中，預設無波浪圖案，待超過 1.5m 時動態注入) -->
+      <!-- 當前浪況速報膠囊摘要 (置中，高反差純黑白邊框) -->
       <div class="mt-4">
-        <div id="ambientSpotSummary" class="ink-b inline-flex items-center gap-1.5 px-3 py-1 font-black text-xs sm:text-sm bg-neutral-50 rounded-sm">
+        <div id="ambientSpotSummary" class="ink-b inline-flex items-center gap-1.5 px-3 py-1 font-black text-xs sm:text-sm bg-white text-black rounded-sm shadow-xs">
           <span>下長沙 · 第一湧浪 0.8m · 潮汐計算中</span>
         </div>
       </div>
@@ -424,28 +462,30 @@
         <button onclick="closeAlarmSettings()" class="font-black text-base px-2 hover:opacity-75 cursor-pointer">✕</button>
       </div>
 
-      <!-- 開關 -->
-      <div class="flex items-center justify-between py-1">
-        <span class="font-black text-xs">啟用此鬧鐘</span>
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" id="alarmEnableToggle" class="sr-only peer" onchange="toggleAlarmEnabled(this.checked)">
-          <div class="w-11 h-6 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
-        </label>
+      <!-- 墨水屏專用高反差實體按鍵式開關 (已移除冗餘提示文字，擴大按鈕空間) -->
+      <div class="flex items-center justify-between py-2.5 ink-b-b">
+        <span class="font-black text-sm block">啟用此鬧鐘</span>
+        <div class="flex items-center gap-3">
+          <span id="alarmToggleStateBadge" class="font-mono font-black text-xs sm:text-sm px-2.5 py-1 ink-b bg-white text-black rounded-sm select-none tracking-wider">OFF 關閉</span>
+          <button type="button" id="alarmToggleBtn" onclick="toggleAlarmEnabledClick()" class="alarm-toggle-box toggle-off ink-b w-16 h-8 rounded-full relative p-[2px] cursor-pointer bg-white transition-all flex items-center select-none" title="點擊切換鬧鐘開關">
+            <span id="alarmToggleKnob" class="alarm-knob w-6 h-6 rounded-full bg-black block transition-transform duration-200 translate-x-0"></span>
+          </button>
+        </div>
       </div>
 
       <!-- 時間選擇 (時、分、AM/PM) -->
       <div class="grid grid-cols-3 gap-2 text-center py-1">
         <div>
-          <label class="block text-[10px] font-black uppercase text-neutral-500 mb-1">小時 (Hour)</label>
-          <select id="alarmHourSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-mono font-black text-center text-sm bg-white cursor-pointer"></select>
+          <label class="block text-[10px] font-black uppercase mb-1">小時 (Hour)</label>
+          <select id="alarmHourSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-mono font-black text-center text-sm bg-white text-black cursor-pointer"></select>
         </div>
         <div>
-          <label class="block text-[10px] font-black uppercase text-neutral-500 mb-1">分鐘 (Min)</label>
-          <select id="alarmMinuteSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-mono font-black text-center text-sm bg-white cursor-pointer"></select>
+          <label class="block text-[10px] font-black uppercase mb-1">分鐘 (Min)</label>
+          <select id="alarmMinuteSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-mono font-black text-center text-sm bg-white text-black cursor-pointer"></select>
         </div>
         <div>
-          <label class="block text-[10px] font-black uppercase text-neutral-500 mb-1">時段 (AM/PM)</label>
-          <select id="alarmAmPmSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-black text-center text-sm bg-white cursor-pointer">
+          <label class="block text-[10px] font-black uppercase mb-1">時段 (AM/PM)</label>
+          <select id="alarmAmPmSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-black text-center text-sm bg-white text-black cursor-pointer">
             <option value="AM">AM (上午)</option>
             <option value="PM">PM (下午)</option>
           </select>
@@ -455,16 +495,16 @@
       <!-- 重複頻率與貪睡設定 -->
       <div class="grid grid-cols-2 gap-2 text-xs py-1">
         <div>
-          <label class="block text-[10px] font-black uppercase text-neutral-500 mb-1">重複頻率</label>
-          <select id="alarmRepeatSelect" class="alarm-select w-full ink-b p-1 rounded-sm font-bold bg-white cursor-pointer">
+          <label class="block text-[10px] font-black uppercase mb-1">重複頻率</label>
+          <select id="alarmRepeatSelect" class="alarm-select w-full ink-b p-1 rounded-sm font-bold bg-white text-black cursor-pointer">
             <option value="daily">每天重複</option>
             <option value="weekdays">僅工作日 (一至五)</option>
             <option value="once">僅響一次</option>
           </select>
         </div>
         <div>
-          <label class="block text-[10px] font-black uppercase text-neutral-500 mb-1">貪睡時間 (Snooze)</label>
-          <select id="alarmSnoozeSelect" class="alarm-select w-full ink-b p-1 rounded-sm font-bold bg-white cursor-pointer">
+          <label class="block text-[10px] font-black uppercase mb-1">貪睡時間 (Snooze)</label>
+          <select id="alarmSnoozeSelect" class="alarm-select w-full ink-b p-1 rounded-sm font-bold bg-white text-black cursor-pointer">
             <option value="5">5 分鐘</option>
             <option value="9">9 分鐘</option>
             <option value="15">15 分鐘</option>
@@ -474,8 +514,8 @@
 
       <!-- 自然鈴聲選擇 (海浪、雀鳥、和弦) -->
       <div class="py-1">
-        <label class="block text-[10px] font-black uppercase text-neutral-500 mb-1">喚醒鈴聲選擇</label>
-        <select id="alarmSoundSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-bold text-xs bg-white cursor-pointer">
+        <label class="block text-[10px] font-black uppercase mb-1">喚醒鈴聲選擇</label>
+        <select id="alarmSoundSelect" class="alarm-select w-full ink-b p-1.5 rounded-sm font-bold text-xs bg-white text-black cursor-pointer">
           <option value="ocean_birds">🌊 🐦 海浪伴隨晨鳥 (衝浪首選)</option>
           <option value="ocean">🌊 純淨海浪潮水 (大自然白噪音)</option>
           <option value="birds">🐦 清晨雀鳥啼鳴 (林間晨光)</option>
@@ -486,7 +526,7 @@
       <!-- 音效試聽與解鎖音訊 -->
       <div class="flex items-center justify-between ink-b-t pt-2 mt-1">
         <span class="text-[11px] font-bold opacity-80">原生自然合成 (無網絡延遲)</span>
-        <button onclick="testAlarmSound()" id="alarmTestBtn" class="ink-b text-xs px-2.5 py-1 font-black rounded-sm cursor-pointer hover:bg-neutral-100 flex items-center gap-1.5">
+        <button onclick="testAlarmSound()" id="alarmTestBtn" class="ink-b text-xs px-2.5 py-1 font-black rounded-sm cursor-pointer bg-white text-black hover:opacity-80 flex items-center gap-1.5">
           <i class="fa-solid fa-play text-[10px]"></i>
           <span>試聽鈴聲</span>
         </button>
@@ -494,8 +534,8 @@
 
       <!-- 底部按鈕 -->
       <div class="grid grid-cols-2 gap-2 pt-2 ink-b-t mt-1">
-        <button onclick="closeAlarmSettings()" class="ink-b py-1.5 font-black text-xs rounded-sm cursor-pointer hover:bg-neutral-100">取消</button>
-        <button onclick="saveAlarmSettings()" class="ink-b bg-black text-white py-1.5 font-black text-xs rounded-sm cursor-pointer hover:bg-neutral-800">保存設定</button>
+        <button onclick="closeAlarmSettings()" class="ink-b py-1.5 font-black text-xs rounded-sm cursor-pointer bg-white text-black hover:opacity-80">取消</button>
+        <button onclick="saveAlarmSettings()" class="ink-b bg-black text-white py-1.5 font-black text-xs rounded-sm cursor-pointer hover:opacity-80">保存設定</button>
       </div>
     </div>
   </div>
@@ -505,19 +545,19 @@
   <!-- ========================================================= -->
   <div id="alarmRingingModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="alarm-ringing-card ink-b bg-white text-black p-6 rounded-sm max-w-sm w-full text-center shadow-2xl flex flex-col items-center gap-4">
-      <div class="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-2xl animate-bounce">
+      <div class="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-2xl animate-bounce ink-b">
         <i class="fa-solid fa-bell"></i>
       </div>
       <div>
         <h2 class="text-xl font-black">晨曦睇浪時間到了！</h2>
         <p id="alarmRingingTimeText" class="font-mono text-3xl font-black my-2">06:30 AM</p>
-        <p class="text-xs font-bold text-neutral-600">已為你自動播放晨間自然鈴聲</p>
+        <p class="text-xs font-bold opacity-75">已為你自動播放晨間自然鈴聲</p>
       </div>
       <div class="grid grid-cols-2 gap-3 w-full mt-2">
-        <button onclick="snoozeAlarm()" class="ink-b bg-neutral-100 text-black py-3 font-black text-sm rounded-sm cursor-pointer hover:bg-neutral-200">
+        <button onclick="snoozeAlarm()" class="ink-b bg-white text-black py-3 font-black text-sm rounded-sm cursor-pointer hover:opacity-80">
           貪睡 (Snooze)
         </button>
-        <button onclick="dismissAlarm()" class="ink-b bg-black text-white py-3 font-black text-sm rounded-sm cursor-pointer hover:bg-neutral-800">
+        <button onclick="dismissAlarm()" class="ink-b bg-black text-white py-3 font-black text-sm rounded-sm cursor-pointer hover:opacity-80">
           關閉鬧鐘
         </button>
       </div>
@@ -841,21 +881,45 @@
     const pad = (n) => n.toString().padStart(2, '0');
     if (alarmConfig.enabled) {
       textEl.innerText = `${pad(alarmConfig.hour)}:${pad(alarmConfig.minute)} ${alarmConfig.ampm}`;
-      btn.className = "ink-b bg-black text-white px-2 py-0.5 font-black text-xs rounded-sm cursor-pointer flex items-center gap-1.5 shadow-sm";
+      btn.className = "ink-b bg-black text-white px-2.5 py-1 font-black text-xs rounded-sm cursor-pointer flex items-center gap-1.5 shadow-sm";
       iconEl.className = "fa-solid fa-bell";
       btn.title = `鬧鐘已開啟：${textEl.innerText}`;
     } else {
       textEl.innerText = "鬧鐘關閉";
-      btn.className = "ink-b bg-neutral-100 text-black px-2 py-0.5 font-black text-xs rounded-sm cursor-pointer flex items-center gap-1.5 opacity-80 hover:opacity-100";
+      btn.className = "ink-b bg-white text-black px-2.5 py-1 font-black text-xs rounded-sm cursor-pointer flex items-center gap-1.5 hover:opacity-80";
       iconEl.className = "fa-regular fa-bell";
       btn.title = "鬧鐘已關閉，點擊設定";
     }
   }
 
+  // 更新開關 UI（確保墨水屏黑白高反差，杜絕隱形）
+  function updateAlarmToggleUI(enabled) {
+    const toggleBtn = document.getElementById('alarmToggleBtn');
+    const toggleKnob = document.getElementById('alarmToggleKnob');
+    const toggleBadge = document.getElementById('alarmToggleStateBadge');
+    if (!toggleBtn || !toggleKnob || !toggleBadge) return;
+
+    if (enabled) {
+      toggleBtn.className = "alarm-toggle-box toggle-on ink-b w-14 h-7 rounded-full relative p-[2px] cursor-pointer bg-black transition-all flex items-center select-none";
+      toggleKnob.className = "alarm-knob w-5 h-5 rounded-full bg-white block transition-transform duration-200 translate-x-7";
+      toggleBadge.innerText = "ON 開啟";
+      toggleBadge.className = "font-mono font-black text-[11px] px-2 py-0.5 ink-b bg-black text-white rounded-sm select-none";
+    } else {
+      toggleBtn.className = "alarm-toggle-box toggle-off ink-b w-14 h-7 rounded-full relative p-[2px] cursor-pointer bg-white transition-all flex items-center select-none";
+      toggleKnob.className = "alarm-knob w-5 h-5 rounded-full bg-black block transition-transform duration-200 translate-x-0";
+      toggleBadge.innerText = "OFF 關閉";
+      toggleBadge.className = "font-mono font-black text-[11px] px-2 py-0.5 ink-b bg-white text-black rounded-sm select-none";
+    }
+  }
+
+  function toggleAlarmEnabledClick() {
+    alarmConfig.enabled = !alarmConfig.enabled;
+    updateAlarmToggleUI(alarmConfig.enabled);
+  }
+
   function openAlarmSettings() {
     initAudioContext();
     const modal = document.getElementById('alarmModal');
-    const toggle = document.getElementById('alarmEnableToggle');
     const hourSelect = document.getElementById('alarmHourSelect');
     const minSelect = document.getElementById('alarmMinuteSelect');
     const ampmSelect = document.getElementById('alarmAmPmSelect');
@@ -881,7 +945,7 @@
         }
       }
 
-      if (toggle) toggle.checked = !!alarmConfig.enabled;
+      updateAlarmToggleUI(alarmConfig.enabled);
       if (hourSelect) hourSelect.value = alarmConfig.hour;
       if (minSelect) minSelect.value = alarmConfig.minute;
       if (ampmSelect) ampmSelect.value = alarmConfig.ampm;
@@ -899,12 +963,7 @@
     if (modal) modal.classList.add('hidden');
   }
 
-  function toggleAlarmEnabled(enabled) {
-    alarmConfig.enabled = enabled;
-  }
-
   function saveAlarmSettings() {
-    const toggle = document.getElementById('alarmEnableToggle');
     const hourSelect = document.getElementById('alarmHourSelect');
     const minSelect = document.getElementById('alarmMinuteSelect');
     const ampmSelect = document.getElementById('alarmAmPmSelect');
@@ -912,7 +971,6 @@
     const snoozeSelect = document.getElementById('alarmSnoozeSelect');
     const soundSelect = document.getElementById('alarmSoundSelect');
 
-    if (toggle) alarmConfig.enabled = toggle.checked;
     if (hourSelect) alarmConfig.hour = parseInt(hourSelect.value, 10);
     if (minSelect) alarmConfig.minute = parseInt(minSelect.value, 10);
     if (ampmSelect) alarmConfig.ampm = ampmSelect.value;
